@@ -2,10 +2,9 @@
 #####################################################################
 # -*- coding: utf-8 -*-
 #####################################################################
-# Addon : Hora Da Pipoca
-# By AddonBrasil - 11/12/2015
-# Atualizado (1.0.1) - 15/12/2015
-# Atualizado (1.1.0) - 12/03/2016
+# Addon : Filmes e Series Online
+# By AddonReneSilva - 01/10/2016
+# Atualizado (1.0.0) - 01/10/2016
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
