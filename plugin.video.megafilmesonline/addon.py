@@ -27,8 +27,8 @@ def menuPrincipal():
 		addDir('Categorias'                , base                          ,   10, artfolder + 'categorias.png')
 		addDir('Lançamentos'               , base + '/lancamentos/'        ,   20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + '/?s=dublado'          ,   20, artfolder + 'pesquisa.png')
-		addDir('Seriados'	               , base + '/series/'             ,   25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'           , '--'                          ,   30, artfolder + 'pesquisa.png')
+		#addDir('Seriados'	               , base + '/series/'             ,   25, artfolder + 'legendados.png')
+		#addDir('Pesquisa Series'           , '--'                          ,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'           , '--'                          ,   35, artfolder + 'pesquisa.png')
 		addDir('Configurações'             , base                          ,  999, artfolder + 'config.png', 1, False)
 		addDir('Configurações ExtendedInfo', base                          , 1000, artfolder + 'config.png', 1, False)
@@ -39,14 +39,14 @@ def getCategorias(url):
 		link = openURL(url)
 		soup = BeautifulSoup(link)
 		
-		conteudo   = soup("ul", {"id": "menuhd"})
+		conteudo   = soup("div", {"id": "menu-principal"})
 		
 		categorias = conteudo[0]("li")
 				
 		totC = len(categorias)
 		
 		for categoria in categorias:
-				titC = categoria.span.text.encode('utf-8','replace')
+				titC = categoria.a.text.encode('utf-8','replace')
 				
 				if not 'Lançamento' in titC :
 						urlC = categoria.a["href"]
@@ -231,13 +231,14 @@ def doPesquisaSeries():
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 26, img, False, total)
-			
+		
 def doPesquisaFilmes():
 		a = pesquisa()
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 100, img, False, total)
-			
+		setViewFilmes()
+		
 def player(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()

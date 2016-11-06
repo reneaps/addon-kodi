@@ -1,10 +1,9 @@
 ﻿#####################################################################
 # -*- coding: utf-8 -*-
 #####################################################################
-# Addon : Hora Da Pipoca
+# Addon : UltraCine
 # By AddonBrasil - 11/12/2015
-# Atualizado (1.0.1) - 15/12/2015
-# Atualizado (1.1.0) - 12/03/2016
+# Atualizado (1.0.0) - 02/11/2016
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -38,9 +37,7 @@ def menuPrincipal():
 def getCategorias(url):
 		link = openURL(url)
 		soup = BeautifulSoup(link)
-		
 		conteudo   = soup("ul", {"class": "menu-desk"})
-		
 		categorias = conteudo[0]("li")
 				
 		totC = len(categorias)
