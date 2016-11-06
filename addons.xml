@@ -65,12 +65,11 @@
 			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
 		</description>
   </extension>
-</addon>
 <addon id="repository.addonReneSilva" name="AddonReneSilva Repository" version="0.0.1" provider-name="AddonReneSilva">
 	<extension point="xbmc.addon.repository" name="AddonReneSilva Repository">
-		<info compressed="false">https://github.com/reneaps/addon-kodi/raw/master/repository.addon/addon.xml</info>
-		<checksum>https://github.com/reneaps/addon-kodi/raw/master/addons.xml.md5</checksum>
-		<datadir zip="true">https://github.com/reneaps/addon-kodi/tree/master/repo/</datadir>
+		<info compressed="false">https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml</info>
+		<checksum>https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml.md5</checksum>
+		<datadir zip="true">https://github.com/reneaps/addon-kodi/tree/master/repo</datadir>
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<summary>Repositório AddonReneSilva</summary>
