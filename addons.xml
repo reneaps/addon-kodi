@@ -22,7 +22,7 @@
 		</description>
   </extension>
 </addon>
-<addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.0.0" provider-name="AddonRene">
+<addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.0.0" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.urlresolver" version="2.10.8"/>
@@ -78,7 +78,6 @@
 		<platform>all</platform>
 	</extension>
 </addon>
-	<?xml version="0.0.1" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.filmesonlihehd11" name=".FilmesHD11" version="1.0.0" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
