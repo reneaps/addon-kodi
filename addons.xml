@@ -22,6 +22,7 @@
 		</description>
   </extension>
 </addon>
+	
 <addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.0.0" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -44,6 +45,7 @@
 		</description>
   </extension>
 </addon>
+	
 <addon id="plugin.video.megafilmesonlinehd" name="Megafilmesonlinehd" version="1.0.0" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -65,6 +67,7 @@
 			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
 		</description>
   </extension>
+</addon>
 <addon id="repository.addonReneSilva" name="AddonReneSilva Repository" version="0.0.1" provider-name="AddonReneSilva">
 	<extension point="xbmc.addon.repository" name="AddonReneSilva Repository">
 		<info compressed="false">https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml</info>
@@ -78,6 +81,7 @@
 		<platform>all</platform>
 	</extension>
 </addon>
+	
 <addon id="plugin.video.filmesonlihehd11" name=".FilmesHD11" version="1.0.0" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
