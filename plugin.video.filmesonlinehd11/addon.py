@@ -13,7 +13,7 @@ import urlresolver
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-addon_id  = 'plugin.video.filmesonlihehd11'
+addon_id  = 'plugin.video.filmesonlinehd11'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
 addonfolder = selfAddon.getAddonInfo('path')
