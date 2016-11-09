@@ -343,7 +343,6 @@ def player(name,url,iconimage):
 		listitem.setProperty('IsPlayable', 'true')
 		playlist.add(url2Play,listitem)
 
-		#xbmcPlayer = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 		xbmcPlayer = xbmc.Player()
 		xbmcPlayer.play(playlist)
 		
