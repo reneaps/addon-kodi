@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #####################################################################
 # Addon : UltraCine
-# By AddonBrasil - 11/12/2015
+# By AddonRFeneSilva - 02/11/2016
 # Atualizado (1.0.0) - 02/11/2016
 #####################################################################
 
@@ -37,14 +37,16 @@ def menuPrincipal():
 def getCategorias(url):
 		link = openURL(url)
 		soup = BeautifulSoup(link)
-		conteudo   = soup("ul", {"class": "menu-desk"})
-		categorias = conteudo[0]("li")
+		#conteudo   = soup("ul", {"class": "menu-desk"})
+		#categorias = conteudo[0]("li")
 				
-		totC = len(categorias)
-		
+		#totC = len(categorias)
+		conteudo   = soup("div", {"class": "box-links left"})	
+		categorias = conteudo[0]('ul')
+		categorias = categorias[0]('li')
+		totC = len(categorias)		
 		for categoria in categorias:
 				titC = categoria.text.encode('utf-8','replace')
-				
 				if not 'Lançamento' in titC :
 						urlC = categoria.a["href"]
 						imgC = artfolder + limpa(titC) + '.png'
@@ -323,7 +325,7 @@ def player(name,url,iconimage):
 def player_series(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
-		mensagemprogresso.create('FilmesESeriesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+		mensagemprogresso.create('UltraCine', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
 		mensagemprogresso.update(0)
 		
 		titsT = []
@@ -432,7 +434,7 @@ def player_series(name,url,iconimage):
 			else:
 				xbmcPlayer.setSubtitles(legendas)
 		
-		#return true
+		return true
 	
 ############################################################################################################
 		
@@ -476,7 +478,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 		
 		liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
 		
-		liz.setProperty('fanart_image', fanart)
+		liz.setProperty('fanart_image', iconimage)
 		liz.setInfo(type="Video", infoLabels={"Title": name})
 		
 		cmItems = []
@@ -510,7 +512,7 @@ def playTrailer(name, url,iconimage):
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s")' % ytID)
 	
 def setViewMenu() :
-		xbmcplugin.setContent(int(sys.argv[1]), 'episodies')
+		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 		
 		opcao = selfAddon.getSetting('menuVisu')
 		

@@ -88,7 +88,7 @@ def getSeries(url):
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "galeria-videos"})
 		filmes   = conteudo[0]("div", {"class": "box-video"})
-		#print filmes
+
 		totF = len(filmes)
 
 		for filme in filmes:
@@ -558,7 +558,7 @@ def playTrailer(name, url,iconimage):
 		xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
 	
 def setViewMenu() :
-		xbmcplugin.setContent(int(sys.argv[1]), 'episodies')
+		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 		
 		opcao = selfAddon.getSetting('menuVisu')
 		

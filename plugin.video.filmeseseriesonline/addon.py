@@ -18,7 +18,6 @@ socket.setdefaulttimeout(60)
 
 addon_id  = 'plugin.video.filmeseseriesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
-
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
 fanart      = addonfolder + '/fanart.png'
@@ -36,7 +35,7 @@ def menuPrincipal():
 		addDir('Configurações'             , base                           ,  999, artfolder + 'config.png', 1, False)
 		addDir('Configurações ExtendedInfo', base                           , 1000, artfolder + 'config.png', 1, False)
 			
-		setViewMenu()		
+		#setViewMenu()		
 		
 def getCategorias(url):
 		link = openURL(url)
@@ -56,7 +55,7 @@ def getCategorias(url):
 						imgC = artfolder + limpa(titC) + '.png'
 						addDir(titC,urlC,20,imgC)
 			
-		setViewMenu()		
+		#setViewMenu()		
 		
 def getFilmes(url):
 		link  = openURL(url)
@@ -81,7 +80,7 @@ def getFilmes(url):
 		except : 
 				pass
 				
-		setViewFilmes()
+		#setViewFilmes()
 				
 def getSeries(url):
 		link  = openURL(url)
@@ -106,7 +105,7 @@ def getSeries(url):
 		except : 
 				pass
 				
-		setViewFilmes()
+		#setViewFilmes()
 		
 def getTemporadas(url):
 		link  = openURL(url)
@@ -344,7 +343,8 @@ def player(name,url,iconimage):
 		listitem.setProperty('IsPlayable', 'true')
 		playlist.add(url2Play,listitem)
 
-		xbmcPlayer = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
+		#xbmcPlayer = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
+		xbmcPlayer = xbmc.Player()
 		xbmcPlayer.play(playlist)
 		
 		mensagemprogresso.update(100)

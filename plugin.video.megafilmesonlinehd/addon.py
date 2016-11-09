@@ -88,12 +88,7 @@ def getSeries(url):
 		conteudo = soup("div", {"class": "galeria"})
 		filmes   = conteudo[0]("div", {"class": "center"})
 		totF = len(filmes)
-								
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(url)
-		xbmcgui.Dialog().ok(addonname, line1)	
-	
+
 		for filme in filmes:
 				titF = filme.a["title"].encode('utf-8')
 				urlF = filme.a["href"].encode('utf-8')
@@ -310,10 +305,7 @@ def player(name,url,iconimage):
 				url2Play = str(url2Play[0])				
 	
 				OK = False
-
-		line1 = str(urlVideo)
-		#xbmcgui.Dialog().ok(addonname, line1)		
-							
+					
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		if not url2Play : return
@@ -549,7 +541,7 @@ def playTrailer(name, url,iconimage):
 		xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
 	
 def setViewMenu() :
-		xbmcplugin.setContent(int(sys.argv[1]), 'episodies')
+		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 		
 		opcao = selfAddon.getSetting('menuVisu')
 		
