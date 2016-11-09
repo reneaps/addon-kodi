@@ -39,34 +39,27 @@ def getCategorias(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')	
 		soup = BeautifulSoup(link)
-
 		conteudo   = soup("div", {"id": "wrap"})
 		categorias = conteudo[0]("li", {"class": "item_normal"})
-
 		totC = len(categorias)
-		print totC
 		for categoria in categorias:
 				titC = categoria.h5.text.encode('utf-8')
 				titC = titC.replace('&ccedil;','c').replace('&atilde;','a').replace('&eacute;','e')
-				titC = titC.replace('&ecirc;','i').replace('&aacute;','a').replace('&eacute;','e')	 
+				titC = titC.replace('&ecirc;','i').replace('&aacute;','a').replace('&eacute;','e')
 				if not 'Lançamento' in titC :
 								urlC = categoria.a["href"]
 								imgC = artfolder + limpa(titC) + '.png'
-		
 								addDir(titC,urlC,20,imgC)
 			
-		setViewMenu()		
+		setViewMenu()
 		
 def getFilmes(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
-
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"id": "wrap"})
 		filmes   = conteudo[0]("div", {"class": "box-filme"})
-
 		totF = len(filmes)
-
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8','replace')
 				titF = titF.replace('Assistir ','').replace('Filme ','')
@@ -75,7 +68,6 @@ def getFilmes(url):
 				imgF = imgF.split('?src=')[1]
 				imgF = imgF.split('&')[0]
 				addDirF(titF, urlF, 100, imgF, False, totF)
-				
 		try : 
 				proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
 				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
@@ -83,17 +75,15 @@ def getFilmes(url):
 				pass
 				
 		setViewFilmes()
-				
+#				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
+							
 def getSeries(url):
 		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')		
-		
+		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"id": "wrap"})
 		filmes   = conteudo[0]("div", {"class": "box-filme"})
-
 		totF = len(filmes)
-
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8','replace')
 				titF = titF.replace('Assistir ','').replace('Filme ','')
@@ -102,19 +92,16 @@ def getSeries(url):
 				imgF = imgF.split('?src=')[1]
 				imgF = imgF.split('&')[0]
 				addDir(titF, urlF, 26, imgF)
-				
 		try : 
 				proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
 				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
 		except : 
 				pass
-				
 		setViewFilmes()
 		
-def getTemporadas(url):
+def getTemporadas(url):	
 		link  = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')		
-				
+		link = unicode(link, 'utf-8', 'ignore')						
 		soup = BeautifulSoup(link)
 		conteudo = soup.find("ul", {"class": "itens"}) 
 		temporadas = conteudo("li")
@@ -124,7 +111,6 @@ def getTemporadas(url):
 		imgF = imgF.split('?src=')[1]
 		imgF = imgF.split('&')[0]
 		urlF = url
-
 		i = 1
 		while i <= totF:
 			titF = str(i) + "ª Temporada"
@@ -249,7 +235,6 @@ def player(name,url,iconimage):
 		
 		titsT = []
 		idsT = []
-		
 		matriz = []
 
 		link = openURL(url)
@@ -481,7 +466,7 @@ def openConfigEI():
 
 def openURL(url):
 		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64; Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
@@ -543,7 +528,7 @@ def playTrailer(name, url,iconimage):
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s")' % ytID)
 	
 def setViewMenu() :
-		xbmcplugin.setContent(int(sys.argv[1]), 'episodies')
+		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 		
 		opcao = selfAddon.getSetting('menuVisu')
 		
