@@ -52,18 +52,16 @@ def getCategorias(url):
 		
 def getFilmes(url):
 		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')
+		#link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"id": "wrap"})
-		filmes   = conteudo[0]("div", {"class": "box-filme"})
+		conteudo = soup("ul", { "class" : "lista-filmes" })
+		filmes   = conteudo[0]("li")
 		totF = len(filmes)
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8','replace')
 				titF = titF.replace('Assistir ','').replace('Filme ','')
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
-				imgF = imgF.split('?src=')[1]
-				imgF = imgF.split('&')[0]
 				addDirF(titF, urlF, 100, imgF, False, totF)
 		try : 
 				proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
@@ -227,7 +225,7 @@ def doPesquisaFilmes():
 def player(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
-		mensagemprogresso.create('AssistirFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+		mensagemprogresso.create('TelonaFilmesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
 		mensagemprogresso.update(0)
 		
 		titsT = []
@@ -237,11 +235,11 @@ def player(name,url,iconimage):
 		link = openURL(url)
 		soup  = BeautifulSoup(link)
 			
-		conteudo = soup("div", {"id": "assistindo"})
-		opcoes  = conteudo[0]("div", {"class": "opcoes"})
-		srvsdub = opcoes[0]('a')
+		conteudo = soup("ul", { "class" : "links-servidores" })
+		srvsdub  = conteudo[0]("li")
 		totD = len(srvsdub)
 		titsT = []
+		i = 0
 		for i in range(totD) :
 						titS = srvsdub[i].text
 						titsT.append(titS)
@@ -254,17 +252,13 @@ def player(name,url,iconimage):
 		if index == -1 : return
 		
 		i = int(index)
-
-		links  = opcoes[0]('a')
 		
-		if len(links) == 0 : links = conteudo[0]("a")
-		
-		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
+		conteudo = soup("div", { "class" : "embeds-servidores" })
+		links = conteudo[0]("iframe")
 
-		link = openURL(urlVideo)
-		soup  = BeautifulSoup(link)
-		conteudo = soup("iframe")
-		urlVideo = str(conteudo[1]['src'])
+		if len(links) == 0 : links = conteudo[0]("iframe")
+		
+		urlVideo = "http:" + links[i]['src']
 	
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -286,7 +280,7 @@ def player(name,url,iconimage):
 				
 		elif 'openload' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://openload.co/embed/%s' % okID			
+				urlVideo = 'https://openload.co/embed/%s' % okID
 				
 		elif 'thevid.net' in urlVideo :
 				linkTV  = openURL(urlVideo)		
@@ -297,9 +291,26 @@ def player(name,url,iconimage):
 				url2Play = str(url2Play[0])				
 	
 				OK = False
-						
-		if OK : url2Play = urlresolver.resolve(urlVideo)
+				
+		soup = BeautifulSoup(openURL(urlVideo))
+		conteudo = soup("body")
+		link = conteudo[0]("script")
+		urlVideo = re.findall(r'src="(.*?)"', str(link))[0]
 
+		link = openURL(urlVideo)
+		pattern = '"file"\s*:\s*[\'|\"](.+?)[\'|\"]'
+		urlVideo = re.findall(pattern, str(link))[0]
+
+		
+		if 'userscloud.com' in urlVideo :
+				nowID = urlVideo.split("embed-")[1]
+				urlVideo = 'https://userscloud.com/%s' % nowID
+		elif 'tusfiles.net' in urlVideo :
+				nowID = urlVideo.split("embed-")[1]
+				urlVideo = 'https://tusfiles.net/%s' % nowID
+				
+		if OK : url2Play = urlresolver.resolve(urlVideo)
+		
 		if not url2Play : return
 		
 		legendas = '-'
@@ -338,7 +349,7 @@ def player(name,url,iconimage):
 def player_series(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
-		mensagemprogresso.create('AssistirFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+		mensagemprogresso.create('TelonaFilmesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
 		mensagemprogresso.update(0)
 		
 		titsT = []
