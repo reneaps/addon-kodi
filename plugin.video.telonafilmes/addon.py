@@ -24,8 +24,8 @@ base        = base64.b64decode('aHR0cDovL3RlbG9uYWZpbG1lc29ubGluZS5uZXQ=')
 
 def menuPrincipal():
 		addDir('Categorias'                , base 							,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/lancamentos/' 	,	20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'           , base + '/search.php?s=dublado&tipo=video' 	,	20, artfolder + 'pesquisa.png')
+		addDir('Lançamentos'               , base + '/lancamentos/' 		,	20, artfolder + 'lancamentos.png')
+		addDir('Filmes Dublados'           , base + '/search/dublado/'	 	,	20, artfolder + 'pesquisa.png')
 		addDir('Series'		               , base + '/categoria/series/'	,   25, artfolder + 'legendados.png')
 		addDir('Pesquisa Series'           , '--'                           ,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'           , '--'                           ,   35, artfolder + 'pesquisa.png')
@@ -52,7 +52,7 @@ def getCategorias(url):
 		
 def getFilmes(url):
 		link = openURL(url)
-		#link = unicode(link, 'utf-8', 'ignore')
+		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
 		conteudo = soup("ul", { "class" : "lista-filmes" })
 		filmes   = conteudo[0]("li")
@@ -64,7 +64,7 @@ def getFilmes(url):
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
 				addDirF(titF, urlF, 100, imgF, False, totF)
 		try : 
-				proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
+				proxima = re.findall('<a class="next page-numbers" href="(.*?)">.*?</a>', link)[0]
 				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
 		except : 
 				pass
@@ -184,25 +184,22 @@ def pesquisa():
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				url      = base + '/search.php?s=%s&tipo=video' % str(pesquisa)
+				url      = base + '/?s=%s&tipo=video' % str(pesquisa)
 
-				link  = openURL(url)
-				link = unicode(link, 'utf-8', 'ignore')		
-		
+				link = openURL(url)
+				#link = unicode(link, 'utf-8', 'ignore')
 				soup     = BeautifulSoup(link)
-				conteudo = soup("div", {"id": "wrap"})
-				filmes   = conteudo[0]("div", {"class": "box-filme"})
+				conteudo = soup("ul", { "class" : "lista-filmes" })
+				filmes   = conteudo[0]("li")
 				totF = len(filmes)
 				hosts = []
 				for filme in filmes:
-					titF = filme.img["alt"].encode('utf-8','replace')
-					titF = titF.replace('Assistir ','').replace('Filme ','')
-					urlF = filme.a["href"].encode('utf-8', 'ignore')
-					imgF = filme.img["src"].encode('utf-8', 'ignore')
-					imgF = imgF.split('?src=')[1]
-					imgF = imgF.split('&')[0]
-					temp = [urlF, titF, imgF]
-					hosts.append(temp)
+						titF = filme.img["alt"].encode('utf-8','replace')
+						titF = titF.replace('Assistir ','').replace('Filme ','')
+						urlF = filme.a["href"].encode('utf-8', 'ignore')
+						imgF = filme.img["src"].encode('utf-8', 'ignore')
+						temp = [urlF, titF, imgF]
+						hosts.append(temp)
 					
 				a = []
 				for url, titulo, img in hosts:
@@ -221,7 +218,8 @@ def doPesquisaFilmes():
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 100, img, False, total)
-			
+		setViewFilmes()
+		
 def player(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
