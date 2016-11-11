@@ -55,23 +55,20 @@ def getCategorias(url):
 		setViewMenu()		
 		
 def getFilmes(url):
-		link	= openURL(url)
-		link	= unicode(link, 'utf-8', 'ignore')
-		soup	= BeautifulSoup(link)
-		conteudo = soup.findAll("div", {"class": "peliculas"})
-		if not conteudo:
-				conteudo = soup.findAll("div", {"class": "filmes"})
-				filmes   = conteudo[1]("film", {"class": "item"})
-		else:
-				filmes   = conteudo[0]("div", {"class": "item"})
+		link  = openURL(url)
+		link = unicode(link, 'utf-8', 'ignore')
+		soup     = BeautifulSoup(link)
+		conteudo = soup("div", {"class": "peliculas"})
+		filmes   = conteudo[0]("div", {"class": "item"})
 		totF = len(filmes)
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
 				urlF = filme.a["href"].encode('utf-8')
 				imgF = filme.img["src"].encode('utf-8')
 				addDirF(titF, urlF, 100, imgF, False, totF)
+
 		try :
-				proxima = re.findall('<a class="nextpostslink" rel="next" href="(.*?)"', link)[0]
+				proxima = re.findall('<a class="nextpostslink" href="(.*?)">.*?<\a>', link)[0]				
 				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
 		except : 
 				pass
@@ -79,86 +76,83 @@ def getFilmes(url):
 		setViewFilmes()
 				
 def getSeries(url):
-		link	= openURL(url)
-		link	= unicode(link, 'utf-8', 'ignore')
-		soup	= BeautifulSoup(link)
-		conteudo = soup.findAll("div", {"class": "peliculas"})
-		if not conteudo:
-				conteudo = soup.findAll("div", {"class": "filmes"})
-				filmes   = conteudo[1]("film", {"class": "item"})
-		else:
-				filmes   = conteudo[0]("div", {"class": "item"})
+		link  = openURL(url)
+		link = unicode(link, 'utf-8', 'ignore')		
+		
+		soup     = BeautifulSoup(link)
+		conteudo = soup("div", {"class": "galeria-videos"})
+		filmes   = conteudo[0]("div", {"class": "box-video"})
+
 		totF = len(filmes)
+
 		for filme in filmes:
-				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
+				titF = filme.a["title"].encode('utf-8').replace('Assistir ', '')
 				urlF = filme.a["href"].encode('utf-8')
 				imgF = filme.img["src"].encode('utf-8')
 				addDir(titF, urlF, 26, imgF)
-		try :
-				proxima = re.findall('<a class="nextpostslink" rel="next" href="(.*?)"', link)[0]
-				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
+				
+		try : 
+				proxima = re.findall('<a class="next page-numbers" href="(.*?)"', link)[0]
+				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
 				
 		setViewFilmes()
 
-def getTemporadas(name,url,iconimage):
-		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')	
-		soup = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "cuerpo"})
-		srvsdub  = conteudo[0]("iframe")
-		url = srvsdub[0]['src']
-		print url
-		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')	
-		soup = BeautifulSoup(link)
-
-		conteudo = soup("div", {"class": "embed"})
-		srvsdub  = conteudo[0]("button")
-		servers = re.findall("addiframe\('(.*?)'\);", link)
-		print servers
-		totD = len(srvsdub)
-		print totD
-		for i in range(totD) :
-				titF = str(i+1) + "a Temporada"
-				urlF = servers[i]
-				addDir(titF, urlF, 28, iconimage)
-
-def getServidores(name,url,iconimage):
-		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')	
-		soup = BeautifulSoup(link)
-
-		conteudo = soup("div", {"class": "embed"})
-		srvsdub  = conteudo[0]("button")
-		servers = re.findall("addiframe\('(.*?)'\);", link)
-		print servers
-		totD = len(srvsdub)
-		print totD
-		for i in range(totD) :
-				titF = srvsdub[i].text.encode('utf-8')
-				titF = titF.replace('Assistir ', '')
-				urlF = servers[i]
-				addDir(titF, urlF, 27, iconimage)
-						
-def getEpisodios(name,url,iconimage):
-		link = openURL(url)
+def getTemporadas(url):
+		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		
 		soup = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "embed"})
-		srvsdub  = conteudo[0]("button")
-		servers = re.findall("addiframe\('(.*?)'\);", link)
-		print servers
-		totD = len(srvsdub)
-		print totD
-		print "Lista Episodios"
-		for i in range(totD) :
-				titF = srvsdub[i].text.encode('utf-8')
-				titF = name[:5] + " " + titF.replace('Assistir ', '')
-				urlF = servers[i]
-				addDir(titF, urlF, 110, iconimage, False, totD)
+		conteudo = soup.find("div", {"class": "lista-temp"})
+		temporadas = conteudo("li")
+		totF = len(temporadas)
+		img = soup.find("div", {"class": "thumb"})
+		imgF = img.img['src']
+		urlF = url
+		i = 1
+		while i <= totF:
+			titF = str(i) + "ª Temporada"
+			try:
+				addDir(titF, urlF, 27, iconimage)
+			except:
+				pass
+			i = i + 1
+			
+def getEpisodios(name, url):
+		n = name.replace('ª Temporada', '')	
+		n = int(n)
+		temp = []
+		episodios = []
+	
+		link  = openURL(url)
+		link = unicode(link, 'utf-8', 'ignore')		
+		
+		soup = BeautifulSoup(link)
+		conteudo = soup('div',{'class':'lista-temp'})
+
+		img = soup.find("div", {"class": "thumb"})
+		imgF = img.img['src']
+
+		try:
+			arquivo = conteudo[0]('div', {'class': 'content-menu-abas box-delay servers item'+str(n)+' atual esconder'})
+			episodio = arquivo[0]('div', {'class': 'episodios'})
+			lista = episodio[0]('div', {'class': 'lista-episodios'})
+			dublados = lista[0]('p', {'class': 'nomeep'})
+			for link in dublados:
+				url = link.a['href'].encode('utf-8')
+				if (url.find('legendado')) == -1 :
+						titulo =  link.a.text.encode('utf-8') + " Dublado"
+				else:
+						titulo = link.a.text.encode('utf-8') + " Legendado"
+				tempor = (titulo,url)
+				episodios.append(tempor)
+		except:
+				pass
+		total = len(episodios)
+
+		for titulo, url in episodios:
+				addDir(titulo, url, 110, imgF, False, total)
 
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -241,13 +235,19 @@ def player(name,url,iconimage):
 		
 		i = index
 		
-		urlVideo = re.findall("addiframe\('(.*?)'\);", link)[i]
+		conteudo = soup("div", {"class": "player-video"})
+		links = conteudo[i]("iframe")
 		
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(urlVideo)
-		#xbmcgui.Dialog().ok(addonname, line1)
+		if len(links) == 0 : links = conteudo[0]("a")
+		
+		urlVideo = re.findall(r'src=[\'"]?([^\'" >]+)', str(links))[0]
 		print urlVideo
+		link = openURL(urlVideo)
+		soup  = BeautifulSoup(link)
+		conteudo = soup("iframe")
+		urlVideo = str(conteudo[0]['src'])
+		#okID = urlVideo.split('embed/?v=')[1]
+		#urlVideo = okID
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -316,15 +316,56 @@ def player(name,url,iconimage):
 					xbmcPlayer.setSubtitles(sfile)
 			else:
 				xbmcPlayer.setSubtitles(legendas)
-
+	
+				
 def player_series(name,url,iconimage):
-		OK = False
+		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
 		mensagemprogresso.create('FilmesOnlineHD11', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
 		mensagemprogresso.update(0)
 		
-		urlVideo = url
+		titsT = []
+		idsT = []
+		links = []
+		hosts = []
+		matriz = []
+
+		link = openURL(url)
+		soup  = BeautifulSoup(link)
 		
+		conteudo = soup("div", {"class": "container"})
+		article = conteudo[3]("article",{'class':"pgn-filme box-padrao"})
+		srvsdub  = article[0]("div",{"class":"lista-servers servers-filme"})
+		srvsdub = srvsdub[0]("a")
+
+		totD = len(srvsdub)
+
+		for i in range(totD) :
+				srv =  srvsdub[i].text
+				titsT.append(srv)
+		
+		if not titsT : return
+		
+		index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
+			
+		if index == -1 : return
+		
+		i = index
+
+		conteudo = soup("div", {"class": "player-video"})
+		links = conteudo[i]("iframe")
+		
+		if len(links) == 0 : links = conteudo[0]("a")
+		
+		urlVideo = re.findall(r'src=[\'"]?([^\'" >]+)', str(links))[0]
+		print urlVideo
+		link = openURL(urlVideo)
+		soup  = BeautifulSoup(link)
+		conteudo = soup("iframe")
+		urlVideo = str(conteudo[0]['src'])
+		#okID = urlVideo.split('embed/?v=')[1]
+		#urlVideo = okID
+
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
 		if 'nowvideo.php' in urlVideo :
@@ -343,12 +384,6 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('embed')[1]
 				urlVideo = 'https://ok.ru/videoembed%s' % fxID
 				
-		elif 'openload' in urlVideo :
-				okID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://openload.co/embed/%s' % okID
-				
-				OK = True
-				
 		elif 'thevid.net' in urlVideo :
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
@@ -358,11 +393,11 @@ def player_series(name,url,iconimage):
 				url2Play = str(url2Play[0])				
 
 				OK = False
-						
+		
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		if not url2Play : return
-		
+
 		legendas = '-'
 		
 		mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
@@ -393,9 +428,9 @@ def player_series(name,url,iconimage):
 					xmltosrt.main(sfile_xml)
 					xbmcPlayer.setSubtitles(sfile)
 			else:
-					xbmcPlayer.setSubtitles(legendas)
-
-		return a
+				xbmcPlayer.setSubtitles(legendas)
+		
+		#return true
 	
 ############################################################################################################
 		
@@ -455,10 +490,8 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 
 def getInfo(url)	:
 		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')		
-		titO = re.findall('<h2>(.*?)</h2>', link)[0]
-		titO = titO.replace(' - HD 720 Dublado','').replace(' - HD 720 Legendado','')
-		
+		titO = re.findall('<h2 class="titulo-filme"><b>(.*?)</b></h2>', link)[0]
+
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
@@ -552,9 +585,8 @@ if   mode == None : menuPrincipal()
 elif mode == 10   : getCategorias(url)
 elif mode == 20   : getFilmes(url)
 elif mode == 25   : getSeries(url)
-elif mode == 26   : getTemporadas(name,url,iconimage)
-elif mode == 27   : getEpisodios(name,url,iconimage)
-elif mode == 28   : getServidores(name,url,iconimage)
+elif mode == 26   : getTemporadas(url)
+elif mode == 27   : getEpisodios(name,url)
 elif mode == 30   : doPesquisaSeries()
 elif mode == 35   : doPesquisaFilmes()
 elif mode == 40   : getFavoritos()
