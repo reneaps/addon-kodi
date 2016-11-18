@@ -68,7 +68,7 @@ def getFilmes(url):
 				addDirF(titF, urlF, 100, imgF, False, totF)
 
 		try :
-				proxima = re.findall('<a class="nextpostslink" href="(.*?)">.*?<\a>', link)[0]				
+				proxima = re.findall('<a class="nextpostslink" rel="next" href="(.*?)">.*?</a>', link)[0]				
 				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
 		except : 
 				pass
@@ -157,7 +157,8 @@ def getEpisodios(name, url):
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
-
+		a = []
+		
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
@@ -183,15 +184,18 @@ def pesquisa():
 					a.append(temp);
 					
 				return a
+		return
 
 def doPesquisaSeries():
 		a = pesquisa()
+		if not a: return
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 26, img, False, total)
 			
 def doPesquisaFilmes():
 		a = pesquisa()
+		if not a: return
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 100, img, False, total)
@@ -225,6 +229,7 @@ def player(name,url,iconimage):
 		print totD
 		for i in range(totD) :
 				srv = srvsdub[i].text.replace('Assistir por ','')
+				srv = srv.replace('Assistir Por ', '')
 				titsT.append(srv)
 				
 		if not titsT : return
@@ -235,20 +240,12 @@ def player(name,url,iconimage):
 		
 		i = index
 		
-		conteudo = soup("div", {"class": "player-video"})
-		links = conteudo[i]("iframe")
-		
-		if len(links) == 0 : links = conteudo[0]("a")
-		
-		urlVideo = re.findall(r'src=[\'"]?([^\'" >]+)', str(links))[0]
-		print urlVideo
-		link = openURL(urlVideo)
-		soup  = BeautifulSoup(link)
-		conteudo = soup("iframe")
-		urlVideo = str(conteudo[0]['src'])
-		#okID = urlVideo.split('embed/?v=')[1]
-		#urlVideo = okID
+		servers = re.findall("addiframe\('(.*?)'\);", link)
+		print servers
 
+		urlVideo = servers[i]
+		print urlVideo
+		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
 		if 'nowvideo.php' in urlVideo :
@@ -284,6 +281,11 @@ def player(name,url,iconimage):
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		if not url2Play : return
+		
+		addon = xbmcaddon.Addon()
+		addonname = addon.getAddonInfo('name')
+		line1 = str(url2Play)
+		#xbmcgui.Dialog().ok(addonname, line1)	
 		
 		legendas = '-'
 	

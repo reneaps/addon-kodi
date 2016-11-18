@@ -180,6 +180,7 @@ def getEpisodios(name, url):
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
+		a = []
 
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
@@ -200,21 +201,25 @@ def pesquisa():
 						imgF = filme.img["src"].encode('utf-8', 'ignore')
 						temp = [urlF, titF, imgF]
 						hosts.append(temp)
-					
+
 				a = []
 				for url, titulo, img in hosts:
 					temp = [url, titulo, img]
 					a.append(temp);
 				return a
+		return
 
 def doPesquisaSeries():
 		a = pesquisa()
+		if not a: return
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 26, img, False, total)
-			
+		setViewFilmes()
+		
 def doPesquisaFilmes():
 		a = pesquisa()
+		if not a: return
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 100, img, False, total)
@@ -299,18 +304,48 @@ def player(name,url,iconimage):
 		pattern = '"file"\s*:\s*[\'|\"](.+?)[\'|\"]'
 		urlVideo = re.findall(pattern, str(link))[0]
 
+		addon = xbmcaddon.Addon()
+		addonname = addon.getAddonInfo('name')
+		line1 = str(urlVideo)
+		#xbmcgui.Dialog().ok(addonname, line1)		
 		
 		if 'userscloud.com' in urlVideo :
 				nowID = urlVideo.split("embed-")[1]
+				nowID = nowID.replace('.mp4', '')
 				urlVideo = 'https://userscloud.com/%s' % nowID
+
 		elif 'tusfiles.net' in urlVideo :
 				nowID = urlVideo.split("embed-")[1]
 				urlVideo = 'https://tusfiles.net/%s' % nowID
+
 				
+		elif 'filehoot.com' in urlVideo :
+				nowID = urlVideo.split("embed-")[1]
+				url2Play = 'https://filehoot.com/vidembed-%s' % nowID
+				OK = False
+
+		addon = xbmcaddon.Addon()
+		addonname = addon.getAddonInfo('name')
+		line1 = str(urlVideo)
+		#xbmcgui.Dialog().ok(addonname, line1)		
+						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
-		
+					
 		if not url2Play : return
-		
+				
+		if 'usercdn.com' in url2Play :
+				nowID = url2Play.split("|")[0]
+				url2Play = nowID
+				
+		elif 'tusfiles.net' in urlVideo :
+				nowID = url2Play.split("|")[0]
+				url2Play = nowID
+				
+		addon = xbmcaddon.Addon()
+		addonname = addon.getAddonInfo('name')
+		line1 = str(url2Play)
+		#xbmcgui.Dialog().ok(addonname, line1)		
+
 		legendas = '-'
 	
 		mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')

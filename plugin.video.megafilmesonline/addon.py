@@ -335,7 +335,7 @@ def player(name,url,iconimage):
 		listitem.setProperty('IsPlayable', 'true')
 		playlist.add(url2Play,listitem)
 
-		xbmcPlayer = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
+		xbmcPlayer = xbmc.Player()
 		xbmcPlayer.play(playlist)
 		
 		mensagemprogresso.update(100)
@@ -467,7 +467,7 @@ def player_series(name,url,iconimage):
 		listitem.setProperty('IsPlayable', 'true')
 		playlist.add(url2Play,listitem)
 
-		xbmcPlayer = xbmc.Player()
+		xbmcPlayer = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 		xbmcPlayer.play(playlist)
 
 		mensagemprogresso.update(100)
