@@ -1,9 +1,10 @@
 ﻿#####################################################################
 # -*- coding: utf-8 -*-
 #####################################################################
-# Addon : FilmesOnLineHD1
-# By AddonReneSilva - 02/11/2016
-# Atualizado (1.0.1) - 02/11/2016
+# Addon : Hora Da Pipoca
+# By AddonBrasil - 11/12/2015
+# Atualizado (1.0.1) - 15/12/2015
+# Atualizado (1.1.0) - 12/03/2016
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -117,11 +118,12 @@ def getTemporadas(url):
 		link = openURL(urlF)
 		link = unicode(link, 'utf-8', 'ignore')	
 		soup = BeautifulSoup(link)
-		conteudo = soup.findAll("button", {"id": "Servidores"})
+		conteudo = soup("div", {"class": "embed"})
 		if not conteudo:
-			conteudo = soup.findAll("a", {"class": "video"})
-			srvsdub  = conteudo
-		else: srvsdub  = conteudo
+			conteudo = soup("div", {"class": "content"})
+			srvsdub  = conteudo[0]("video")
+		else:
+			srvsdub  = conteudo[0]("button")
 
 		servers = re.findall("addiframe\('(.*?)'\);", link)
 		totF = len(srvsdub)
@@ -142,11 +144,12 @@ def getServidores(name, url, iconimage):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')	
 		soup     = BeautifulSoup(link)		
-		conteudo = soup.findAll("button", {"id": "Servidores"})
+		conteudo = soup("div", {"class": "embed"})
 		if not conteudo:
-			conteudo = soup.findAll("a", {"class": "video"})
-			srvsdub  = conteudo
-		else: srvsdub  = conteudo
+			conteudo = soup("div", {"class": "content"})
+			srvsdub  = conteudo[0]("video")
+		else:
+			srvsdub  = conteudo[0]("button")
 		servers = re.findall("addiframe\('(.*?)'\);", link)
 		print servers
 		totD = len(srvsdub)
@@ -157,7 +160,7 @@ def getServidores(name, url, iconimage):
 				titF = titF.replace('Assistir ', '')
 				urlF = servers[i]
 				if "Epis" in titF:
-					addDir(titF, urlF, 110, imgF, False, totD)
+					addDir(titF, urlF, 28, imgF, False, totD)
 				else:
 					addDir(titF, urlF, 27, imgF)
 					
@@ -169,11 +172,12 @@ def getEpisodios(name, url, iconimage):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')	
 		soup     = BeautifulSoup(link)		
-		conteudo = soup.findAll("button", {"id": "Servidores"})
+		conteudo = soup("div", {"class": "embed"})
 		if not conteudo:
-			conteudo = soup.findAll("a", {"class": "video"})
-			srvsdub  = conteudo
-		else: srvsdub  = conteudo
+			conteudo = soup("div", {"class": "content"})
+			srvsdub  = conteudo[0]("video")
+		else:
+			srvsdub  = conteudo[0]("button")
 		
 		servers = re.findall("addiframe\('(.*?)'\);", link)
 		
@@ -275,7 +279,7 @@ def player(name,url,iconimage):
 		totD = len(srvsdub)
 		print totD
 		for i in range(totD) :
-				srv = srvsdub[i].text.encode('utf-8').replace('Assistir por ','')
+				srv = srvsdub[i].text.replace('Assistir por ','')
 				srv = srv.replace('Assistir Por ', '')
 				titsT.append(srv)
 				
@@ -513,21 +517,19 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 
 def getInfo(url)	:
 		link = openURL(url)
-		titO = re.findall('<h1>(.*?)</h1>', link)[2]
-		titO = titO.split('&#8211')[0]
+		titO = re.findall('<h2 class="titulo-filme"><b>(.*?)</b></h2>', link)[0]
 
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
 		link = openURL(url)
-		ytID = re.findall('<iframe width="560" height="315" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen>', link)[0]
+		ytID = re.findall('<iframe src="http://www.youtube.com/embed/(.*?)" frameborder="0" width="100%" height="100%" scrolling="no" allowfullscreen="true"></iframe>', link)[0]
 
 		if not ytID : 
 			addon = xbmcaddon.Addon()
 			addonname = addon.getAddonInfo('name')
 			line1 = str("Trailer não disponível!")
-			line2 = str(ytID)
-			xbmcgui.Dialog().ok(addonname, line1, line2)	
+			xbmcgui.Dialog().ok(addonname, line1)	
 			return
 			
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s")' % ytID)
