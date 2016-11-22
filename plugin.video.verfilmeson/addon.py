@@ -3,8 +3,8 @@
 # -*- coding: utf-8 -*-
 #####################################################################
 # Addon : VerFilmesON
-# By AddonReneSilva - 11/12/2015
-# Atualizado (1.0.0) - 18/11²2016
+# By AddonReneSilva - 18/11/2016
+# Atualizado (1.0.0) - 18/11/2016
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -300,8 +300,15 @@ def player(name,url,iconimage):
 	
 				OK = False
 						
-		if OK : url2Play = urlresolver.resolve(urlVideo)
-
+		if OK : 
+			try:
+				url2Play = urlresolver.resolve(urlVideo)
+			except:
+				dialog = xbmcgui.Dialog()
+				dialog.ok(" Erro:", " Video removido! ")
+				url2Play = []
+				pass
+			
 		if not url2Play : return
 		
 		legendas = '-'
@@ -408,8 +415,15 @@ def player_series(name,url,iconimage):
 	
 				OK = False
 						
-		if OK : url2Play = urlresolver.resolve(urlVideo)
-
+		if OK : 
+			try:
+				url2Play = urlresolver.resolve(urlVideo)
+			except:
+				dialog = xbmcgui.Dialog()
+				dialog.ok(" Erro:", " Video removido! ")
+				url2Play = []
+				pass
+				
 		if not url2Play : return
 
 		legendas = '-'
@@ -546,7 +560,7 @@ def limpa(texto):
 		return texto
 		
 ############################################################################################################
-              
+ 
 def get_params():
         param=[]
         paramstring=sys.argv[2]
