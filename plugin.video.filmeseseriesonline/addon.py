@@ -134,7 +134,7 @@ def getEpisodios(name, url):
 	
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		
-	
+
 		soup = BeautifulSoup(link)
 		conteudo = soup('div',{'class':'tab_content'})
 
@@ -142,9 +142,12 @@ def getEpisodios(name, url):
 		img = soup.find("div", {"class": "capa-thumb"})
 		imgF = re.findall(r'<img src="(.*?) alt=.*?" />', str(img))
 		img = imgF[0]
-		
+			
 		try:
 			arquivo = conteudo[n]('ul')
+			if not arquivo:
+				n += 1
+				arquivo = conteudo[n]('ul')
 			dublados = arquivo[0]('li')
 			au = arquivo[0].text.encode('utf-8')
 			result= re.split(r'Epi', au)
@@ -164,6 +167,9 @@ def getEpisodios(name, url):
 			pass
 		try:
 			arquivo = conteudo[n]('ul')
+			if not arquivo:
+				n += 1
+				arquivo = conteudo[n]('ul')
 			legendados = arquivo[1]('li')
 			au = arquivo[1].text.encode('utf-8')
 			result= re.split(r'Epi', au)
@@ -241,7 +247,7 @@ def player(name,url,iconimage):
 		
 		matriz = []
 		
-		link  = openURL(url)
+		link     = openURL(url)
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "embeds-servidores"})
 		srvsdub  = conteudo[0]("iframe")
@@ -423,9 +429,6 @@ def player_series(name,url,iconimage):
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[0]['src'])
 
-		#okID = urlVideo.split('embed/?v=')[1]
-		#urlVideo = okID
-
 		print "URLVIDEO " + urlVideo
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
@@ -563,7 +566,7 @@ def playTrailer(name, url,iconimage):
 		xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
 	
 def setViewMenu() :
-		xbmcplugin.setContent(int(sys.argv[1]), 'episodies')
+		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 		
 		opcao = selfAddon.getSetting('menuVisu')
 		
@@ -584,6 +587,8 @@ def setViewFilmes() :
 		elif opcao == '5': xbmc.executebuiltin("Container.SetViewMode(504)")
 		elif opcao == '6': xbmc.executebuiltin("Container.SetViewMode(503)")
 		elif opcao == '7': xbmc.executebuiltin("Container.SetViewMode(515)")
+		elif opcao == '8': xbmc.executebuiltin("Container.SetViewMode(550)")
+		elif opcao == '9': xbmc.executebuiltin("Container.SetViewMode(560)")
 		
 def limpa(texto):
 		texto = texto.replace('ç','c').replace('ã','a').replace('õ','o')
