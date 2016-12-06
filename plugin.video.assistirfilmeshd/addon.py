@@ -1,11 +1,10 @@
 ﻿#####################################################################
-#####################################################################
 # -*- coding: utf-8 -*-
 #####################################################################
-# Addon : Hora Da Pipoca
-# By AddonBrasil - 11/12/2015
-# Atualizado (1.0.1) - 15/12/2015
-# Atualizado (1.1.0) - 12/03/2016
+# Addon : AssistirFilmesHD
+# By AddonReneSilva - 11/12/2015
+# Atualizado (1.0.0) - 02/11/2016
+# Atualizado (1.0.1) - 06/12/2016
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -550,8 +549,6 @@ def setViewFilmes() :
 		elif opcao == '5': xbmc.executebuiltin("Container.SetViewMode(504)")
 		elif opcao == '6': xbmc.executebuiltin("Container.SetViewMode(503)")
 		elif opcao == '7': xbmc.executebuiltin("Container.SetViewMode(515)")
-		elif opcao == '8': xbmc.executebuiltin("Container.SetViewMode(550)")
-		elif opcao == '9': xbmc.executebuiltin("Container.SetViewMode(560)")
 		
 def limpa(texto):
 		texto = texto.replace('ç','c').replace('ã','a').replace('õ','o')
