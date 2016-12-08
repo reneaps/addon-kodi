@@ -70,7 +70,6 @@ def getFilmes(url):
 				pass
 				
 		setViewFilmes()
-#				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
 							
 def getSeries(url):
 		link = openURL(url)
@@ -324,6 +323,11 @@ def player(name,url,iconimage):
 				url2Play = 'https://filehoot.com/vidembed-%s' % nowID
 				OK = False
 
+		elif 'samaup.com' in urlVideo :
+				nowID = urlVideo.split("embed-")[1]
+				url2Play = 'https://samaup.com/vidembed-%s' % nowID
+				OK = False
+
 		addon = xbmcaddon.Addon()
 		addonname = addon.getAddonInfo('name')
 		line1 = str(urlVideo)
@@ -549,15 +553,15 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 
 def getInfo(url)	:
 		link = openURL(url)
-		titO = re.findall('<h1 class="titulopostagem">(.*?)</h1>', link)[0]
-		titO = titO.replace('Dublado','').replace('Legendado','')
+		titO = re.findall('<h1 class="big title-single"><strong>(.*?)</strong></h1>', str(link))[0]
+		titO = titO.replace('Dublado','').replace('Legendado','').replace('Assistir','')
 						
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
 		link = openURL(url)
-		ytID = re.findall('<a href="http://www.youtube.com/embed/(.*?)autoplay=1" class="trailer">TRAILER</a>', link)[0]
-		ytID = ytID.replace('?','')
+		ytID = re.findall('<iframe width="340" height="290" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen></iframe>', link)[0]
+		#ytID = ytID.replace('?','')
 
 		if not ytID : 
 			addon = xbmcaddon.Addon()
@@ -590,6 +594,8 @@ def setViewFilmes() :
 		elif opcao == '5': xbmc.executebuiltin("Container.SetViewMode(504)")
 		elif opcao == '6': xbmc.executebuiltin("Container.SetViewMode(503)")
 		elif opcao == '7': xbmc.executebuiltin("Container.SetViewMode(515)")
+		elif opcao == '8': xbmc.executebuiltin("Container.SetViewMode(550)")
+		elif opcao == '9': xbmc.executebuiltin("Container.SetViewMode(560)")
 		
 def limpa(texto):
 		texto = texto.replace('ç','c').replace('ã','a').replace('õ','o')
