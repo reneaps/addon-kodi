@@ -6,9 +6,11 @@
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
+
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
+
   <extension point="xbmc.addon.metadata">
     <language>en</language>
     <platform>all</platform>
@@ -27,9 +29,11 @@
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
+
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
+
   <extension point="xbmc.addon.metadata">
     <language>en</language>
     <platform>all</platform>
@@ -48,17 +52,18 @@
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
+
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
+
   <extension point="xbmc.addon.metadata">
     <language>en</language>
     <platform>all</platform>
     <summary lang="en">Filmes e Series Online</summary>
     <description lang="en">
 			No addon FilmesOnlineHD11 você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-			Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+			Vocêtambém pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
 		</description>
   </extension>
 </addon>
@@ -69,16 +74,18 @@
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
+
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
+
   <extension point="xbmc.addon.metadata">
     <language>en</language>
     <platform>all</platform>
     <summary lang="en">Filmes e Series Online</summary>
     <description lang="en">
 			No addon Megafilmesonline você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-			Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+			Vocêtambém pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
 			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
 		</description>
   </extension>
@@ -90,9 +97,11 @@
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
+
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
+
   <extension point="xbmc.addon.metadata">
     <language>en</language>
     <platform>all</platform>
@@ -111,9 +120,11 @@
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
+
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
+
   <extension point="xbmc.addon.metadata">
     <language>en</language>
     <platform>all</platform>
@@ -132,9 +143,11 @@
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
+
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
+
   <extension point="xbmc.addon.metadata">
     <language>en</language>
     <platform>all</platform>
@@ -153,28 +166,6 @@
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Filmes e Series Online</summary>
-    <description lang="en">
-			No addon VerFilmesON voce assiste filmes separados por categorias, lancamentos,filmes HD, etc.
-			Voce tambem pode ver as informacoes ou assistir ao trailer do filme no submenu do addon (Botao direito do mouse ou tecla "C").
-			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
-		</description>
-  </extension>
-</addon>
-
-<addon id="plugin.video.verfilmeson" name="VerfilmesON" version="1.0.1" provider-name="AddonReneSilva">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-		<import addon="script.module.urlresolver" version="2.10.8"/>
-		<import addon="script.extendedinfo" version="3.0.0"/>
-  </requires>
-
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
@@ -203,5 +194,4 @@
 		<platform>all</platform>
 	</extension>
 </addon>
-
 </addons>
