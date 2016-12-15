@@ -5,6 +5,7 @@
 # Addon : Filmes e Series Online
 # By AddonReneSilva - 01/10/2016
 # Atualizado (1.0.0) - 01/10/2016
+# Atualizado (1.0.1) - 15/12/2016
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -55,7 +56,7 @@ def getCategorias(url):
 						imgC = artfolder + limpa(titC) + '.png'
 						addDir(titC,urlC,20,imgC)
 			
-		#setViewMenu()		
+		setViewMenu()		
 		
 def getFilmes(url):
 		link  = openURL(url)
@@ -80,7 +81,7 @@ def getFilmes(url):
 		except : 
 				pass
 				
-		#setViewFilmes()
+		setViewFilmes()
 				
 def getSeries(url):
 		link  = openURL(url)
@@ -105,7 +106,7 @@ def getSeries(url):
 		except : 
 				pass
 				
-		#setViewFilmes()
+		xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
 		
 def getTemporadas(url):
 		link  = openURL(url)
@@ -124,7 +125,9 @@ def getTemporadas(url):
 			except:
 				pass
 			i = i + 1
-
+			
+		xbmcplugin.setContent(int(sys.argv[1]), 'seasons')
+		
 def getEpisodios(name, url):
 		n = name.replace('ª Temporada', '')	
 		n = int(n)
@@ -190,8 +193,10 @@ def getEpisodios(name, url):
 		total = len(episodios)
 
 		for url, titulo in episodios:
-				addDir(titulo, url, 110, img, False, total)
-
+				addDirF(titulo, url, 110, img, False, total)
+				
+		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+		
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
@@ -220,7 +225,6 @@ def pesquisa():
 				for url, titulo, img in hosts:
 					temp = [url, titulo, img]
 					a.append(temp);
-					#addDir(titulo, url, 26, img)
 					
 				return a
 
@@ -316,7 +320,6 @@ def player(name,url,iconimage):
 		elif 'ok.ru' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://ok.ru/videoembed/%s' % okID
-				#OK = False
 				
 		elif 'openload' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
