@@ -77,19 +77,16 @@ def getSeries(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"id": "wrap"})
-		filmes   = conteudo[0]("div", {"class": "box-filme"})
+		conteudo = soup("div", {"class": "fundo"})
+		filmes   = conteudo[0]("div", {"class": "capa"})
 		totF = len(filmes)
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8','replace')
-				titF = titF.replace('Assistir ','').replace('Filme ','')
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
-				imgF = imgF.split('?src=')[1]
-				imgF = imgF.split('&')[0]
-				addDir(titF, urlF, 26, imgF)
+				addDir(titF, urlF, 27, imgF)
 		try : 
-				proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
+				proxima = re.findall('<a class="next page-numbers" href="(.*?)">.*?</a>', link)[0]
 				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
 		except : 
 				pass
@@ -99,10 +96,10 @@ def getTemporadas(url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')						
 		soup = BeautifulSoup(link)
-		conteudo = soup.find("ul", {"class": "itens"}) 
-		temporadas = conteudo("li")
+		conteudo = soup.find("div", {"class": "content content-single"}) 
+		temporadas = conteudo("h4")
 		totF = len(temporadas)
-		img = soup.find("div", {"id": "postimg"})
+		img = soup.find("div", {"class": "capa-single"})
 		imgF = img.img['src']
 		imgF = imgF.split('?src=')[1]
 		imgF = imgF.split('&')[0]
@@ -127,8 +124,8 @@ def getEpisodios(name, url):
 		link = unicode(link, 'utf-8', 'ignore')		
 
 		soup = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "videos"})
-		arquivo = conteudo[0]("li", {"class": "video" + str(n) + "-code"})
+		conteudo = soup("div", {"class": "content content-single"})
+		arquivo = conteudo[0]("h4")
 			
 		try:
 			temporadas = arquivo[0]('table')
@@ -185,23 +182,20 @@ def pesquisa():
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				url      = base + '/search.php?s=%s&btn-busca=' % str(pesquisa)
+				url      = base + '/?s=%s&tipo=video' % str(pesquisa)
 
 				link  = openURL(url)
 				link = unicode(link, 'utf-8', 'ignore')		
 		
 				soup     = BeautifulSoup(link)
-				conteudo = soup("div", {"id": "wrap"})
-				filmes   = conteudo[0]("div", {"class": "box-filme"})
+				conteudo = soup("div", {"class": "fundo"})
+				filmes   = conteudo[0]("div", {"class": "capa"})
 				totF = len(filmes)
 				hosts = []
 				for filme in filmes:
 					titF = filme.img["alt"].encode('utf-8','replace')
-					titF = titF.replace('Assistir ','').replace('Filme ','')
 					urlF = filme.a["href"].encode('utf-8', 'ignore')
 					imgF = filme.img["src"].encode('utf-8', 'ignore')
-					imgF = imgF.split('?src=')[1]
-					imgF = imgF.split('&')[0]
 					temp = [urlF, titF, imgF]
 					hosts.append(temp)
 					
