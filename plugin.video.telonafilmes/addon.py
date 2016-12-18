@@ -26,7 +26,7 @@ def menuPrincipal():
 		addDir('Categorias'                , base 							,   10, artfolder + 'categorias.png')
 		addDir('Lançamentos'               , base + '/lancamentos/' 		,	20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + '/search/dublado/'	 	,	20, artfolder + 'pesquisa.png')
-		addDir('Series'		               , base + '/categoria/series/'	,   25, artfolder + 'legendados.png')
+		addDir('Series'		               , base + '/series/'				,	25, artfolder + 'legendados.png')
 		addDir('Pesquisa Series'           , '--'                           ,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'           , '--'                           ,   35, artfolder + 'pesquisa.png')
 		addDir('Configurações'             , base                           ,  999, artfolder + 'config.png', 1, False)
@@ -75,16 +75,14 @@ def getSeries(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"id": "wrap"})
-		filmes   = conteudo[0]("div", {"class": "box-filme"})
+		conteudo = soup("ul", { "class" : "lista-filmes" })
+		filmes   = conteudo[0]("li")
 		totF = len(filmes)
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8','replace')
 				titF = titF.replace('Assistir ','').replace('Filme ','')
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
-				imgF = filme.img["src"].encode('utf-8', 'ignore')
-				imgF = imgF.split('?src=')[1]
-				imgF = imgF.split('&')[0]
+				imgF = filme.img["src"].encode('utf-8', 'ignore')	
 				addDir(titF, urlF, 26, imgF)
 		try : 
 				proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
@@ -97,13 +95,15 @@ def getTemporadas(url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')						
 		soup = BeautifulSoup(link)
-		conteudo = soup.find("ul", {"class": "itens"}) 
+		conteudo = soup("div", { "class" : "embeds-servidores" })
+		urlT = conteudo[0]("iframe")
+		conteudo = temp.find("ul", {"class": "menu-temps"}) 
 		temporadas = conteudo("li")
 		totF = len(temporadas)
-		img = soup.find("div", {"id": "postimg"})
+		img = soup.find("div", {"class": "capa-single"})
 		imgF = img.img['src']
-		imgF = imgF.split('?src=')[1]
-		imgF = imgF.split('&')[0]
+		#imgF = imgF.split('?src=')[1]
+		#imgF = imgF.split('&')[0]
 		urlF = url
 		i = 1
 		while i <= totF:
@@ -260,8 +260,11 @@ def player(name,url,iconimage):
 
 		if len(links) == 0 : links = conteudo[0]("iframe")
 		
-		urlVideo = "http:" + links[i]['src']
-	
+		if 'jwplatform.com' in (links[i]['src']) :
+				urlVideo = "http:" + links[i]['src']		
+		else:
+				urlVideo = links[i]['src']
+
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
 		if 'nowvideo.php' in urlVideo :
@@ -293,21 +296,22 @@ def player(name,url,iconimage):
 				url2Play = str(url2Play[0])				
 	
 				OK = False
-				
-		soup = BeautifulSoup(openURL(urlVideo))
-		conteudo = soup("body")
-		link = conteudo[0]("script")
-		urlVideo = re.findall(r'src="(.*?)"', str(link))[0]
-
-		link = openURL(urlVideo)
-		pattern = '"file"\s*:\s*[\'|\"](.+?)[\'|\"]'
-		urlVideo = re.findall(pattern, str(link))[0]
-
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(urlVideo)
-		#xbmcgui.Dialog().ok(addonname, line1)		
 		
+		if 'jwplatform.com' in urlVideo :		
+				soup = BeautifulSoup(openURL(urlVideo))
+				conteudo = soup("body")
+				link = conteudo[0]("script")
+				urlVideo = re.findall(r'src="(.*?)"', str(link))[0]
+
+				addon = xbmcaddon.Addon()
+				addonname = addon.getAddonInfo('name')
+				line1 = str(urlVideo)
+				#xbmcgui.Dialog().ok(addonname, line1)		
+				
+				link = openURL(urlVideo)
+				pattern = '"file"\s*:\s*[\'|\"](.+?)[\'|\"]'
+				urlVideo = re.findall(pattern, str(link))[0]
+
 		if 'userscloud.com' in urlVideo :
 				nowID = urlVideo.split("embed-")[1]
 				nowID = nowID.replace('.mp4', '')
@@ -323,11 +327,11 @@ def player(name,url,iconimage):
 				url2Play = 'https://filehoot.com/vidembed-%s' % nowID
 				OK = False
 
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(urlVideo)
-		#xbmcgui.Dialog().ok(addonname, line1)		
-						
+		elif 'samaup.com' in urlVideo :
+				nowID = urlVideo.split("embed-")[1]
+				url2Play = 'https://samaup.com/vidembed-%s' % nowID
+				OK = False
+				
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 					
 		if not url2Play : return
@@ -340,11 +344,6 @@ def player(name,url,iconimage):
 				nowID = url2Play.split("|")[0]
 				url2Play = nowID
 				
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(url2Play)
-		#xbmcgui.Dialog().ok(addonname, line1)		
-
 		legendas = '-'
 	
 		mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')

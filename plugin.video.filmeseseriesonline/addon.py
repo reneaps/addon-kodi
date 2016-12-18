@@ -5,6 +5,8 @@
 # Addon : Filmes e Series Online
 # By AddonReneSilva - 01/10/2016
 # Atualizado (1.0.0) - 01/10/2016
+# Atualizado (1.0.1) - 15/12/2016
+# Atualizado (1.0.2) - 18/12/2016
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -55,7 +57,7 @@ def getCategorias(url):
 						imgC = artfolder + limpa(titC) + '.png'
 						addDir(titC,urlC,20,imgC)
 			
-		#setViewMenu()		
+		setViewMenu()		
 		
 def getFilmes(url):
 		link  = openURL(url)
@@ -80,7 +82,7 @@ def getFilmes(url):
 		except : 
 				pass
 				
-		#setViewFilmes()
+		setViewFilmes()
 				
 def getSeries(url):
 		link  = openURL(url)
@@ -105,7 +107,7 @@ def getSeries(url):
 		except : 
 				pass
 				
-		#setViewFilmes()
+		xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
 		
 def getTemporadas(url):
 		link  = openURL(url)
@@ -124,7 +126,9 @@ def getTemporadas(url):
 			except:
 				pass
 			i = i + 1
-
+			
+		xbmcplugin.setContent(int(sys.argv[1]), 'seasons')
+		
 def getEpisodios(name, url):
 		n = name.replace('ª Temporada', '')	
 		n = int(n)
@@ -190,8 +194,10 @@ def getEpisodios(name, url):
 		total = len(episodios)
 
 		for url, titulo in episodios:
-				addDir(titulo, url, 110, img, False, total)
-
+				addDirF(titulo, url, 110, img, False, total)
+				
+		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+		
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
@@ -220,7 +226,6 @@ def pesquisa():
 				for url, titulo, img in hosts:
 					temp = [url, titulo, img]
 					a.append(temp);
-					#addDir(titulo, url, 26, img)
 					
 				return a
 
@@ -283,46 +288,29 @@ def player(name,url,iconimage):
 		if not titsT : return
 		
 		index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-		
+			
 		if index == -1 : return
 		
-		ind = idsT[index]
-
 		conteudo = soup("div", {"class": "geral"})
 		links = conteudo[0]("a")
 		
 		if len(links) == 0 : links = conteudo[0]("a")
-		ind = int(ind)
-		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[ind-1]
-		link = openURL(urlVideo)
-		soup  = BeautifulSoup(link)
-		conteudo = soup("iframe")
-		urlVideo = str(conteudo[0]['src'])
+		i = int(index)
+		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-		
-		if 'nowvideo.php' in urlVideo :
-				nowID = urlVideo.split("id=")[1]
-				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
+
+		if 'openload' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://openload.co/embed/%s' % fxID
 				
-		elif 'video.tt' in urlVideo :
-				vttID = urlVideo.split('e/')[1]
-				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
+		elif 'ok' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://ok.ru/videoembed%s' % fxID
 				
-		elif 'flashx.php' in urlVideo :
-				fxID = urlVideo.split('id=')[1]
-				urlVideo = 'http://www.flashx.tv/embed-%s.html' % fxID
-				
-		elif 'ok.ru' in urlVideo :
-				okID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://ok.ru/videoembed/%s' % okID
-				#OK = False
-				
-		elif 'openload' in urlVideo :
-				okID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://openload.co/embed/%s' % okID				
-				
-		elif 'thevid.net' in urlVideo :
+		elif 'thevid' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
@@ -331,7 +319,7 @@ def player(name,url,iconimage):
 				url2Play = str(url2Play[0])				
 	
 				OK = False
-						
+							
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		if not url2Play : return
@@ -384,7 +372,7 @@ def player_series(name,url,iconimage):
 
 		link = openURL(url)
 		soup  = BeautifulSoup(link)
-	
+				
 		try :
 				conteudo = soup("div", {"class": "geral"})
 				srvsdub  = conteudo[0]("a")
@@ -415,41 +403,33 @@ def player_series(name,url,iconimage):
 			
 		if index == -1 : return
 		
-		ind = idsT[index]
-
 		conteudo = soup("div", {"class": "geral"})
 		links = conteudo[0]("a")
 		
 		if len(links) == 0 : links = conteudo[0]("a")
-		ind = int(ind)
-		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[ind-1]
-				
-		link = openURL(urlVideo)
-		soup  = BeautifulSoup(link)
-		conteudo = soup("iframe")
-		urlVideo = str(conteudo[0]['src'])
+		i = int(index)
+		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
+		
+		addon = xbmcaddon.Addon()
+		addonname = addon.getAddonInfo('name')
+		line1 = str(urlVideo)
+		#xbmcgui.Dialog().ok(addonname, line1)	
 
 		print "URLVIDEO " + urlVideo
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-				
-		if 'nowvideo.php' in urlVideo :
-				nowID = urlVideo.split("id=")[1]
-				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
-				
-		elif 'video.tt' in urlVideo :
-				vttID = urlVideo.split('e/')[1]
-				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
 
-		elif 'flashx.php' in urlVideo :
-				fxID = urlVideo.split('id=')[1]
-				urlVideo = 'http://www.flashx.tv/playvid-%s.html' % fxID
+		if 'openload' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://openload.co/embed/%s' % fxID
 				
-		elif 'ok.ru' in urlVideo :
-				fxID = urlVideo.split('embed')[1]
-				urlVideo = 'https://ok.ru/videoembed%s' % fxID
+		elif 'ok' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://ok.ru/videoembed%s' % fxID
 				
-		elif 'thevid.net' in urlVideo :
+		elif 'thevid' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)

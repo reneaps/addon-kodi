@@ -1,2 +1,2 @@
 # addon-kodi
-Plugin para Kodi
+Plugin video para Kodi
