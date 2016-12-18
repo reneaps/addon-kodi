@@ -5,6 +5,7 @@
 # Addon : VerFilmesON
 # By AddonReneSilva - 18/11/2016
 # Atualizado (1.0.0) - 18/11/2016
+# Atualizado (1.0.1) - 18/12/2016
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -54,7 +55,7 @@ def getCategorias(url):
 		
 def getFilmes(url):
 		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')
+		#link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "galeria"})
 		filmes   = conteudo[0]("div", {"class": "box-filme"})
@@ -65,7 +66,8 @@ def getFilmes(url):
 				titF = filme.a["title"].encode('utf-8','replace')
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
-				addDirF(titF, urlF, 100, imgF, False, totF)
+				pltF = ''
+				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
 		try : 
 				proxima = re.findall('<a class="page larger" href="(.*?)">.*?</a>', link)[0]
 				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
@@ -262,35 +264,19 @@ def player(name,url,iconimage):
 		
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 
-		link = openURL(urlVideo)
-		soup  = BeautifulSoup(link)
-		conteudo = soup.find("iframe")
-		urlVideo = conteudo.get('src')
-		print urlVideo
-	
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-		
-		if 'nowvideo.php' in urlVideo :
-				nowID = urlVideo.split("id=")[1]
-				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
+
+		if 'openload' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://openload.co/embed/%s' % fxID
 				
-		elif 'video.tt' in urlVideo :
-				vttID = urlVideo.split('e/')[1]
-				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
+		elif 'ok' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://ok.ru/videoembed%s' % fxID
 				
-		elif 'flashx.php' in urlVideo :
-				fxID = urlVideo.split('id=')[1]
-				urlVideo = 'http://www.flashx.tv/embed-%s.html' % fxID
-				
-		elif 'ok.ru' in urlVideo :
-				okID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://ok.ru/videoembed/%s' % okID
-				
-		elif 'openload' in urlVideo :
-				okID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://openload.co/embed/%s' % okID			
-				
-		elif 'thevid.net' in urlVideo :
+		elif 'thevid' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
@@ -299,7 +285,7 @@ def player(name,url,iconimage):
 				url2Play = str(url2Play[0])				
 	
 				OK = False
-						
+								
 		if OK : 
 			try:
 				url2Play = urlresolver.resolve(urlVideo)
@@ -382,30 +368,27 @@ def player_series(name,url,iconimage):
 		
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 
-		link = openURL(urlVideo)
-		soup  = BeautifulSoup(link)
-		conteudo = soup.find("iframe")
-		urlVideo = conteudo.get('src')
-
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-				
-		if 'nowvideo.php' in urlVideo :
-				nowID = urlVideo.split("id=")[1]
-				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
-				
-		elif 'video.tt' in urlVideo :
-				vttID = urlVideo.split('e/')[1]
-				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
 
-		elif 'flashx.php' in urlVideo :
-				fxID = urlVideo.split('id=')[1]
-				urlVideo = 'http://www.flashx.tv/playvid-%s.html' % fxID
+		if 'openload' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://openload.co/embed/%s' % fxID
 				
-		elif 'ok.ru' in urlVideo :
-				fxID = urlVideo.split('embed')[1]
-				urlVideo = 'https://ok.ru/videoembed%s' % fxID
-				
-		elif 'thevid.net' in urlVideo :
+		elif 'ok' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://ok.ru/videoembed%s' % fxID
+
+		elif 'vidto' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://vidto.me/embed-%s-850x550.html' % fxID
+
+		elif 'vidzi' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://vidzi.tv/embed-%s-850x550.html' % fxID
+						
+		elif 'thevid' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
@@ -414,7 +397,7 @@ def player_series(name,url,iconimage):
 				url2Play = str(url2Play[0])				
 	
 				OK = False
-						
+				
 		if OK : 
 			try:
 				url2Play = urlresolver.resolve(urlVideo)
@@ -491,17 +474,23 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
 		ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 		return ok
 		
-def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
+def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
 		u  = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
 		ok = True
+		
 		liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
-		liz.setProperty('fanart_image', fanart)
-		liz.setInfo(type="Video", infoLabels={"Title": name})
+		
+		liz.setProperty('fanart_image', iconimage)
+		liz.setInfo(type="Video", infoLabels={"Title": name, "Plot": plot})
+		
 		cmItems = []
-		cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
-		cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.quote(name), url, urllib.quote(iconimage))))
+		
+		cmItems.append(('[COLOR lime]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=99)'%(sys.argv[0], urllib.quote_plus(url))))
+		
 		liz.addContextMenuItems(cmItems, replaceItems=False)
+				
 		ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=pasta,totalItems=total)
+		
 		return ok	
 
 def getInfo(url)	:
@@ -513,8 +502,7 @@ def getInfo(url)	:
 
 def playTrailer(name, url,iconimage):
 		link = openURL(url)
-		ytID = re.findall('<a href="http://www.youtube.com/embed/(.*?)autoplay=1" class="trailer">TRAILER</a>', link)[0]
-		ytID = ytID.replace('?','')
+		ytID = re.findall('<iframe width="100%" height="100%" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen></iframe>', str(link))[0]
 
 		if not ytID : 
 			addon = xbmcaddon.Addon()
@@ -522,7 +510,7 @@ def playTrailer(name, url,iconimage):
 			line1 = str("Trailer não disponível!")
 			xbmcgui.Dialog().ok(addonname, line1)	
 			return
-			
+
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s")' % ytID)
 	
 def setViewMenu() :
