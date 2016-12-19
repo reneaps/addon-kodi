@@ -3,6 +3,7 @@
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.urlresolver" version="2.10.8"/>
+		<import addon="plugin.video.pulsar" version="0.6.1"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
 	
@@ -17,7 +18,7 @@
     <description lang="en">
 			No addon TeuTorrent você assiste filmes separados por categorias, lançamentos,filmes HD, etc. \
 			Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C"). \
-			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior e o plugin de video PULSAR 0.6.1 ou superior
 		</description>
   </extension>
 </addon>
