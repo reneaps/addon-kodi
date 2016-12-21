@@ -180,7 +180,7 @@ def getEpisodios(name, url):
 		total = len(episodios)
 
 		for titF, urlF in episodios:
-				addDir(titF, urlF, 110, imgF, False, totF)
+				addDirF(titF, urlF, 110, imgF, False, totF)
 
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -225,7 +225,7 @@ def doPesquisaFilmes():
 		a = pesquisa()
 		total = len(a)
 		for url2, titulo, img in a:
-			addDir(titulo, url2, 100, img, False, total)
+			addDirF(titulo, url2, 100, img, False, total)
 			
 def player(name,url,iconimage):
 		OK = True
@@ -336,8 +336,7 @@ def player(name,url,iconimage):
 					xbmcPlayer.setSubtitles(sfile)
 			else:
 				xbmcPlayer.setSubtitles(legendas)
-	
-				
+
 def player_series(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
@@ -447,9 +446,7 @@ def player_series(name,url,iconimage):
 					xbmcPlayer.setSubtitles(sfile)
 			else:
 				xbmcPlayer.setSubtitles(legendas)
-		
-		return true
-	
+
 ############################################################################################################
 		
 def openConfig():
@@ -480,7 +477,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
 		liz = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
 		
 		liz.setProperty('fanart_image', fanart)
-		liz.setInfo(type = "Video", infoLabels = {"title": name})
+		liz.setInfo(type = "Video", infoLabels = {"Title": name})
 		
 		ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 
