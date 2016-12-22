@@ -5,6 +5,7 @@
 # By AddonReneSilva - 11/12/2015
 # Atualizado (1.0.0) - 02/11/2016
 # Atualizado (1.0.1) - 06/12/2016
+# Atualizado (1.0.2) - 21/12/2016
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -75,8 +76,7 @@ def getFilmes(url):
 				pass
 				
 		setViewFilmes()
-#				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
-							
+					
 def getSeries(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
@@ -181,6 +181,8 @@ def getEpisodios(name, url):
 
 		for titF, urlF in episodios:
 				addDirF(titF, urlF, 110, imgF, False, totF)
+				
+		setViewFilmes()
 
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -471,13 +473,12 @@ def openURL(url):
 
 def addDir(name, url, mode, iconimage, total=1, pasta=True):
 		u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
-		
 		ok = True
 		
 		liz = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
 		
 		liz.setProperty('fanart_image', fanart)
-		liz.setInfo(type = "Video", infoLabels = {"Title": name})
+		liz.setInfo(type = "Video", infoLabels = {"title": name})
 		
 		ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 
