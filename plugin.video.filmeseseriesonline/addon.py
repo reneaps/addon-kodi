@@ -297,17 +297,22 @@ def player(name,url,iconimage):
 		if len(links) == 0 : links = conteudo[0]("a")
 		i = int(index)
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
+
+		addon = xbmcaddon.Addon()
+		addonname = addon.getAddonInfo('name')
+		line1 = str(hosts)
+		#xbmcgui.Dialog().ok(addonname, line1)	
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
 		if 'openload' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
-				
+		
 		elif 'ok' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://ok.ru/videoembed%s' % fxID
-				
+				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
+
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
@@ -413,8 +418,8 @@ def player_series(name,url,iconimage):
 		addon = xbmcaddon.Addon()
 		addonname = addon.getAddonInfo('name')
 		line1 = str(urlVideo)
-		#xbmcgui.Dialog().ok(addonname, line1)	
-
+		xbmcgui.Dialog().ok(addonname, line1)	
+				
 		print "URLVIDEO " + urlVideo
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
@@ -425,8 +430,8 @@ def player_series(name,url,iconimage):
 				
 		elif 'ok' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://ok.ru/videoembed%s' % fxID
-				
+				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
+
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID

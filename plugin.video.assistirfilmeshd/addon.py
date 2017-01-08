@@ -94,7 +94,7 @@ def getSeries(url):
 				addDir(titF, urlF, 26, imgF)
 		try : 
 				proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
-				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
+				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
 		setViewFilmes()
