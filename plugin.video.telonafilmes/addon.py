@@ -4,6 +4,7 @@
 # Addon : Telona Filmes Online
 # By AddonReneSilva - 10/11/2016
 # Atualizado (1.0.0) - 10/11/2016
+# Atualizado (1.0.1) - 21/01/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
