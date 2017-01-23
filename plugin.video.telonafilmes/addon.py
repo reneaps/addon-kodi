@@ -13,13 +13,9 @@ import urlresolver
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-
-
-
-
-
 addon_id  = 'plugin.video.telonafilmes'
 selfAddon = xbmcaddon.Addon(id=addon_id)
+
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
 fanart      = addonfolder + '/fanart.png'
