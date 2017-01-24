@@ -187,23 +187,19 @@ def pesquisa():
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				url      = base + '/search.php?s=%s&btn-busca=' % str(pesquisa)
+				url      = base + '/?s=%s&' % str(pesquisa)
 
-				link  = openURL(url)
-				link = unicode(link, 'utf-8', 'ignore')		
-		
+				link = openURL(url)
+				#link = unicode(link, 'utf-8', 'ignore')
 				soup     = BeautifulSoup(link)
-				conteudo = soup("div", {"id": "wrap"})
+				conteudo = soup("div", {"class": "galeria"})
 				filmes   = conteudo[0]("div", {"class": "box-filme"})
 				totF = len(filmes)
 				hosts = []
 				for filme in filmes:
-					titF = filme.img["alt"].encode('utf-8','replace')
-					titF = titF.replace('Assistir ','').replace('Filme ','')
+					titF = filme.a["title"].encode('utf-8','replace')
 					urlF = filme.a["href"].encode('utf-8', 'ignore')
 					imgF = filme.img["src"].encode('utf-8', 'ignore')
-					imgF = imgF.split('?src=')[1]
-					imgF = imgF.split('&')[0]
 					temp = [urlF, titF, imgF]
 					hosts.append(temp)
 					
