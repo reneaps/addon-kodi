@@ -26,7 +26,7 @@ base        = base64.b64decode('aHR0cDovL3d3dy52ZXJmaWxtZXNvbi5jb20=')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base + '/categoria/'			,   10, artfolder + 'categorias.png')
+		addDir('Categorias'                , base							,   10, artfolder + 'categorias.png')
 		addDir('Lançamentos'               , base + '/lancamentos/'		 	,	20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + '/?s=dublado&'		 	,	20, artfolder + 'pesquisa.png')
 		addDir('Series'		               , base + '/series/'				,   25, artfolder + 'legendados.png')
@@ -41,8 +41,9 @@ def getCategorias(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')	
 		soup = BeautifulSoup(link)
-		conteudo   = soup("nav", {"id": "todas-categorias"})
-		categorias = conteudo[0]("li")
+		conteudo   = soup("nav", {"id": "menu2"})
+		menu = conteudo[0]("ul")
+		categorias = menu[0]("li")
 		totC = len(categorias)
 		for categoria in categorias:
 				titC = categoria.text.encode('utf-8')
@@ -481,6 +482,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
 		
 		cmItems = []
 		
+		cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
 		cmItems.append(('[COLOR lime]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=99)'%(sys.argv[0], urllib.quote_plus(url))))
 		
 		liz.addContextMenuItems(cmItems, replaceItems=False)
@@ -491,14 +493,14 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
 
 def getInfo(url)	:
 		link = openURL(url)
-		titO = re.findall('<h1 class="titulopostagem">(.*?)</h1>', link)[0]
-		titO = titO.replace('Dublado','').replace('Legendado','')
+		titO = re.findall('<h1 id="tt-site" class="hidden-xs">(.*?)</h1>', link)[0]
+		titO = titO.replace('Assistir','').replace('Dublado','').replace('Legendado','').replace('Online','')
 						
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
 		link = openURL(url)
-		ytID = re.findall('<iframe width="100%" height="100%" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen></iframe>', str(link))[0]
+		ytID = re.findall('<iframe width="100%" height="100%" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen>.*?</iframe>', link)[0]
 
 		if not ytID : 
 			addon = xbmcaddon.Addon()
@@ -507,7 +509,7 @@ def playTrailer(name, url,iconimage):
 			xbmcgui.Dialog().ok(addonname, line1)	
 			return
 
-		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s")' % ytID)
+		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s)' % ytID)
 	
 def setViewMenu() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
