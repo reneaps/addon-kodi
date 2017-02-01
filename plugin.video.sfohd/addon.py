@@ -26,9 +26,9 @@ base        = base64.b64decode('aHR0cDovL3d3dy5zdXBlcmZpbG1lc29ubGluZWhkLm5ldA==
 
 def menuPrincipal():
 		addDir('Categorias'                , base							,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/lancamentos/'		 	,	20, artfolder + 'lancamentos.png')
+		addDir('Lançamentos'               , base + '/genero/lancamentos/' 	,	20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + '/?s=dublado&'		 	,	20, artfolder + 'pesquisa.png')
-		addDir('Series'		               , base + '/series/'				,   25, artfolder + 'legendados.png')
+		addDir('Series'		               , base + '/genero/series-online/' ,   25, artfolder + 'legendados.png')
 		addDir('Pesquisa Series'           , '--'                           ,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'           , '--'                           ,   35, artfolder + 'pesquisa.png')
 		addDir('Configurações'             , base                           ,  999, artfolder + 'config.png', 1, False)
@@ -45,8 +45,8 @@ def getCategorias(url):
 		totC = len(categorias)
 		for categoria in categorias:
 				titC = categoria.text.encode('utf-8')
-				if not 'Lançamento' in titC :
-								urlC =  re.findall(r' value="(.*?)"', str(categoria))
+				if "value" in str(categoria):
+								urlC =  categoria['value']
 								imgC = artfolder + limpa(titC) + '.png'
 								addDir(titC,urlC,20,imgC)
 			
@@ -80,8 +80,8 @@ def getSeries(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "galeria"})
-		filmes   = conteudo[0]("div", {"class": "box-filme"})
+		conteudo = soup("div", {"class": "videos"})
+		filmes   = conteudo[0]("div", {"class": "box-video col-lg-2 col-md-2 col-sm-3 col-xs-6"})
 
 		totF = len(filmes)
 
@@ -91,7 +91,7 @@ def getSeries(url):
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
 				addDir(titF, urlF, 26, imgF)
 		try : 
-				proxima = re.findall('<a class="page larger" href="(.*?)">.*?</a>', link)[0]
+				proxima = re.findall('<a class="next page-numbers" href="(.*?)">.*?</a>', link)[0]
 				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
 		except : 
 				pass
@@ -101,9 +101,9 @@ def getTemporadas(url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')						
 		soup = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "box-player"})
-		linhas = conteudo[0]("div", {"class": "top-menu-abas lista-players servers-filme"})
-		temporadas = linhas[0]("a")
+		conteudo = soup("div", {"class": "temporadas full-hidden abas"})
+		#linhas = conteudo[0]("div", {"class": "top-menu-abas lista-players servers-filme"})
+		temporadas = conteudo[0]("a")
 		totF = len(temporadas)
 		img = soup.find("div", {"class": "thumb"})
 		imgF = img.img['src']
@@ -231,12 +231,7 @@ def player(name,url,iconimage):
 
 		link = openURL(url)
 		soup  = BeautifulSoup(link)
-		conteudo = soup.find("iframe")
-		url = conteudo.get('src')
-		print url
-		link = openURL(url)
-		soup  = BeautifulSoup(link)
-		conteudo = soup("div", {"class":"geral"})
+		conteudo = soup("div", {"class":"lista-servers servers-filme"})
 		srvsdub = conteudo[0]('a')
 		totD = len(srvsdub)
 		titsT = []
@@ -252,26 +247,29 @@ def player(name,url,iconimage):
 		if index == -1 : return
 		
 		i = int(index)
+		
+		lista = soup("div", {"class":"tab-content lista-relacionados"})
+		iframe = lista[0]('iframe')
 
-		links  = conteudo[0]('a')
+		links = re.findall(r'src=[\'"]?([^\'" >]+)', str(iframe))
 		
-		if len(links) == 0 : links = conteudo[0]("a")
-		
-		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
+		urlVideo = links[i]
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
 		if 'openload' in urlVideo :
-				fxID = urlVideo.split('=')[1]
-				urlVideo = 'https://openload.co/embed/%s' % fxID
+				#fxID = urlVideo.split('=')[1]
+				#urlVideo = 'https://openload.co/embed/%s' % fxID
+				urlVideo = urlVideo
 				
 		elif 'ok' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed%s' % fxID
 				
 		elif 'thevid' in urlVideo :
-				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://thevid.net/e/%s' % fxID
+				#fxID = urlVideo.split('=')[1]
+				#urlVideo = 'http://thevid.net/e/%s' % fxID
+				urlVideo = urlVideo
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
