@@ -21,7 +21,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.0.2" provider-name="AddonReneSilva">
+<addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.0.3" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.urlresolver" version="2.10.8"/>
@@ -113,7 +113,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.sfohd" name="SuperfilmesOnlineHD" version="1.0.0" provider-name="AddonReneSilva">
+<addon id="plugin.video.sfohd" name="SuperfilmesOnlineHD" version="1.0.1" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.urlresolver" version="2.10.8"/>

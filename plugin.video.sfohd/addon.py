@@ -5,6 +5,7 @@
 # Addon : SuperFilmesOnlineHD
 # By AddonReneSilva - 01/02/2017
 # Atualizado (1.0.0) - 01/02/2017
+# Atualizado (1.0.1) - 05/02/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -92,7 +93,7 @@ def getSeries(url):
 				addDir(titF, urlF, 26, imgF)
 		try : 
 				proxima = re.findall('<a class="next page-numbers" href="(.*?)">.*?</a>', link)[0]
-				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
+				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
 		setViewFilmes()
@@ -101,13 +102,19 @@ def getTemporadas(url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')						
 		soup = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "temporadas full-hidden abas"})
-		#linhas = conteudo[0]("div", {"class": "top-menu-abas lista-players servers-filme"})
-		temporadas = conteudo[0]("a")
-		totF = len(temporadas)
-		img = soup.find("div", {"class": "thumb"})
+		conteudo = soup("div", {"class": "col-md-9"})
+		iframe = conteudo[0]("iframe")
+		url2 = iframe[0]['src']
+		img = soup.find("div", {"class": "filme-conteudo poster"})
 		imgF = img.img['src']
-		urlF = url
+		link  = openURL(url2)
+		link = unicode(link, 'utf-8', 'ignore')
+		soup = BeautifulSoup(link)
+		conteudo = soup("div", {"class": "box-absolute"})
+		linhas = conteudo[0]("div", {"class": "temporadas full-hidden abas"})
+		temporadas = linhas[0]("a")
+		totF = len(temporadas)
+		urlF = url2
 		i = 1
 		while i <= totF:
 			titF = str(i) + "ª Temporada"
@@ -117,65 +124,48 @@ def getTemporadas(url):
 				pass
 			i = i + 1
 
-def getEpisodios(name, url):
+def getEpisodios(name, url, iconimage):
 		n = name.replace('ª Temporada', '')	
-		n = int(n)
-		n = (n-1)
 		temp = []
 		episodios = []
-	
-		link  = openURL(url)
+
+		urlF = url + "#temporada" + str(n)
+		link  = openURL(urlF)
 		link = unicode(link, 'utf-8', 'ignore')		
 
 		soup = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "box-player"})
-		arquivo = conteudo[0]("div", {"class": "player-video"})
+		conteudo = soup("div", {"class": "idiomas abas full-hidden"})
+		arquivo = conteudo[0]("a")
 		temp = []
 		episodios = []
-		imgF = []
-		img = soup.find("div", {"class": "thumb"})
-		imgF = img.img['src']
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(n)
-		#xbmcgui.Dialog().ok(addonname, line1)	
+		imgF = iconimage
+
 		try:
-			temporadas = arquivo[n]('ul')
-			filmes = temporadas[0]("li")   
-			audio = temporadas[0].p.text.encode('utf-8')
-			print "\n"+audio
+			rowlistaepisodios = soup("div",{"id": "legendado"+n})
+			filmes = rowlistaepisodios[0]("div", {"class":"row-lista-episodios content full-hidden"}) 
 			totF = len(filmes)
 			for filme in filmes:
-				titF = filme.a.text.encode('utf-8', 'ignore')
-				titF = titF.replace('Assistir ','').replace('Filme ','') + " " + audio
-				urlF = filme.a["href"].encode('utf-8', 'ignore')
-				#urlF = base + "/" + urlF
+				titF = filme.p.text.encode('utf-8', 'ignore')
+				titF = name + " Legendado " + titF
 				temp = (titF, urlF)
 				episodios.append(temp)
+
 		except:
-			pass
+			pass	
 		try:
-			temporadas = arquivo[n]('ul')
-			filmes = temporadas[1]("li")      
-			audio = temporadas[1].p.text.encode('utf-8')
-			print "\n"+audio
+			rowlistaepisodios = soup("div",{"id": "dublado"+n})
+			filmes = rowlistaepisodios[0]("div", {"class":"row-lista-episodios content full-hidden"}) 
 			totF = len(filmes)
 			for filme in filmes:
-				titF = filme.a.text.encode('utf-8', 'ignore')
-				titF = titF.replace('Assistir ','').replace('Filme ','') + " " + audio
-				urlF = filme.a["href"].encode('utf-8', 'ignore')
-				#urlF = base + "/" + urlF
+				titF = filme.p.text.encode('utf-8', 'ignore')
+				titF = name + " Dublado " + titF
 				temp = (titF, urlF)
 				episodios.append(temp)
 		except:
 			pass
 
-		audio = []
-		imgF = []
-		img = soup.find("div", {"class": "thumb"})
-		imgF = img.img['src']
 		total = len(episodios)
-		
+
 		for titF, urlF in episodios:
 				addDir(titF, urlF, 110, imgF, False, totF)
 
@@ -257,16 +247,7 @@ def player(name,url,iconimage):
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
-		if 'openload' in urlVideo :
-				#fxID = urlVideo.split('=')[1]
-				#urlVideo = 'https://openload.co/embed/%s' % fxID
-				urlVideo = urlVideo
-				
-		elif 'ok' in urlVideo :
-				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://ok.ru/videoembed%s' % fxID
-				
-		elif 'thevid' in urlVideo :
+		if 'thevid' in urlVideo :
 				#fxID = urlVideo.split('=')[1]
 				#urlVideo = 'http://thevid.net/e/%s' % fxID
 				urlVideo = urlVideo
@@ -329,23 +310,29 @@ def player_series(name,url,iconimage):
 		mensagemprogresso.update(0)
 		
 		titsT = []
+		urlsF = []
 		links = []
 		hosts = []
 		matriz = []
 
 		link = openURL(url)
 		soup  = BeautifulSoup(link)
-
-		conteudo = soup("div", {"class": "itens"})
-		srvsdub = conteudo[0]('a')
-								
-		totD = len(srvsdub)
-
-		for i in range(totD) :
-						titS = srvsdub[i].text
-						titS = titS.replace('Assistir no', '')
-						titsT.append(titS)
-						print titsT
+		n = name[:1]
+		if "Legendado" in name: audio = "legendado"
+		if "Dublado" in name: audio = "dublado"
+		audio = audio + str(n)
+		conteudo = soup("div",{"id": audio})
+		lista = conteudo[0]("div", {"class":"row-lista-episodios content full-hidden"})
+		f = name[-2::]
+		f = int(f)
+		f = (f-1)
+		servers = lista[f]
+		info = servers("p", {"class":"info server"})
+		for i in info:
+			titS = i.a["title"]
+			urlF = i.a['href']
+			titsT.append(titS)
+			urlsF.append(urlF)
 		
 		if not titsT : return
 		
@@ -359,28 +346,17 @@ def player_series(name,url,iconimage):
 		
 		if len(links) == 0 : links = conteudo[0]("a")
 		
-		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
+		#urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
+		urlVideo = urlsF[i]
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
-		if 'openload' in urlVideo :
-				fxID = urlVideo.split('=')[1]
-				urlVideo = 'https://openload.co/embed/%s' % fxID
-				
-		elif 'ok' in urlVideo :
-				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://ok.ru/videoembed%s' % fxID
-
-		elif 'vidto' in urlVideo :
-				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://vidto.me/embed-%s-850x550.html' % fxID
-
-		elif 'vidzi' in urlVideo :
+		if 'vidzi' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidzi.tv/embed-%s-850x550.html' % fxID
 						
 		elif 'thevid' in urlVideo :
-				fxID = urlVideo.split('=')[1]
+				fxID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
@@ -588,7 +564,7 @@ elif mode == 10   : getCategorias(url)
 elif mode == 20   : getFilmes(url)
 elif mode == 25   : getSeries(url)
 elif mode == 26   : getTemporadas(url)
-elif mode == 27   : getEpisodios(name,url)
+elif mode == 27   : getEpisodios(name,url,iconimage)
 elif mode == 30   : doPesquisaSeries()
 elif mode == 35   : doPesquisaFilmes()
 elif mode == 40   : getFavoritos()

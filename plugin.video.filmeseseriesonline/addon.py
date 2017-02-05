@@ -7,6 +7,7 @@
 # Atualizado (1.0.0) - 01/10/2016
 # Atualizado (1.0.1) - 15/12/2016
 # Atualizado (1.0.2) - 18/12/2016
+# Atualizado (1.0.3) - 05/02/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -298,17 +299,12 @@ def player(name,url,iconimage):
 		i = int(index)
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(hosts)
-		#xbmcgui.Dialog().ok(addonname, line1)	
-		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
 		if 'openload' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
-		
+				
 		elif 'ok' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
@@ -414,12 +410,7 @@ def player_series(name,url,iconimage):
 		if len(links) == 0 : links = conteudo[0]("a")
 		i = int(index)
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
-		
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(urlVideo)
-		xbmcgui.Dialog().ok(addonname, line1)	
-				
+
 		print "URLVIDEO " + urlVideo
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
@@ -431,7 +422,7 @@ def player_series(name,url,iconimage):
 		elif 'ok' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
-
+								
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
@@ -548,7 +539,8 @@ def playTrailer(name, url,iconimage):
 		ytID = re.findall('<iframe width=".*?" height=".*?" src="https://www.youtube.com/embed/(.*?)rel=0&controls=0&showinfo=0" frameborder="0" allowfullscreen>.*?</iframe>', link)[0]
 		ytID = ytID.replace('?','')
 
-		xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
+		#xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
+		xbmc.executebuiltin('XBMC.RunPlugin("plugin://plugin.video.youtube/play/?video_id=%s")' % ytID)
 	
 def setViewMenu() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
