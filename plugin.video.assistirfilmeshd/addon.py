@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 #####################################################################
 # Addon : AssistirFilmesHD
-# By AddonReneSilva - 11/12/2015
+# By AddonReneSilva - 02/11/2016
 # Atualizado (1.0.0) - 02/11/2016
 # Atualizado (1.0.1) - 06/12/2016
 # Atualizado (1.0.2) - 21/12/2016
+# Atualizado (1.0.3) - 06/02/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -91,7 +92,7 @@ def getSeries(url):
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
 				imgF = imgF.split('?src=')[1]
 				imgF = imgF.split('&')[0]
-				addDir(titF, urlF, 26, imgF)
+				addDirF(titF, urlF, 26, imgF)
 		try : 
 				proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
 				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
@@ -115,11 +116,12 @@ def getTemporadas(url):
 		while i <= totF:
 			titF = str(i) + "ª Temporada"
 			try:
-				addDir(titF, urlF, 27, imgF)
+				addDirF(titF, urlF, 27, imgF)
 			except:
 				pass
 			i = i + 1
-
+		#setViewFilmes()
+		
 def getEpisodios(name, url):
 		n = name.replace('ª Temporada', '')	
 		n = int(n)
@@ -182,7 +184,7 @@ def getEpisodios(name, url):
 		for titF, urlF in episodios:
 				addDirF(titF, urlF, 110, imgF, False, totF)
 				
-		setViewFilmes()
+		#setViewFilmes()
 
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -290,8 +292,12 @@ def player(name,url,iconimage):
 				urlVideo = 'https://ok.ru/videoembed/%s' % okID
 				
 		elif 'openload' in urlVideo :
-				okID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://openload.co/embed/%s' % okID			
+				okID = urlVideo.split('/')[4]
+				urlVideo = 'https://openload.co/embed/%s' % okID
+				addon = xbmcaddon.Addon()
+				addonname = addon.getAddonInfo('name')
+				line1 = str(urlVideo)
+				xbmcgui.Dialog().ok(addonname, line1)	
 				
 		elif 'thevid.net' in urlVideo :
 				linkTV  = openURL(urlVideo)		
@@ -523,7 +529,7 @@ def playTrailer(name, url,iconimage):
 			xbmcgui.Dialog().ok(addonname, line1)	
 			return
 			
-		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s")' % ytID)
+		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo&&id=%s)' % ytID)
 	
 def setViewMenu() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
