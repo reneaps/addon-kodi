@@ -23,10 +23,10 @@ base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhZmlsbWVzb25saW5laGQuY29t')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base                          ,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/filmes-lancamentos'  ,   20, artfolder + 'lancamentos.png')
+		addDir('Categorias'                , base + '/'						,   10, artfolder + 'categorias.png')
+		addDir('Lançamentos'               , base + '/filmes-lancamentos'	,   20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + '/?s=dublado&btn-busca=',  20, artfolder + 'pesquisa.png')
-		addDir('Seriados'	               , base + '/seriados/'		   ,   25, artfolder + 'legendados.png')
+		addDir('Seriados'	               , base + '/seriados/'		    ,  25, artfolder + 'legendados.png')
 		addDir('Pesquisa Series'           , '--'                          ,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'           , '--'                          ,   35, artfolder + 'pesquisa.png')
 		addDir('Configurações'             , base                          ,  999, artfolder + 'config.png', 1, False)
@@ -61,7 +61,7 @@ def getFilmes(url):
 
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "galeria"})
-		filmes   = conteudo[0]("div", {"class": "center"})
+		filmes   = conteudo[0]("div", {"class": "box-filme c1 relative c7"})
 		totF = len(filmes)
 
 		for filme in filmes:
@@ -99,7 +99,7 @@ def getSeries(url):
 		except : 
 				pass
 				
-		setViewFilmes()
+		setViewSeries()
 		
 def getTemporadas(url):
 		link  = openURL(url)
@@ -118,7 +118,7 @@ def getTemporadas(url):
 			except:
 				pass
 			i = i + 1
-		setViewMenu()
+		setViewSeries()
 		
 def getEpisodios(name, url):
 		n = name.replace('ª Temporada', '')	
@@ -173,7 +173,7 @@ def getEpisodios(name, url):
 
 		for titulo, url, img in episodios:
 				addDir(titulo, url, 110, iconimage, False, total)
-		setViewMenu()
+		setViewSeries()
 		
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -444,6 +444,7 @@ def player_series(name,url,iconimage):
 def openConfig():
 		selfAddon.openSettings()
 		setViewMenu()
+		setViewSeries()
 		xbmcplugin.endOfDirectory(int(sys.argv[1]))
 		
 def openConfigEI():
@@ -518,6 +519,22 @@ def setViewMenu() :
 		
 def setViewFilmes() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'movies')
+
+		opcao = selfAddon.getSetting('filmesVisu')
+
+		if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
+		elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
+		elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
+		elif opcao == '3': xbmc.executebuiltin("Container.SetViewMode(501)")
+		elif opcao == '4': xbmc.executebuiltin("Container.SetViewMode(508)")
+		elif opcao == '5': xbmc.executebuiltin("Container.SetViewMode(504)")
+		elif opcao == '6': xbmc.executebuiltin("Container.SetViewMode(503)")
+		elif opcao == '7': xbmc.executebuiltin("Container.SetViewMode(515)")
+		elif opcao == '8': xbmc.executebuiltin("Container.SetViewMode(550)")
+		elif opcao == '9': xbmc.executebuiltin("Container.SetViewMode(560)")
+
+def setViewSeries() :
+		xbmcplugin.setContent(int(sys.argv[1]), 'tvShows')
 
 		opcao = selfAddon.getSetting('filmesVisu')
 
