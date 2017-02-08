@@ -161,38 +161,30 @@ def pesquisa():
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				url      = 'https://www.google.com.br/search?q=%s&q=+site:www.ultracine.com.br' % str(pesquisa)
-				link  = openURL(url)
-				link = unicode(link, 'utf-8', 'ignore')
+				pesquisa = pesquisa.replace(" ","+")
+				url      = 'http://www.google.com/search?q=%s+site:www.ultracine.com.br' % str(pesquisa)
+				link     = openURL(url)
+				#link     = unicode(link, 'utf-8', 'ignore')
 				soup     = BeautifulSoup(link)
-				filmes = soup.find("h3")
+				conteudo = soup("div",{"class":"rc"})
+				filmes   = conteudo[0]("h3")
 				a = []
+				titF = filmes[0].a.text
+				urlF = filmes[0].a["href"]
+				imgF = iconimage
+				temp = (urlF, titF, imgF)
+				a.append(temp)
+				xbmc.log('[plugin.video.ultracine] ' + str(urlF), xbmc.LOGERROR)
+				return a
+
+'''
 				for b in filmes:
-						c = re.findall(r'q=[\'"]?([^\'" >]+)', str(b))[0]
+						c = re.findall(r'href=[\'"]?([^\'" >]+)', str(b))[0]
 						urlF = c.split('&')[0]
 						titF = filmes.b.text
 						imgF = iconimage
 						temp = (urlF, titF, imgF)
 						a.append(temp);
-				return a
-
-'''
-				conteudo = soup("div", {"class": "galeria-videos"})
-				filmes   = conteudo[0]("div", {"class": "box-video"})
-				totF = len(filmes)
-				hosts = []
-				for filme in filmes:
-						titF = filme.a["title"].encode('utf-8')
-						urlF = filme.a["href"].encode('utf-8')
-						imgF = filme.img["src"].encode('utf-8')		
-						temp = [urlF, titF, imgF]
-						hosts.append(temp)
-					
-				a = []
-				for url, titulo, img in hosts:
-					temp = [url, titulo, img]
-					a.append(temp);
-				
 				return a
 '''
 
@@ -452,7 +444,7 @@ def openConfigEI():
 
 def openURL(url):
 		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/30.0.0')
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
