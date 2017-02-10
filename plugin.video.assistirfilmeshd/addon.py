@@ -128,6 +128,7 @@ def getEpisodios(name, url):
 		#n = (n-1)
 		temp = []
 		episodios = []
+		#xbmc.log('[plugin.video.assistirfilmeshd] ' + str(url), xbmc.LOGNOTICE)
 	
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		
@@ -272,7 +273,9 @@ def player(name,url,iconimage):
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[1]['src'])
-	
+		
+		xbmc.log('[plugin.video.assistirfilmeshd] ' + str(urlVideo), xbmc.LOGNOTICE)
+		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
 		if 'nowvideo.php' in urlVideo :
@@ -391,6 +394,8 @@ def player_series(name,url,iconimage):
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[1]['src'])
 
+		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L397] ' + str(urlVideo), xbmc.LOGNOTICE)
+		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
 		if 'nowvideo.php' in urlVideo :
@@ -529,8 +534,9 @@ def playTrailer(name, url,iconimage):
 			xbmcgui.Dialog().ok(addonname, line1)	
 			return
 			
-		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo&&id=%s)' % ytID)
-	
+		xbmcPlayer = xbmc.Player()
+		xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id='+ytID)
+		
 def setViewMenu() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 		
