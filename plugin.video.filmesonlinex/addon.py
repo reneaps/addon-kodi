@@ -139,7 +139,7 @@ def pesquisar_filmes():
 def player(name,url,iconimage):
 	html = abrir_url(url)
 	link_houst = re.compile(r"<a class=\'video\' rel=\'nofollow\' href=\'(.+?)'\>.+?</a>").findall(html)[0]
-	if link_houst is None:
+	if not link_houst:
 		link_houst = re.compile(r"<a class=\'video cboxElement\' rel=\'nofollow\' href=\'(.+?)'\>.+?</a>").findall(html)[0]
 	print link_houst
 	html = abrir_url(link_houst)
@@ -150,10 +150,14 @@ def player(name,url,iconimage):
 		for urlF, qual in link_video:
 			addLink(name.replace('Assistir Agora: ','')+' Full HD '+str(qual),urlF,imgF)
 	except:
-		link_video = re.compile(r'playerInstance.load\(\{sources: \[\{file:\'(.*?)\'').findall(html)
-		for urlF in link_video:
-			addLink(name.replace('Assistir Agora: ','')+' Full HD 1080p',urlF,imgF)
 		pass
+	if not link_video:
+		try:
+			link_video = re.compile(r'playerInstance.load\(\{sources: \[\{file:*\'(.*?).\'').findall(html)
+			for urlF in link_video:
+				addLink(name.replace('Assistir Agora: ','')+' Full HD 1080p',urlF,imgF)
+		except:
+			pass
 
 def player2(name,url,iconimage):
     print url
