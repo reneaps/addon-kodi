@@ -242,8 +242,11 @@ def player(name,url,iconimage):
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[0]['src'])
-		#okID = urlVideo.split('embed/?v=')[1]
-		#urlVideo = okID
+		
+		addon = xbmcaddon.Addon()
+		addonname = addon.getAddonInfo('name')
+		line1 = str(urlVideo)
+		#xbmcgui.Dialog().ok(addonname, line1)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		

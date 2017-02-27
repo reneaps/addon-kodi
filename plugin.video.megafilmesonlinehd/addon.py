@@ -4,6 +4,7 @@
 # Addon : MegaFilmesOnlineHD
 # By AddonReneSilva - 11/12/2015
 # Atualizado (1.0.1) - 02/11/2016
+# Atualizado (1.0.2) - 27/02/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -18,8 +19,8 @@ selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
 fanart      = addonfolder + '/fanart.png'
-base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhZmlsbWVzb25saW5laGQuY29t')
-
+#base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhZmlsbWVzb25saW5laGQuY29t')
+base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhZmlsbWVzb25saW5laGQuY29tL3JlZGlyZWN0LnBocA==')
 ############################################################################################################
 
 def menuPrincipal():
@@ -67,6 +68,7 @@ def getFilmes(url):
 		for filme in filmes:
 				titF = filme.a["title"].encode('utf-8')
 				urlF = filme.a["href"].encode('utf-8')
+				urlF = urlF.replace("http://www.megafilmesonlinehd.com", base)
 				imgF = filme.img["src"].encode('utf-8')
 				addDirF(titF, urlF, 100, imgF, False, totF)
 				
@@ -90,6 +92,7 @@ def getSeries(url):
 		for filme in filmes:
 				titF = filme.a["title"].encode('utf-8')
 				urlF = filme.a["href"].encode('utf-8')
+				urlF = urlF.replace("http://www.megafilmesonlinehd.com", base)
 				imgF = filme.img["src"].encode('utf-8')
 				addDir(titF, urlF, 26, imgF)
 				
@@ -98,8 +101,6 @@ def getSeries(url):
 				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
-				
-		setViewSeries()
 		
 def getTemporadas(url):
 		link  = openURL(url)
@@ -118,7 +119,6 @@ def getTemporadas(url):
 			except:
 				pass
 			i = i + 1
-		setViewSeries()
 		
 def getEpisodios(name, url):
 		n = name.replace('ª Temporada', '')	
@@ -144,9 +144,9 @@ def getEpisodios(name, url):
 			dtable = tipo[0]('table')
 			dublados = dtable[0]('tr')
 			for link in dublados:
-					urlF  = link.findAll('a')[1]['href']
+					urlF  = link.findAll('a')[0]['href']
 					try:
-						url2 = link.findAll('a')[0]['href']
+						url2 = link.findAll('a')[1]['href']
 					except:
 						pass
 					titulo = "Episodio " + link.findAll('td')[0].contents[0] + " Dub"
@@ -158,9 +158,9 @@ def getEpisodios(name, url):
 			dtable = tipo[1]('table')
 			dublados = dtable[0]('tr')
 			for link in dublados:
-					urlF  = link.findAll('a')[1]['href']
+					urlF  = link.findAll('a')[0]['href']
 					try:
-						url2 = link.findAll('a')[0]['href']
+						url2 = link.findAll('a')[1]['href']
 					except:
 						pass
 					titulo = "Episodio " + link.findAll('td')[0].contents[0] + " Leg"
@@ -173,7 +173,6 @@ def getEpisodios(name, url):
 
 		for titulo, url, img in episodios:
 				addDir(titulo, url, 110, iconimage, False, total)
-		setViewSeries()
 		
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -232,8 +231,9 @@ def player(name,url,iconimage):
 		link     = openURL(url)
 		link     = unicode(link, 'utf-8', 'ignore')		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "container"})
-		article  = conteudo[1]("div",{'class':"content-top full-hidden"})
+		conteudo = soup("main", {"id": "content-site"})
+		xbmc.log('[plugin.video.verfilmes] L236 ' + str(url), xbmc.LOGNOTICE)
+		article  = conteudo[0]("div",{'class':"content-top full-hidden"})
 		srvsdub  = article[0]("div",{"class":"full-hidden"})
 		serv = srvsdub[0]("div",{"class":"top-menu-abas full-hidden"})
 		srvsdub = serv[0]("a")
@@ -396,7 +396,7 @@ def player_series(name,url,iconimage):
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
+				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])	
 
 				OK = False
@@ -444,7 +444,6 @@ def player_series(name,url,iconimage):
 def openConfig():
 		selfAddon.openSettings()
 		setViewMenu()
-		setViewSeries()
 		xbmcplugin.endOfDirectory(int(sys.argv[1]))
 		
 def openConfigEI():
@@ -533,22 +532,6 @@ def setViewFilmes() :
 		elif opcao == '8': xbmc.executebuiltin("Container.SetViewMode(550)")
 		elif opcao == '9': xbmc.executebuiltin("Container.SetViewMode(560)")
 
-def setViewSeries() :
-		xbmcplugin.setContent(int(sys.argv[1]), 'tvShows')
-
-		opcao = selfAddon.getSetting('filmesVisu')
-
-		if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
-		elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
-		elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
-		elif opcao == '3': xbmc.executebuiltin("Container.SetViewMode(501)")
-		elif opcao == '4': xbmc.executebuiltin("Container.SetViewMode(508)")
-		elif opcao == '5': xbmc.executebuiltin("Container.SetViewMode(504)")
-		elif opcao == '6': xbmc.executebuiltin("Container.SetViewMode(503)")
-		elif opcao == '7': xbmc.executebuiltin("Container.SetViewMode(515)")
-		elif opcao == '8': xbmc.executebuiltin("Container.SetViewMode(550)")
-		elif opcao == '9': xbmc.executebuiltin("Container.SetViewMode(560)")
-		
 def limpa(texto):
 		texto = texto.replace('ç','c').replace('ã','a').replace('õ','o')
 		texto = texto.replace('â','a').replace('ê','e').replace('ô','o')
