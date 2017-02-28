@@ -5,6 +5,7 @@
 # By AddonReneSilva - 15/12/2016
 # Atualizado (1.0.0) - 15/12/2016
 # Atualizado (1.0.1) - 18/12/2016
+# Atualizado (1.0.2) - 28/02/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
