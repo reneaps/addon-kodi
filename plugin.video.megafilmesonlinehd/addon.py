@@ -4,7 +4,7 @@
 # Addon : MegaFilmesOnlineHD
 # By AddonReneSilva - 11/12/2015
 # Atualizado (1.0.1) - 02/11/2016
-# Atualizado (1.0.2) - 27/02/2017
+# Atualizado (1.0.2) - 01/03/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -19,15 +19,15 @@ selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
 fanart      = addonfolder + '/fanart.png'
-#base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhZmlsbWVzb25saW5laGQuY29t')
-base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhZmlsbWVzb25saW5laGQuY29tL3JlZGlyZWN0LnBocA==')
+base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhZmlsbWVzb25saW5laGQuY29t')
+#base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhZmlsbWVzb25saW5laGQuY29tL3JlZGlyZWN0LnBocA==')
 ############################################################################################################
 
 def menuPrincipal():
 		addDir('Categorias'                , base + '/'						,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/filmes-lancamentos'	,   20, artfolder + 'lancamentos.png')
+		addDir('Lançamentos'               , base + '/category/filmes-lancamentos'	,   20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + '/?s=dublado&btn-busca=',  20, artfolder + 'pesquisa.png')
-		addDir('Seriados'	               , base + '/seriados/'		    ,  25, artfolder + 'legendados.png')
+		addDir('Seriados'	               , base + '/category/seriados/'  ,  25, artfolder + 'legendados.png')
 		addDir('Pesquisa Series'           , '--'                          ,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'           , '--'                          ,   35, artfolder + 'pesquisa.png')
 		addDir('Configurações'             , base                          ,  999, artfolder + 'config.png', 1, False)
@@ -57,6 +57,7 @@ def getCategorias(url):
 		setViewMenu()		
 		
 def getFilmes(url):
+		xbmc.log('[plugin.video.megafilmesonlinehd] L59 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 
@@ -232,7 +233,7 @@ def player(name,url,iconimage):
 		link     = unicode(link, 'utf-8', 'ignore')		
 		soup     = BeautifulSoup(link)
 		conteudo = soup("main", {"id": "content-site"})
-		xbmc.log('[plugin.video.verfilmes] L236 ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megafilmesonlinehd] L235 ' + str(url), xbmc.LOGNOTICE)
 		article  = conteudo[0]("div",{'class':"content-top full-hidden"})
 		srvsdub  = article[0]("div",{"class":"full-hidden"})
 		serv = srvsdub[0]("div",{"class":"top-menu-abas full-hidden"})
