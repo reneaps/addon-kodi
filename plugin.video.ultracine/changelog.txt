@@ -1,4 +1,4 @@
+[B]02/11/2016 v 1.0.1[/B]
+- atualizado servidores conforme atualização do site.
 [B]02/11/2016 v 1.0.0[/B]
 - Versao inicial do Addon by AddonReneSilva
-
-

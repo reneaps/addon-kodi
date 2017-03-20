@@ -65,6 +65,7 @@ def getFilmes(url):
 				titF = filme.a["title"].encode('utf-8').replace('Assistir ', '')
 				urlF = filme.a["href"].encode('utf-8')
 				imgF = filme.img["src"].encode('utf-8')
+				#xbmc.log('[plugin.video.ultracine] L68 - ' + str(urlF), xbmc.LOGNOTICE)
 				addDirF(titF, urlF, 100, imgF, False, totF)
 
 		try :
@@ -77,7 +78,7 @@ def getFilmes(url):
 				
 def getSeries(url):
 		link  = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')		
+		#link = unicode(link, 'utf-8', 'ignore')		
 		
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "galeria-videos"})
@@ -161,30 +162,38 @@ def pesquisa():
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				pesquisa = pesquisa.replace(" ","+")
-				url      = 'http://www.google.com/search?q=%s+site:www.ultracine.com.br' % str(pesquisa)
-				link     = openURL(url)
-				#link     = unicode(link, 'utf-8', 'ignore')
+				url      = 'https://www.google.com.br/search?q=%s&q=+site:www.ultracine.com.br' % str(pesquisa)
+				link  = openURL(url)
+				link = unicode(link, 'utf-8', 'ignore')
 				soup     = BeautifulSoup(link)
-				conteudo = soup("div",{"class":"rc"})
-				filmes   = conteudo[0]("h3")
+				filmes = soup.find("h3")
 				a = []
-				titF = filmes[0].a.text
-				urlF = filmes[0].a["href"]
-				imgF = iconimage
-				temp = (urlF, titF, imgF)
-				a.append(temp)
-				xbmc.log('[plugin.video.ultracine] ' + str(urlF), xbmc.LOGERROR)
-				return a
-
-'''
 				for b in filmes:
-						c = re.findall(r'href=[\'"]?([^\'" >]+)', str(b))[0]
+						c = re.findall(r'q=[\'"]?([^\'" >]+)', str(b))[0]
 						urlF = c.split('&')[0]
 						titF = filmes.b.text
 						imgF = iconimage
 						temp = (urlF, titF, imgF)
 						a.append(temp);
+				return a
+
+'''
+				conteudo = soup("div", {"class": "galeria-videos"})
+				filmes   = conteudo[0]("div", {"class": "box-video"})
+				totF = len(filmes)
+				hosts = []
+				for filme in filmes:
+						titF = filme.a["title"].encode('utf-8')
+						urlF = filme.a["href"].encode('utf-8')
+						imgF = filme.img["src"].encode('utf-8')		
+						temp = [urlF, titF, imgF]
+						hosts.append(temp)
+					
+				a = []
+				for url, titulo, img in hosts:
+					temp = [url, titulo, img]
+					a.append(temp);
+				
 				return a
 '''
 
@@ -211,12 +220,14 @@ def player(name,url,iconimage):
 		
 		matriz = []
 		
+		xbmc.log('[plugin.video.ultracine] L223 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)	
 		soup     = BeautifulSoup(link)	
 		conteudo = soup("div", {"class": "container"})
 		article = conteudo[3]("article",{'class':"pgn-filme box-padrao"})
 		srvsdub  = article[0]("div",{"class":"lista-servers servers-filme"})
-		srvsdub = srvsdub[0]("a")
+		srvsdub = srvsdub[1]("a")
+		srvsdub = srvsdub[1]("a")
 		totD = len(srvsdub)
 		print totD
 		for i in range(totD) :
@@ -237,17 +248,13 @@ def player(name,url,iconimage):
 		if len(links) == 0 : links = conteudo[0]("a")
 		
 		urlVideo = re.findall(r'src=[\'"]?([^\'" >]+)', str(links))[0]
+
 		print urlVideo
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[0]['src'])
 		
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(urlVideo)
-		#xbmcgui.Dialog().ok(addonname, line1)
-
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
 		if 'nowvideo.php' in urlVideo :
@@ -270,7 +277,7 @@ def player(name,url,iconimage):
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://openload.co/embed/%s' % okID			
 				
-		elif 'thevid.net' in urlVideo :
+		elif 'thevid.net2' in urlVideo :
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
@@ -279,7 +286,7 @@ def player(name,url,iconimage):
 				url2Play = str(url2Play[0])				
 	
 				OK = False
-						
+				
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		if not url2Play : return
@@ -362,8 +369,6 @@ def player_series(name,url,iconimage):
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[0]['src'])
-		#okID = urlVideo.split('embed/?v=')[1]
-		#urlVideo = okID
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
@@ -447,7 +452,7 @@ def openConfigEI():
 
 def openURL(url):
 		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/30.0.0')
+		req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
@@ -504,7 +509,7 @@ def playTrailer(name, url,iconimage):
 			xbmcgui.Dialog().ok(addonname, line1)	
 			return
 			
-		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s")' % ytID)
+		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo,id=%s)' % ytID)
 	
 def setViewMenu() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
