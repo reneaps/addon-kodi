@@ -177,26 +177,6 @@ def pesquisa():
 						a.append(temp);
 				return a
 
-'''
-				conteudo = soup("div", {"class": "galeria-videos"})
-				filmes   = conteudo[0]("div", {"class": "box-video"})
-				totF = len(filmes)
-				hosts = []
-				for filme in filmes:
-						titF = filme.a["title"].encode('utf-8')
-						urlF = filme.a["href"].encode('utf-8')
-						imgF = filme.img["src"].encode('utf-8')		
-						temp = [urlF, titF, imgF]
-						hosts.append(temp)
-					
-				a = []
-				for url, titulo, img in hosts:
-					temp = [url, titulo, img]
-					a.append(temp);
-				
-				return a
-'''
-
 def doPesquisaSeries():
 		a = pesquisa()
 		total = len(a)
@@ -219,14 +199,12 @@ def player(name,url,iconimage):
 		idsT = []
 		
 		matriz = []
-		
-		xbmc.log('[plugin.video.ultracine] L223 - ' + str(url), xbmc.LOGNOTICE)
+
 		link  = openURL(url)	
 		soup     = BeautifulSoup(link)	
 		conteudo = soup("div", {"class": "container"})
 		article = conteudo[3]("article",{'class':"pgn-filme box-padrao"})
 		srvsdub  = article[0]("div",{"class":"lista-servers servers-filme"})
-		srvsdub = srvsdub[1]("a")
 		srvsdub = srvsdub[1]("a")
 		totD = len(srvsdub)
 		print totD
@@ -254,6 +232,8 @@ def player(name,url,iconimage):
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[0]['src'])
+		
+		xbmc.log('[plugin.video.ultracine] L223 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
