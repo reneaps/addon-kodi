@@ -88,6 +88,9 @@ def getSeries(url):
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8','replace')
 				titF = titF.replace('Assistir ','').replace('Filme ','')
+				titF = titF.replace('- Todas as Temporadas - Dublado / Legendado', '')
+				titF = titF.replace('- Minisérie', '')
+				titF = titF.replace('- Minissérie', '')
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
 				imgF = imgF.split('?src=')[1]
@@ -120,7 +123,6 @@ def getTemporadas(url):
 			except:
 				pass
 			i = i + 1
-		#setViewFilmes()
 		
 def getEpisodios(name, url):
 		n = name.replace('ª Temporada', '')	
@@ -128,7 +130,6 @@ def getEpisodios(name, url):
 		#n = (n-1)
 		temp = []
 		episodios = []
-		#xbmc.log('[plugin.video.assistirfilmeshd] ' + str(url), xbmc.LOGNOTICE)
 	
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		
@@ -146,7 +147,7 @@ def getEpisodios(name, url):
 
 			for filme in filmes:
 							titF = filme.text.encode('utf-8', 'ignore')
-							titF = titF.replace('Assistir ','').replace('Filme ','') + " " +audio #" Dublado"
+							titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Dublado"
 							titF = str(n) + "T " + titF
 							urlF = filme.get("href").encode('utf-8', 'ignore')
 							urlF = base + "/" + urlF
@@ -164,7 +165,7 @@ def getEpisodios(name, url):
 
 			for filme in filmes:
 							titF = filme.text.encode('utf-8', 'ignore')
-							titF = titF.replace('Assistir ','').replace('Filme ','') + " " +audio #" Legendado"
+							titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Legendado"
 							titF = str(n) + "T " + titF
 							urlF = filme.get("href").encode('utf-8', 'ignore')
 							urlF = base + "/" + urlF
@@ -185,8 +186,6 @@ def getEpisodios(name, url):
 		for titF, urlF in episodios:
 				addDirF(titF, urlF, 110, imgF, False, totF)
 				
-		#setViewFilmes()
-
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
@@ -274,7 +273,7 @@ def player(name,url,iconimage):
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[1]['src'])
 		
-		xbmc.log('[plugin.video.assistirfilmeshd] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd] L277 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -297,22 +296,25 @@ def player(name,url,iconimage):
 		elif 'openload' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'https://openload.co/embed/%s' % okID
-				addon = xbmcaddon.Addon()
-				addonname = addon.getAddonInfo('name')
-				line1 = str(urlVideo)
-				xbmcgui.Dialog().ok(addonname, line1)	
 				
 		elif 'thevid.net' in urlVideo :
+				okID = urlVideo.split('e/')[1]
+				urlVideo = 'http://thevid.net/v/%s' % okID
+				xbmc.log('[plugin.video.assistirfilmeshd] L304 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				'''
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
+				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])				
 	
 				OK = False
+				'''
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
+		
+		xbmc.log('[plugin.video.assistirfilmeshd] L318 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		if not url2Play : return
 		
@@ -459,6 +461,8 @@ def player_series(name,url,iconimage):
 					xbmcPlayer.setSubtitles(sfile)
 			else:
 				xbmcPlayer.setSubtitles(legendas)
+		
+		return ok
 
 ############################################################################################################
 		
@@ -476,7 +480,8 @@ def openConfigEI():
 
 def openURL(url):
 		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64; Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		req.add_header('User-Agent', 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C)')
+		#req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64; Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
