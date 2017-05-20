@@ -391,12 +391,18 @@ def player_series(name,url,iconimage):
 		
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 		
+		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L398] ' + str(urlVideo), xbmc.LOGNOTICE)
+		
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
-		urlVideo = str(conteudo[1]['src'])
+		addon = xbmcaddon.Addon()
+		addonname = addon.getAddonInfo('name')
+		line1 = str(conteudo)
+		#xbmcgui.Dialog().ok(addonname, line1)
+		urlVideo = str(conteudo[0]['src'])
 
-		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L397] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L405] ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
@@ -411,6 +417,10 @@ def player_series(name,url,iconimage):
 		elif 'flashx.php' in urlVideo :
 				fxID = urlVideo.split('id=')[1]
 				urlVideo = 'http://www.flashx.tv/playvid-%s.html' % fxID
+
+		elif 'raptu.com' in urlVideo :
+				fxID = urlVideo.split('embed/')[1]
+				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
 				
 		elif 'ok.ru' in urlVideo :
 				fxID = urlVideo.split('embed')[1]
@@ -462,7 +472,7 @@ def player_series(name,url,iconimage):
 			else:
 				xbmcPlayer.setSubtitles(legendas)
 		
-		return ok
+		#return ok
 
 ############################################################################################################
 		
