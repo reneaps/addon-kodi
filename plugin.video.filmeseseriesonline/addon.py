@@ -8,6 +8,7 @@
 # Atualizado (1.0.1) - 15/12/2016
 # Atualizado (1.0.2) - 18/12/2016
 # Atualizado (1.0.3) - 05/02/2017
+# Atualizado (1.0.4) - 21/05/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -29,14 +30,15 @@ base        = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNlc2VyaWVzb25saW5lLm5ldC8=
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base                          	,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/categoria/filmes/lancamentos/' ,   20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'           , base + '/?s=dublado&tipo=video' ,  20, artfolder + 'pesquisa.png')
-		addDir('Seriados'	               , base + '/categoria/series/'	,   25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'           , '--'                           ,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'           , '--'                           ,   35, artfolder + 'pesquisa.png')
-		addDir('Configurações'             , base                           ,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo', base                           , 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'					, base                          	, 10, artfolder + 'categorias.png')
+		addDir('Lançamentos'				, base + '/filmes/lancamentos/' 	, 20, artfolder + 'lancamentos.png')
+		addDir('Filmes em HD'				, base + '/filmes/filmes-hd/' 		, 20, artfolder + 'pesquisa.png')
+		addDir('Filmes Dublados'			, base + '/?s=dublado&tipo=video' 	, 20, artfolder + 'pesquisa.png')
+		addDir('Series'						, base + '/series/'					, 25, artfolder + 'legendados.png')
+		addDir('Pesquisa Series'			, '--'                           	, 30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'			, '--'                           	, 35, artfolder + 'pesquisa.png')
+		addDir('Configurações'				, base                             , 999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo'		, base                        , 1000, artfolder + 'config.png', 1, False)
 			
 		#setViewMenu()		
 		
@@ -44,18 +46,21 @@ def getCategorias(url):
 		link = openURL(url)
 		soup = BeautifulSoup(link)
 		
-		conteudo   = soup("div", {"class": "esquerda"})
-		categorias = conteudo[0]("div", {"class": "smallcategoria"})
+		conteudo   = soup("div", {"class": "fundo"})
+		arquivo = conteudo[0]("div", {"class": "margem"})
+		categorias = arquivo[0]("div", {"class": "smallcategoria"})
 		
 		totC = len(categorias)
 		
 		for categoria in categorias:
 				titC = categoria.img["title"].encode('utf-8','replace')
-				titC = titC.replace('Filmes na categoria: ', '')
+				titC = titC.replace('Assistir Filmes ', '').replace('Online ', '')
+				titC = titC.replace('de ', '').replace('Assistir ', '')
 				
 				if not 'Lançamento' in titC :
 						urlC = categoria.a["href"]
 						imgC = artfolder + limpa(titC) + '.png'
+						titC = titC + " " + categoria.div.div.text.encode('utf-8','replace')
 						addDir(titC,urlC,20,imgC)
 			
 		setViewMenu()		
@@ -90,7 +95,7 @@ def getSeries(url):
 		link = unicode(link, 'utf-8', 'ignore')		
 		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "esquerdaother"})
+		conteudo = soup("ul", {"class": "lista-filmes"})
 		filmes   = conteudo[0]("div", {"class": "capa"})
 		
 		totF = len(filmes)
@@ -144,7 +149,7 @@ def getEpisodios(name, url):
 		conteudo = soup('div',{'class':'tab_content'})
 
 		imgF = ""
-		img = soup.find("div", {"class": "capa-thumb"})
+		img = soup.find("div", {"class": "capa-single"})
 		imgF = re.findall(r'<img src="(.*?) alt=.*?" />', str(img))
 		img = imgF[0]
 			
@@ -316,7 +321,7 @@ def player(name,url,iconimage):
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
+				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])				
 	
 				OK = False
