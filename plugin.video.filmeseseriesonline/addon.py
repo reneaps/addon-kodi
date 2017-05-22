@@ -415,20 +415,30 @@ def player_series(name,url,iconimage):
 		if len(links) == 0 : links = conteudo[0]("a")
 		i = int(index)
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
+		urlVideo = 'http://www.pirataplay.com/embed/' + urlVideo
 
-		print "URLVIDEO " + urlVideo
+		xbmc.log('[plugin.video.assistirfilmeshd] L420 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		
+		link = openURL(urlVideo)
+		soup  = BeautifulSoup(link)
+		conteudo = soup("iframe")
+		urlVideo = str(conteudo[0]['src'])
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
-		if 'openload' in urlVideo :
+		if 'openload2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
+
+		if 'vidzi2' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://vidzi.tv/embed-%s.html' % fxID
 				
-		elif 'ok' in urlVideo :
+		elif 'ok2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 								
-		elif 'thevid' in urlVideo :
+		elif 'thevid2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		
