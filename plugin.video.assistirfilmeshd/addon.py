@@ -49,11 +49,14 @@ def getCategorias(url):
 				titC = titC.replace('&ccedil;','c').replace('&atilde;','a').replace('&eacute;','e')
 				titC = titC.replace('&ecirc;','i').replace('&aacute;','a').replace('&eacute;','e')
 				if not 'Lançamento' in titC :
-								urlC = categoria.a["href"]
-								imgC = artfolder + limpa(titC) + '.png'
-								addDir(titC,urlC,20,imgC)
+							urlC = categoria.a["href"]
+							imgC = categoria.a.div["style"]
+							imgC = re.findall(r' url(.*?);', imgC)[0]
+							imgC = imgC.replace("(","").replace(")","")
+							#imgC = artfolder + limpa(titC) + '.png'
+							addDir(titC,urlC,20,imgC)
 			
-		setViewMenu()
+		setViewFilmes()
 		
 def getFilmes(url):
 		link = openURL(url)

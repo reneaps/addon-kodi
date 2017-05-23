@@ -1,8 +1,0 @@
-#EXTM3U
-
-#EXTINF:0 tvg-logo="" group-title="Sports",
-
-#EXTINF:-1,Discovery Turbo
-http://miltonmove.ddns.net:8080/live/samantacampos/sc2256302/49.ts
-
-#swfUrl= pageUrl=
