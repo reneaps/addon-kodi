@@ -10,6 +10,7 @@
 # Atualizado (1.0.3) - 05/02/2017
 # Atualizado (1.0.4) - 21/05/2017
 # Atualizado (1.0.5) - 25/05/2017
+# Atualizado (1.0.6) - 25/05/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -60,7 +61,8 @@ def getCategorias(url):
 				
 				if not 'Lançamento' in titC :
 						urlC = categoria.a["href"]
-						imgC = artfolder + limpa(titC) + '.png'
+						imgC = categoria.img["src"]
+						#imgC = artfolder + limpa(titC) + '.png'
 						titC = titC + " " + categoria.div.div.text.encode('utf-8','replace')
 						addDir(titC,urlC,20,imgC)
 			
@@ -247,7 +249,8 @@ def doPesquisaFilmes():
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 100, img, False, total)
-			
+		setViewFilmes()
+		
 def player(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
@@ -363,7 +366,6 @@ def player(name,url,iconimage):
 					xbmcPlayer.setSubtitles(sfile)
 			else:
 				xbmcPlayer.setSubtitles(legendas)
-	
 				
 def player_series(name,url,iconimage):
 		OK = True
