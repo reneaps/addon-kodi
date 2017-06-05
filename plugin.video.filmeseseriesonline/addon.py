@@ -11,6 +11,7 @@
 # Atualizado (1.0.4) - 21/05/2017
 # Atualizado (1.0.5) - 25/05/2017
 # Atualizado (1.0.6) - 25/05/2017
+# Atualizado (1.0.7) - 04/06/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -48,23 +49,29 @@ def getCategorias(url):
 		link = openURL(url)
 		soup = BeautifulSoup(link)
 		
-		conteudo   = soup("div", {"class": "fundo"})
-		arquivo = conteudo[0]("div", {"class": "margem"})
-		categorias = arquivo[0]("div", {"class": "smallcategoria"})
-		
+		#conteudo   = soup("div", {"class": "fundo"})
+		#arquivo = conteudo[0]("div", {"class": "margem"})
+		#categorias = arquivo[0]("div", {"class": "smallcategoria"})
+		conteudo   = soup("div", {"class": "container"})
+		arquivo = conteudo[3]("ul", {"class": "listagem-categorias"})
+		categorias = arquivo[0]("li")
+
 		totC = len(categorias)
 		
 		for categoria in categorias:
-				titC = categoria.img["title"].encode('utf-8','replace')
+				#titC = categoria.img["title"].encode('utf-8','replace')
+				titC = categoria.h2.text.encode('utf-8','replace')
 				titC = titC.replace('Assistir Filmes ', '').replace('Online ', '')
 				titC = titC.replace('de ', '').replace('Assistir ', '')
 				
 				if not 'Lançamento' in titC :
-						urlC = categoria.a["href"]
-						imgC = categoria.img["src"]
-						#imgC = artfolder + limpa(titC) + '.png'
-						titC = titC + " " + categoria.div.div.text.encode('utf-8','replace')
-						addDir(titC,urlC,20,imgC)
+					if not 'Séries' in titC:
+						if not 'Filmes' in titC:
+							urlC = categoria.a["href"]
+							imgC = categoria.img["src"]
+							#imgC = artfolder + limpa(titC) + '.png'
+							#titC = titC + " " + categoria.div.div.text.encode('utf-8','replace')
+							addDir(titC,urlC,20,imgC)
 			
 		setViewMenu()		
 		
@@ -73,13 +80,15 @@ def getFilmes(url):
 		link = unicode(link, 'utf-8', 'ignore')		
 		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("ul", {"class": "lista-filmes"})
-		filmes   = conteudo[0]("div", {"class": "capa"})
-		
+		conteudo = soup("div", {"class": "filmes"})
+		filmes   = conteudo[0]("div", {"class": "item"})
+		#conteudo = soup("ul", {"class": "lista-filmes"})
+		#filmes   = conteudo[0]("div", {"class": "capa"})		
 		totF = len(filmes)
 		
 		for filme in filmes:
-				titF = filme.img["alt"].encode('utf-8','replace')
+				titF = filme.a.text.encode('utf-8','replace')
+				#titF = filme.img["alt"].encode('utf-8','replace')
 				titF = titF.replace('Assistir ','').replace('Filme ','')
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
@@ -98,13 +107,15 @@ def getSeries(url):
 		link = unicode(link, 'utf-8', 'ignore')		
 		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("ul", {"class": "lista-filmes"})
-		filmes   = conteudo[0]("div", {"class": "capa"})
-		
+		conteudo = soup("div", {"class": "filmes"})
+		filmes   = conteudo[0]("div", {"class": "item"})
+		#conteudo = soup("ul", {"class": "lista-filmes"})
+		#filmes   = conteudo[0]("div", {"class": "capa"})		
 		totF = len(filmes)
 		
 		for filme in filmes:
-				titF = filme.img["alt"].encode('utf-8','replace')
+				titF = filme.a.text.encode('utf-8','replace')
+				#titF = filme.img["alt"].encode('utf-8','replace')
 				titF = titF.replace('Assistir ','').replace('Filme ','')
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
@@ -152,8 +163,10 @@ def getEpisodios(name, url):
 		conteudo = soup('div',{'class':'tab_content'})
 
 		imgF = ""
-		img = soup.find("div", {"class": "capa-single"})
-		imgF = re.findall(r'<img src="(.*?) alt=.*?" />', str(img))
+		#img = soup.find("div", {"class": "capa-single"})
+		img = soup.find("div", {"class": "capa-post"})
+		#imgF = re.findall(r'<img src="(.*?) alt=.*?" />', str(img))
+		imgF = re.findall(r'<img src="(.*?) class=.*?" />', str(img))
 		img = imgF[0]
 			
 		try:
@@ -218,16 +231,20 @@ def pesquisa():
 
 				link  = openURL(url)
 				link = unicode(link, 'utf-8', 'ignore')		
-		
+				
 				soup     = BeautifulSoup(link)
-				conteudo = soup("div", {"class": "esquerda"})
-				filmes   = conteudo[0]("div", {"class": "capa"})
+				conteudo = soup("div", {"class": "filmes"})
+				filmes   = conteudo[0]("div", {"class": "item"})
+				#conteudo = soup("ul", {"class": "lista-filmes"})
+				#filmes   = conteudo[0]("div", {"class": "capa"})	
 				totF = len(filmes)
 				hosts = []
 				for filme in filmes:
-					urlF = filme.a['href'].encode('utf-8', 'ignore')
-					titF = filme.a.text.encode('utf-8', 'ignore').replace('\n','')
-					imgF = filme.img['src']
+					titF = filme.a.text.encode('utf-8','replace')
+					#titF = filme.img["alt"].encode('utf-8','replace')
+					titF = titF.replace('Assistir ','').replace('Filme ','')
+					urlF = filme.a["href"].encode('utf-8', 'ignore')
+					imgF = filme.img["src"].encode('utf-8', 'ignore')
 					temp = [urlF, titF, imgF]
 					hosts.append(temp)
 					
@@ -420,12 +437,14 @@ def player_series(name,url,iconimage):
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 		urlVideo = 'http://www.pirataplay.com/embed/' + urlVideo
 
-		xbmc.log('[plugin.video.assistirfilmeshd] L420 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmeseseriesonline] L420 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[0]['src'])
+		
+		xbmc.log('[plugin.video.filmeseseriesonline] L434 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
