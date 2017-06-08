@@ -4,10 +4,12 @@
 # Addon : FilmesOnLineHD1
 # By AddonReneSilva - 02/11/2016
 # Atualizado (1.0.1) - 02/11/2016
+# Atualizado (1.0.2) - 08/06/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import urlresolver
+import json
 
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
@@ -24,10 +26,10 @@ base        = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNvbmxpbmVoZDExLmNj')
 
 def menuPrincipal():
 		addDir('Categorias'                , base							,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/lancamentos/'			,   20, artfolder + 'lancamentos.png')
+		addDir('Lançamentos'               , base 							,   20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + '/?s=dublado&submit='	,   20, artfolder + 'pesquisa.png')
-		addDir('Seriados'	               , base + '/series/'				,   25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'           , '--'							,   30, artfolder + 'pesquisa.png')
+		#addDir('Seriados'	               , base + '/series/'				,   25, artfolder + 'legendados.png')
+		#addDir('Pesquisa Series'           , '--'							,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'           , '--'							,   35, artfolder + 'pesquisa.png')
 		addDir('Configurações'             , base							,  999, artfolder + 'config.png', 1, False)
 		addDir('Configurações ExtendedInfo', base							, 1000, artfolder + 'config.png', 1, False)
@@ -39,15 +41,14 @@ def getCategorias(url):
 		soup = BeautifulSoup(link)
 		link = unicode(link, 'utf-8', 'ignore')
 		
-		conteudo   = soup("div", {"class": "cabecalho"})	
-		categorias = conteudo[0]('li', {'class':'unidade submenu'})
-		categorias = categorias[0]('li')
-				
+		conteudo = soup('div', {'class':'ui two column grid'})
+		categorias = conteudo[0]('a')
+	
 		totC = len(categorias)
 		
 		for categoria in categorias:
 				titC = categoria.text.encode('utf-8','replace')
-				urlC = categoria.a["href"]
+				urlC = "http:" + categoria["href"]
 				imgC = artfolder + limpa(titC) + '.png'
 				addDir(titC,urlC,20,imgC)
 			
@@ -57,18 +58,20 @@ def getFilmes(url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "peliculas"})
-		filmes   = conteudo[0]("div", {"class": "item"})
+		conteudo = soup.findAll("div", {"class": "ui main inverted segment"})
+		if not conteudo :
+			conteudo = soup.findAll("div", {"class": "ui six special doubling cards"})
+		filmes   = conteudo[0]("a", {"class": "ui card"})
 		totF = len(filmes)
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
-				urlF = filme.a["href"].encode('utf-8')
-				imgF = filme.img["src"].encode('utf-8')
+				urlF = "http:" + filme["href"].encode('utf-8')
+				imgF = "http:" + filme.img["src"].encode('utf-8')
 				addDirF(titF, urlF, 100, imgF, False, totF)
 
 		try :
-				proxima = re.findall('<a class="nextpostslink" rel="next" href="(.*?)">.*?</a>', link)[0]				
-				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
+				proxima = re.findall('<a class="item" href="(.*?)">Pr.*?<i class="angle right icon"></i></a>', link)[0]				
+				addDir('Próxima Página >>', "http:"+proxima, 20, artfolder + 'proxima.png')
 		except : 
 				pass
 				
@@ -79,36 +82,32 @@ def getSeries(url):
 		link = unicode(link, 'utf-8', 'ignore')		
 		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "peliculas"})
-		filmes   = conteudo[0]("div", {"class": "item"})
+		conteudo = soup.findAll("div", {"class": "ui six special doubling cards"})
+		filmes   = conteudo[0]("a", {"class": "ui card"})
 		totF = len(filmes)
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
-				urlF = filme.a["href"].encode('utf-8')
-				imgF = filme.img["src"].encode('utf-8')
+				urlF = "http:" + filme["href"].encode('utf-8')
+				imgF = "http:" + filme.img["src"].encode('utf-8')
 				addDir(titF, urlF, 26, imgF)
 				
 		try : 
-				proxima = re.findall('<a class="nextpostslink" rel="next" href="(.*?)">.*?</a>', link)[0]				
-				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
+				proxima = re.findall('<a class="item" href="(.*?)">Pr.*?<i class="angle right icon"></i></a>', link)[0]				
+				addDir('Próxima Página >>', "http:"+proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
 				
 		setViewFilmes()
 
 def getTemporadas(url):
+		xbmc.log('[plugin.video.filmesonlinehd11] L102 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')	
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "cuerpo"})
-		if not conteudo:
-			conteudo = soup.findAll("film", {"class":"players"})
-			srvsdub  = conteudo[0]("iframe")
-		else:
-			srvsdub  = conteudo[0]("iframe")
-		urlF = srvsdub[0]['src']
+		conteudo = soup.findAll("div", {"class":"embed"})
+		urlF  = conteudo[0]("data-url")
 		
-		img = soup.find("div", {"class": "caratula"})
+		img = soup.find("div", {"class": "three wide center aligned column posterColumn"})
 		if not img:
 			img = soup.find("div", {"class": "peli"})
 		imgF = re.findall(r'<img src="(.*?) alt=.*?" />', str(img))
@@ -206,18 +205,17 @@ def pesquisa():
 				link  = openURL(url)
 				link = unicode(link, 'utf-8', 'ignore')		
 				soup     = BeautifulSoup(link)
-				conteudo = soup.findAll("div", {"class": "peliculas"})
-				if not conteudo:
-						conteudo = soup.findAll("div", {"class": "filmes"})
-						filmes   = conteudo[1]("film", {"class": "item"})
-				else:
-						filmes   = conteudo[0]("div", {"class": "item"})
+				conteudo = soup.findAll("div", {"class": "ui main inverted segment"})
+				if not conteudo :
+					conteudo = soup.findAll("div", {"class": "ui six special doubling cards"})
+				filmes   = conteudo[0]("a", {"class": "ui card"})
+				
 				totF = len(filmes)
-				#print totF
+				
 				for filme in filmes:
 						titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
-						urlF = filme.a["href"].encode('utf-8')
-						imgF = filme.img["src"].encode('utf-8')	
+						urlF = "http:" + filme["href"].encode('utf-8')
+						imgF = "http:" + filme.img["src"].encode('utf-8')
 						temp = [urlF, titF, imgF]
 						hosts.append(temp)
 					
@@ -256,27 +254,22 @@ def player(name,url,iconimage):
 
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')	
-		soup     = BeautifulSoup(link)
-		conteudo = soup("film", {"class": "players"})
-		if not conteudo:
-				conteudo = soup.findAll("div", {"class": "cuerpo"})
-				srvsdub  = conteudo[0]("iframe")
-		else:
-				srvsdub  = conteudo[0]("iframe")
-		url = srvsdub[0]['src']
+		soup = BeautifulSoup(link)
+		conteudo = soup("div", {"class": "ui embed dimmable"})
+		urlF = conteudo[0]['data-url']
 
-		link = openURL(url)
+		link = openURL(urlF)
 		link = unicode(link, 'utf-8', 'ignore')	
 		soup = BeautifulSoup(link)
+		dados = {}
+		dados = re.findall("links=(.*?);", link)[0]
 
-		conteudo = soup("div", {"class": "embed"})
-		srvsdub  = conteudo[0]("button")
-
+		srvsdub = json.loads(dados)
 		totD = len(srvsdub)
-		print totD
+
 		for i in range(totD) :
-				srv = srvsdub[i].text.encode('utf-8').replace('Assistir por ','')
-				srv = srv.replace('Assistir Por ', '')
+				srv = srvsdub[i]["Nome"]
+				srv = srv.replace('Assistir Por ', '').replace('Assistir por ', '')
 				titsT.append(srv)
 				
 		if not titsT : return
@@ -286,22 +279,16 @@ def player(name,url,iconimage):
 		if index == -1 : return
 		
 		i = index
-		
-		servers = re.findall("addiframe\('(.*?)'\);", link)
-		print servers
 
-		urlVideo = servers[i]
+		urlVideo = srvsdub[i]["Url"]
 		print urlVideo
+		xbmc.log('[plugin.video.filmesonlinehd11] L287 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
 		if 'nowvideo.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
-				
-		elif 'video.tt' in urlVideo :
-				vttID = urlVideo.split('e/')[1]
-				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
 				
 		elif 'flashx.php' in urlVideo :
 				fxID = urlVideo.split('id=')[1]
@@ -311,16 +298,18 @@ def player(name,url,iconimage):
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://ok.ru/videoembed/%s' % okID
 				
-		elif 'openload' in urlVideo :
+		elif 'openload2' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://openload.co/embed/%s' % okID			
 				
-		elif 'thevid.net' in urlVideo :
-				linkTV  = openURL(urlVideo)		
+		elif 'thevid2.net' in urlVideo :
+				okID = urlVideo.split('e/')[1]
+				urlVideo = 'http://thevid.net/v/%s' % okID
+				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
+				url2Play = re.findall('var vurl\d+="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])				
 	
 				OK = False
@@ -334,13 +323,10 @@ def player(name,url,iconimage):
 				url2Play = []
 				pass
 				
+		if url2Play : xbmc.log('[plugin.video.filmesonlinehd11] L341 - ' + str(url2Play), xbmc.LOGNOTICE)
+		
 		if not url2Play : return
-		
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(url2Play)
-		#xbmcgui.Dialog().ok(addonname, line1)	
-		
+
 		legendas = '-'
 	
 		mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
@@ -372,7 +358,7 @@ def player(name,url,iconimage):
 					xbmcPlayer.setSubtitles(sfile)
 			else:
 				xbmcPlayer.setSubtitles(legendas)
-		return ok
+		#return ok
 		
 def player_series(name,url,iconimage):
 		OK = True
@@ -471,7 +457,8 @@ def openConfigEI():
 
 def openURL(url):
 		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		req.add_header('User-Agent', 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C)')
+		#req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
