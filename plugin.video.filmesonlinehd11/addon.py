@@ -5,6 +5,7 @@
 # By AddonReneSilva - 02/11/2016
 # Atualizado (1.0.1) - 02/11/2016
 # Atualizado (1.0.2) - 08/06/2017
+# Atualizado (1.0.3) - 09/06/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -200,18 +201,14 @@ def pesquisa():
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				url      = base + '/?s=%s&submit=' % str(pesquisa)
+				url      = base + '/search?q=%s' % str(pesquisa)
 
 				link  = openURL(url)
 				link = unicode(link, 'utf-8', 'ignore')		
 				soup     = BeautifulSoup(link)
-				conteudo = soup.findAll("div", {"class": "ui main inverted segment"})
-				if not conteudo :
-					conteudo = soup.findAll("div", {"class": "ui six special doubling cards"})
+				conteudo = soup("div", {"class": "wrapcontent"})
 				filmes   = conteudo[0]("a", {"class": "ui card"})
-				
 				totF = len(filmes)
-				
 				for filme in filmes:
 						titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
 						urlF = "http:" + filme["href"].encode('utf-8')
@@ -500,15 +497,23 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 
 def getInfo(url)	:
 		link = openURL(url)
-		titO = re.findall('<h1>(.*?)</h1>', link)[2]
-		titO = titO.split('&#8211')[0]
+		titO = re.findall('<h1 class="ui inverted header">(.*?)</h1>', link)[0]
+		xbmc.log('[plugin.video.filmesonlinehd11] L504 - ' + str(titO), xbmc.LOGNOTICE)
+		titO = titO.split('-')[0]
 
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
 		link = openURL(url)
-		ytID = re.findall('<iframe width="560" height="315" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen>', link)[0]
-
+		soup = BeautifulSoup(link)
+		conteudo = soup("div", {"class": "embed"})
+		y = soup("div",{"class":"socialButtons"})
+		print y
+		a= y[0].a["href"]
+		ytID = a.split("v=")[1]
+		#ytID = re.findall('<a href="https://www.youtube.com/watch?v=(.*?)" class="negative ui mini fluid button" data-lity.+?<a>', str(link))
+		xbmc.log('[plugin.video.filmesonlinehd11] L512 - ' + str(ytID), xbmc.LOGNOTICE)
+		
 		if not ytID : 
 			addon = xbmcaddon.Addon()
 			addonname = addon.getAddonInfo('name')
@@ -517,7 +522,9 @@ def playTrailer(name, url,iconimage):
 			xbmcgui.Dialog().ok(addonname, line1, line2)	
 			return
 			
-		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s")' % ytID)
+		#xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s)' % ytID)
+		xbmcPlayer = xbmc.Player()
+		xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id='+ytID)
 	
 def setViewMenu() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
