@@ -1,0 +1,4 @@
+[B]12/06/2017 v 1.0.0[/B]
+- Versao inicial do Addon by AddonBrasil
+[B]14/06/2017 v 1.0.1[/B]
+- Liberando acesso a opção "Series"
