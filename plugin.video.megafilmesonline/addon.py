@@ -5,6 +5,7 @@
 # By AddonBrasil - 11/12/2015
 # Atualizado (1.0.1) - 15/12/2015
 # Atualizado (1.1.0) - 12/03/2016
+# Atualizado (1.2.0) - 14/06/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -37,21 +38,17 @@ def menuPrincipal():
 		
 def getCategorias(url):
 		link = openURL(url)
+		link = unicode(link, 'utf-8', 'ignore')	
 		soup = BeautifulSoup(link)
-		
 		conteudo   = soup("div", {"id": "menu-principal"})
-		
 		categorias = conteudo[0]("li")
-				
 		totC = len(categorias)
-		
 		for categoria in categorias:
 				titC = categoria.a.text.encode('utf-8','replace')
-				
 				if not 'Lançamento' in titC :
+					if not 'Porno' in titC :
 						urlC = categoria.a["href"]
 						imgC = artfolder + limpa(titC) + '.png'
-				
 						addDir(titC,urlC,20,imgC)
 			
 		setViewMenu()		
@@ -59,14 +56,10 @@ def getCategorias(url):
 def getFilmes(url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		
-		
-		
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "galeria-videos"})
 		filmes   = conteudo[0]("div", {"class": "box-video"})
-		#print filmes
 		totF = len(filmes)
-
 		for filme in filmes:
 				titF = filme.a["title"].encode('utf-8')
 				urlF = filme.a["href"].encode('utf-8')
@@ -140,12 +133,7 @@ def getEpisodios(name, url):
 		img = soup.find("div", {"class": "content"})
 		imgF = re.findall(r'src=[\'"]?([^\'" >]+)', str(img))
 		img = imgF[0]
-									
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(img)
-		#xbmcgui.Dialog().ok(addonname, line1)	
-				
+											
 		try:
 			#arquivo = conteudo[n]('div', {'class': 'lista-relacionados servers'})
 			#dublados = arquivo[0]('div', {'class': 'player-video box-temp-old'})
@@ -155,12 +143,7 @@ def getEpisodios(name, url):
 			result= re.split(r'Epi', au)
 			audio = result[0]
 			audio = audio.replace('Assistir', '')
-									
-			addon = xbmcaddon.Addon()
-			addonname = addon.getAddonInfo('name')
-			line1 = str(dublados)
-			xbmcgui.Dialog().ok(addonname, line1)	
-			
+
 			for link in dublados:
 					url = link.a["href"].encode('utf-8', 'ignore')
 					titulo = link.a.text.encode('utf-8', 'ignore')
@@ -274,18 +257,15 @@ def player(name,url,iconimage):
 
 		conteudo = soup("div", {"class": "player-video"})
 		links = conteudo[i]("iframe")
-								
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(links)
-		#xbmcgui.Dialog().ok(addonname, line1)	
-		
+
 		if len(links) == 0 : links = conteudo[0]("a")
 
 		urlVideo = re.findall(r'data-src=[\'"]?([^\'" >]+)', str(links))[0]
-		okID = urlVideo.split('embed/?v=')[1]
-		urlVideo = okID
-
+		#okID = urlVideo.split('embed/?v=')[1]
+		#urlVideo = okID
+								
+		xbmc.log('[plugin.video.megafilmesonline] L279 ' + str(urlVideo), xbmc.LOGNOTICE)
+		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
 		if 'nowvideo.php' in urlVideo :
@@ -296,30 +276,30 @@ def player(name,url,iconimage):
 				vttID = urlVideo.split('e/')[1]
 				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
 				
+		elif 'mail.ru' in urlVideo :
+				url2Play = str(urlVideo)
+				xbmc.log('[plugin.video.megafilmesonline] L393 ' + str(url2Play), xbmc.LOGNOTICE)
+				
 		elif 'flashx.php' in urlVideo :
 				fxID = urlVideo.split('id=')[1]
 				urlVideo = 'http://www.flashx.tv/embed-%s.html' % fxID
 				
-		elif 'ok.ru' in urlVideo :
+		elif 'ok.ru2' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://ok.ru/videoembed/%s' % okID
 				
-		elif 'openload' in urlVideo :
+		elif 'openload2' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://openload.co/embed/%s' % okID			
 				
 		elif 'thevid.net' in urlVideo :
-				linkTV  = openURL(urlVideo)		
-				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
-				aMatches = re.compile(sPattern).findall(linkTV)
-				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])				
-	
-				OK = False
+				okID = urlVideo.split('e/')[1]
+				urlVideo = 'http://thevid.net/e/%s' % okID	
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
-
+		
+		xbmc.log('[plugin.video.megafilmesonline] L323 ' + str(url2Play), xbmc.LOGNOTICE)
+		
 		if not url2Play : return
 		
 		legendas = '-'
