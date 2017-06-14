@@ -28,11 +28,11 @@ base         = base64.b64decode('aHR0cDovL2hkZmlsbWVzb25saW5lZ3JhdGlzLm5ldC8=')
 
 def menuPrincipal():
 		addDir('Categorias'                , base							,	10, artfolder + 'categorias.png')
+		addDir('Coleções'                  , base + 'colecoes/'				,	15, artfolder + 'filmes.png')
 		addDir('Lançamentos'               , base + 'genero/lancamentos/'	,	20, artfolder + 'new.png')
 		addDir('Filmes Dublados'           , base + '?s=dublado' 			,	20, artfolder + 'filmes.png')
 		addDir('Filmes 720p'               , base + 'qualidade/720p/' 		,	20, artfolder + 'filmes.png')
 		addDir('Filmes 2016'               , base + 'ano/2016/'				,	20, artfolder + 'filmes.png')
-		addDir('Coleções'                  , base + 'colecoes/'				,	20, artfolder + 'filmes.png')
 		addDir('Series'                    , base + '?post_type=tvshows'	,   25, artfolder + 'series.png')
 		addDir('Pesquisa Series'           , '--'                           ,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'           , '--'                           ,   35, artfolder + 'pesquisa.png')
@@ -57,6 +57,27 @@ def getCategorias(url):
 			
 		setViewMenu()
 		
+def getColecoes(url):
+		link = openURL(url)
+		link = unicode(link, 'utf-8', 'ignore')
+		#xbmc.log('[plugin.video.hdfilmes] L125 ' + str(link), xbmc.LOGNOTICE)
+		soup = BeautifulSoup(link)
+		filmes = soup.findAll("div", {"class":"item"})
+		totF = len(filmes)
+		for i in range(totF):
+				imgF = filmes[i].img['src']
+				titF = filmes[i].img['alt'].encode('utf-8','replace')
+				urlF = filmes[i].a['href']
+				addDir(titF,urlF,20,imgF)
+				#addDirF(titF, urlF, 100, imgF, False, totF, pltF)
+		try :
+				proxima = re.findall('<link rel="next" href="(.*?)"', link)[0]
+				addDir('Próxima Página >>', proxima, 15, artfolder + 'proxima.png')
+		except : 
+				pass
+				
+		#setViewFilmes()
+		
 def getFilmes(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
@@ -70,8 +91,11 @@ def getFilmes(url):
 				urlF = databox.a['href']
 				soup = BeautifulSoup(str(databox))
 				sinopse = soup.findAll("div", {"class":"boxinfo"})
-				sinopse = sinopse[0]("span", {"class":"ttx"})
-				pltF = sinopse[0].text.encode('utf-8','replace')
+				if "ttx" in sinopse :
+					sinopse = sinopse[0]("span", {"class":"ttx"})
+					pltF = sinopse[0].text.encode('utf-8','replace')
+				else:
+					pltF = ""
 				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
 		try :
 				proxima = re.findall('<link rel="next" href="(.*?)"', link)[0]
@@ -623,6 +647,7 @@ print "Iconimage: "+str(iconimage)
 
 if   mode == None : menuPrincipal()
 elif mode == 10   : getCategorias(url)
+elif mode == 15   : getColecoes(url)
 elif mode == 20   : getFilmes(url)
 elif mode == 25   : getSeries(url)
 elif mode == 26   : getTemporadas(url)
