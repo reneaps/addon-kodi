@@ -12,6 +12,7 @@
 # Atualizado (1.0.5) - 25/05/2017
 # Atualizado (1.0.6) - 25/05/2017
 # Atualizado (1.0.7) - 04/06/2017
+# Atualizado (1.0.8) - 15/06/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -91,8 +92,9 @@ def getFilmes(url):
 				#titF = filme.img["alt"].encode('utf-8','replace')
 				titF = titF.replace('Assistir ','').replace('Filme ','')
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
+				pltF = sinopse(urlF)
 				imgF = filme.img["src"].encode('utf-8', 'ignore')
-				addDirF(titF, urlF, 100, imgF, False, totF)
+				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
 				
 		try : 
 				proxima = re.findall('<a class="next page-numbers" href="(.*?)"', link)[0]
@@ -532,26 +534,22 @@ def openURL(url):
 
 def addDir(name, url, mode, iconimage, total=1, pasta=True):
 		u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
-		
 		ok = True
-		
 		liz = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
-		
 		liz.setProperty('fanart_image', fanart)
 		liz.setInfo(type = "Video", infoLabels = {"title": name})
-		
 		ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
-
 		return ok
 		
-def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
+def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
 		u  = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
 		ok = True
 		
 		liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
 		
 		liz.setProperty('fanart_image', fanart)
-		liz.setInfo(type="Video", infoLabels={"Title": name})
+		#liz.setInfo(type="Video", infoLabels={"Title": name})
+		liz.setInfo(type="Video", infoLabels={"Title": name, "Plot": plot})
 		
 		cmItems = []
 		
@@ -613,6 +611,15 @@ def limpa(texto):
 		
 		return texto
 		
+def sinopse(urlF):
+		link = openURL(urlF)
+		#link = unicode(link, 'utf-8', 'ignore')
+		soup = BeautifulSoup(link)
+		conteudo = soup("div", {"class": "content clearfix"})
+		#print conteudo
+		plot = conteudo[0].text
+		return plot
+
 ############################################################################################################
               
 def get_params():
