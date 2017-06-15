@@ -613,11 +613,12 @@ def limpa(texto):
 		
 def sinopse(urlF):
 		link = openURL(urlF)
-		#link = unicode(link, 'utf-8', 'ignore')
+		link = unicode(link, 'utf-8', 'ignore')
 		soup = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "content clearfix"})
+		#conteudo = soup("div", {"class": "content clearfix"})
+		p = soup('p', limit=11)[5]
 		#print conteudo
-		plot = conteudo[0].text
+		plot = p.text.replace('kk-star-ratings','')
 		return plot
 
 ############################################################################################################
