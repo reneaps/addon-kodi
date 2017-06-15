@@ -6,6 +6,7 @@
 # By AddonReneSilva - 12/06/2017
 # Atualizado (1.0.0) - 12/06/2017
 # Atualizado (1.0.1) - 14/06/2017
+# Atualizado (1.0.2) - 15/06/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -60,7 +61,6 @@ def getCategorias(url):
 def getColecoes(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
-		#xbmc.log('[plugin.video.hdfilmes] L125 ' + str(link), xbmc.LOGNOTICE)
 		soup = BeautifulSoup(link)
 		filmes = soup.findAll("div", {"class":"item"})
 		totF = len(filmes)
@@ -76,7 +76,7 @@ def getColecoes(url):
 		except : 
 				pass
 				
-		#setViewFilmes()
+		setViewFilmes()
 		
 def getFilmes(url):
 		link = openURL(url)
@@ -91,9 +91,10 @@ def getFilmes(url):
 				urlF = databox.a['href']
 				soup = BeautifulSoup(str(databox))
 				sinopse = soup.findAll("div", {"class":"boxinfo"})
-				if "ttx" in sinopse :
-					sinopse = sinopse[0]("span", {"class":"ttx"})
+				if sinopse :
+					sinop = sinopse[0]("span", {"class":"ttx"})
 					pltF = sinopse[0].text.encode('utf-8','replace')
+					xbmc.log('[plugin.video.hdfilmes] L97 ' + str(sinop), xbmc.LOGNOTICE)
 				else:
 					pltF = ""
 				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
@@ -103,13 +104,12 @@ def getFilmes(url):
 		except : 
 				pass
 				
-		#setViewFilmes()
+		setViewFilmes()
 							
 def getSeries(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup = BeautifulSoup(link)
-		#filmes = soup.findAll("div", {"class":"item"})
 		conteudo = soup("div", {"class":"peliculas"})
 		filmes = conteudo[0]("div",{"class":"item"})
 		totF = len(filmes)
@@ -118,7 +118,6 @@ def getSeries(url):
 				titF = databox.img['alt'].encode('utf-8','replace')
 				urlF = databox.a['href']
 				soup = BeautifulSoup(str(databox))
-				#xbmc.log('[plugin.video.hdfilmes] L91 ' + str(soup), xbmc.LOGNOTICE)
 				sinopse = soup.find("div", {"class":"boxinfo"})
 				if sinopse is None :
 						pltF = ''
@@ -131,7 +130,6 @@ def getSeries(url):
 				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
-		#setViewFilmes()
 		
 def getTemporadas(url):
 		link  = openURL(url)
