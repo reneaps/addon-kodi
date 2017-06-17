@@ -30,6 +30,7 @@ selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
 fanart      = addonfolder + '/fanart.png'
+addon_handle = int(sys.argv[1])
 base        = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNlc2VyaWVzb25saW5lLm5ldC8=')
 
 ############################################################################################################
@@ -45,7 +46,7 @@ def menuPrincipal():
 		addDir('Configurações'				, base                             , 999, artfolder + 'config.png', 1, False)
 		addDir('Configurações ExtendedInfo'	, base                            , 1000, artfolder + 'config.png', 1, False)
 			
-		#setViewMenu()		
+		setViewMenu()		
 		
 def getCategorias(url):
 		link = openURL(url)
@@ -181,7 +182,8 @@ def getEpisodios(name, url):
 			result= re.split(r'Epi', au)
 			audio = result[0]
 			if (au.find('Dublado')) == -1 : 
-				audio = name + ' Legendado'
+				if (au.find('Dublada')) == -1 : 
+					audio = name + ' Legendado'
 			else:
 				audio = name + ' Dublado'
 
@@ -202,8 +204,9 @@ def getEpisodios(name, url):
 			au = arquivo[1].text.encode('utf-8')
 			result= re.split(r'Epi', au)
 			audio = result[0]
-			if (au.find('Dublado')) == -1 : 
-				audio = name + ' Legendado'
+			if (au.find('Dublado')) == -1 :
+				if (au.find('Dublada')) == -1 : 
+					audio = name + ' Legendado'
 			else:
 				audio = name + ' Dublado'	
 			for link in legendados:
@@ -560,7 +563,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
 		
 		liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
 		
-		liz.setProperty('fanart_image', fanart)
+		liz.setProperty('fanart_image', iconimage)
 		#liz.setInfo(type="Video", infoLabels={"Title": name})
 		liz.setInfo(type="Video", infoLabels={"Title": name, "Plot": plot})
 		
@@ -604,16 +607,18 @@ def setViewFilmes() :
 
 		opcao = selfAddon.getSetting('filmesVisu')
 
-		if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
-		elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
-		elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
-		elif opcao == '3': xbmc.executebuiltin("Container.SetViewMode(501)")
-		elif opcao == '4': xbmc.executebuiltin("Container.SetViewMode(508)")
-		elif opcao == '5': xbmc.executebuiltin("Container.SetViewMode(504)")
-		elif opcao == '6': xbmc.executebuiltin("Container.SetViewMode(503)")
-		elif opcao == '7': xbmc.executebuiltin("Container.SetViewMode(515)")
-		elif opcao == '8': xbmc.executebuiltin("Container.SetViewMode(550)")
-		elif opcao == '9': xbmc.executebuiltin("Container.SetViewMode(560)")
+		if   opcao ==  '0': xbmc.executebuiltin("Container.SetViewMode(50)")
+		elif opcao ==  '1': xbmc.executebuiltin("Container.SetViewMode(51)")
+		elif opcao ==  '2': xbmc.executebuiltin("Container.SetViewMode(500)")
+		elif opcao ==  '3': xbmc.executebuiltin("Container.SetViewMode(501)")
+		elif opcao ==  '4': xbmc.executebuiltin("Container.SetViewMode(502)")
+		elif opcao ==  '5': xbmc.executebuiltin("Container.SetViewMode(503)")
+		elif opcao ==  '6': xbmc.executebuiltin("Container.SetViewMode(508)")
+		elif opcao ==  '7': xbmc.executebuiltin("Container.SetViewMode(504)")
+		elif opcao ==  '8': xbmc.executebuiltin("Container.SetViewMode(503)")
+		elif opcao ==  '9': xbmc.executebuiltin("Container.SetViewMode(515)")
+		elif opcao == '10': xbmc.executebuiltin("Container.SetViewMode(550)")
+		elif opcao == '11': xbmc.executebuiltin("Container.SetViewMode(560)")
 		
 def limpa(texto):
 		texto = texto.replace('ç','c').replace('ã','a').replace('õ','o')
