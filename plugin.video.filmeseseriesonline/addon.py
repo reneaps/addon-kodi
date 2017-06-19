@@ -14,6 +14,7 @@
 # Atualizado (1.0.7) - 04/06/2017
 # Atualizado (1.0.8) - 15/06/2017
 # Atualizado (1.0.9) - 17/06/2017
+# Atualizado (1.1.0) - 19/06/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -164,6 +165,7 @@ def getEpisodios(name, url):
 
 		soup = BeautifulSoup(link)
 		conteudo = soup('div',{'class':'tab_content'})
+		arquivo = conteudo[n]('ul')
 
 		imgF = ""
 		#img = soup.find("div", {"class": "capa-single"})
@@ -173,10 +175,6 @@ def getEpisodios(name, url):
 		img = imgF[0]
 			
 		try:
-			arquivo = conteudo[n]('ul')
-			if not arquivo:
-				n += 1
-				arquivo = conteudo[n]('ul')
 			dublados = arquivo[0]('li')
 			au = arquivo[0].text.encode('utf-8')
 			result= re.split(r'Epi', au)
@@ -186,20 +184,16 @@ def getEpisodios(name, url):
 					audio = name + ' Legendado'
 			else:
 				audio = name + ' Dublado'
-
 			for link in dublados:
+				if link.a.text != "":
 					url = link.a["href"].encode('utf-8', 'ignore')
 					titulo = link.a.text.encode('utf-8', 'ignore')
 					titulo = str(audio)+" "+titulo
-					tempor = (url, titulo)
-					episodios.append(tempor)
+					temp = (url, titulo)
+					episodios.append(temp)
 		except:
 			pass
 		try:
-			arquivo = conteudo[n]('ul')
-			if not arquivo:
-				n += 1
-				arquivo = conteudo[n]('ul')
 			legendados = arquivo[1]('li')
 			au = arquivo[1].text.encode('utf-8')
 			result= re.split(r'Epi', au)
@@ -210,11 +204,12 @@ def getEpisodios(name, url):
 			else:
 				audio = name + ' Dublado'	
 			for link in legendados:
+				if link.a.text != "":
 					url = link.a["href"].encode('utf-8', 'ignore')
 					titulo = link.a.text.encode('utf-8', 'ignore')
 					titulo = str(audio)+" "+titulo
-					tempor = (url, titulo)
-					episodios.append(tempor)
+					temp = (url, titulo)
+					episodios.append(temp)
 		except:
 			pass		
 
