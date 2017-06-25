@@ -128,6 +128,7 @@ def trailer(name,url,iconimage):
         print link
         xbmcPlayer = xbmc.Player()
         xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id='+link)
+		del xbmcPlayer
         
 def trailer2(name,url,iconimage):
     yt = "https://www.youtube.com/results?search_query="
@@ -138,6 +139,7 @@ def trailer2(name,url,iconimage):
     print idd   
     xbmcPlayer = xbmc.Player()
     xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id='+idd)
+	del xbmcPlayer
 
 def pesquisar_filmes():
     keyb = xbmc.Keyboard('', 'Pesquisar...')
@@ -163,7 +165,7 @@ def player(name,url,iconimage):
     print link_houst
     html = abrir_url(link_houst)
     imgF =  re.compile(r'image:.*."(.*?)",').findall(html)[0]
-    xbmc.log('[plugin.video.filmesonlinex] L152 - ' + str(imgF), xbmc.LOGNOTICE)
+    #xbmc.log('[plugin.video.filmesonlinex] L152 - ' + str(imgF), xbmc.LOGNOTICE)
     addDir('[B]Adicionar aos Favoritos[/B]',name+','+iconimage+','+url,17,url_base2+'E1ebCG3qH1eEfP2v',False)
     try:
         link_video = re.compile(r'"file":"(.*?)","type":".*?","label":"(.*?)".').findall(html)
@@ -198,6 +200,8 @@ def player2(name,url,iconimage):
         status.close()      
     except: 
         xbmcgui.Dialog().ok('FILMESONLINEX', 'Conteudo temporariamente indisponivel,desculpe o transtorno.')
+	del xbmcPlayer
+	del status
         
 ############################################################################################################
 #                                                  FUNCÕES                                                 #
@@ -209,6 +213,7 @@ def abrir_url(url):
     response = urllib2.urlopen(req)
     link=response.read()
     response.close()
+    del response
     return link
     
 def gethtml(url):
@@ -216,6 +221,8 @@ def gethtml(url):
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
     response = urllib2.urlopen(req)
     link = response.read()
+    response.close()
+    del response
     soup = BeautifulSoup(link)
     return soup
 
@@ -360,6 +367,5 @@ elif mode==31:
 elif mode==32:
     print ""
     cast_upnp(url)  
-    
     
 xbmcplugin.endOfDirectory(int(sys.argv[1]))
