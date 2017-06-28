@@ -15,6 +15,7 @@
 # Atualizado (1.0.8) - 15/06/2017
 # Atualizado (1.0.9) - 17/06/2017
 # Atualizado (1.1.0) - 19/06/2017
+# Atualizado (1.1.1) - 28/06/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -338,6 +339,10 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 
+		elif 'raptu' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
+
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
@@ -450,6 +455,7 @@ def player_series(name,url,iconimage):
 		i = int(index)
 		
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
+		
 		urlVideo = 'http://www.pirataplay.com/embed/' + urlVideo
 
 		link = openURL(urlVideo)
@@ -465,6 +471,10 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
 
+		elif 'raptu.com' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
+
 		if 'vidzi2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidzi.tv/embed-%s.html' % fxID
@@ -474,13 +484,14 @@ def player_series(name,url,iconimage):
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 								
 		elif 'thevid2' in urlVideo :
-				fxID = urlVideo.split('=')[1]
+				fxID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
+				xbmc.log('[plugin.video.filmeseseriesonline] L485 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+				url2Play = re.findall('var vurl_\d+a="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])				
 	
 				OK = False
@@ -536,12 +547,16 @@ def openConfigEI():
 		xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-		response = urllib2.urlopen(req)
-		link=response.read()
-		response.close()
-		return link
+        headers = {
+        "Referer": url,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"
+    }
+        req = urllib2.Request(url, "",headers)
+        req.get_method = lambda: 'GET'
+        response = urllib2.urlopen(req)
+        link=response.read()
+        response.close()
+        return link
 
 def addDir(name, url, mode, iconimage, total=1, pasta=True):
 		u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
