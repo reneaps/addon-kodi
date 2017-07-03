@@ -9,6 +9,7 @@
 # Atualizado (1.0.4) - 06/02/2017
 # Atualizado (1.0.5) - 21/05/2017
 # Atualizado (1.0.6) - 25/05/2017
+# Atualizado (1.0.7) - 03/07/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -272,13 +273,15 @@ def player(name,url,iconimage):
 		if len(links) == 0 : links = conteudo[0]("a")
 		
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
+		
+		xbmc.log('[plugin.video.assistirfilmeshd] L276 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
-		urlVideo = str(conteudo[1]['src'])
+		urlVideo = str(conteudo[0]['src'])
 		
-		xbmc.log('[plugin.video.assistirfilmeshd] L277 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd] L283 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -286,9 +289,9 @@ def player(name,url,iconimage):
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
 				
-		elif 'video.tt' in urlVideo :
-				vttID = urlVideo.split('e/')[1]
-				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
+		elif 'youwatch.org' in urlVideo :
+				vttID = urlVideo.split('embed-')[1]
+				urlVideo = 'http://youwatch.org/embed-%s' % vttID
 				
 		elif 'flashx.php' in urlVideo :
 				fxID = urlVideo.split('id=')[1]
@@ -298,14 +301,14 @@ def player(name,url,iconimage):
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://ok.ru/videoembed/%s' % okID
 				
-		elif 'openload' in urlVideo :
+		elif 'openload2' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'https://openload.co/embed/%s' % okID
 				
 		elif 'thevid.net' in urlVideo :
-				okID = urlVideo.split('e/')[1]
+				okID = urlVideo.split('v/')[1]
 				urlVideo = 'http://thevid.net/v/%s' % okID
-				xbmc.log('[plugin.video.assistirfilmeshd] L304 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.assistirfilmeshd] L310 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				'''
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
@@ -319,7 +322,7 @@ def player(name,url,iconimage):
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 		
-		xbmc.log('[plugin.video.assistirfilmeshd] L318 - ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd] L324 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		if not url2Play : return
 		
@@ -354,7 +357,7 @@ def player(name,url,iconimage):
 					xbmcPlayer.setSubtitles(sfile)
 			else:
 				xbmcPlayer.setSubtitles(legendas)
-
+		
 def player_series(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
@@ -396,18 +399,15 @@ def player_series(name,url,iconimage):
 		
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 		
-		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L398] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L401] ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
-		addon = xbmcaddon.Addon()
-		addonname = addon.getAddonInfo('name')
-		line1 = str(conteudo)
-		#xbmcgui.Dialog().ok(addonname, line1)
+
 		urlVideo = str(conteudo[0]['src'])
 
-		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L405] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L412] ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
@@ -427,7 +427,7 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
 				
-		elif 'ok.ru' in urlVideo :
+		elif 'ok2.ru' in urlVideo :
 				fxID = urlVideo.split('embed')[1]
 				urlVideo = 'https://ok.ru/videoembed%s' % fxID
 				
@@ -436,7 +436,7 @@ def player_series(name,url,iconimage):
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
+				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])				
 	
 				OK = False
@@ -551,7 +551,7 @@ def playTrailer(name, url,iconimage):
 			addon = xbmcaddon.Addon()
 			addonname = addon.getAddonInfo('name')
 			line1 = str("Trailer não disponível!")
-			xbmcgui.Dialog().ok(addonname, line1)	
+			xbmcgui.Dialog().ok(addonname, line1)
 			return
 			
 		xbmcPlayer = xbmc.Player()
