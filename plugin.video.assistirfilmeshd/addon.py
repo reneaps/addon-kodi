@@ -10,6 +10,7 @@
 # Atualizado (1.0.5) - 21/05/2017
 # Atualizado (1.0.6) - 25/05/2017
 # Atualizado (1.0.7) - 03/07/2017
+# Atualizado (1.0.8) - 05/07/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -18,9 +19,9 @@ import urlresolver
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-addon_id  = 'plugin.video.assistirfilmeshd'
-selfAddon = xbmcaddon.Addon(id=addon_id)
-
+versao      = '1.0.8'
+addon_id    = 'plugin.video.assistirfilmeshd'
+selfAddon   = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
 fanart      = addonfolder + '/fanart.png'
