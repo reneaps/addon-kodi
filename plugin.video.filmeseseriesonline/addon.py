@@ -16,6 +16,7 @@
 # Atualizado (1.0.9) - 17/06/2017
 # Atualizado (1.1.0) - 19/06/2017
 # Atualizado (1.1.1) - 28/06/2017
+# Atualizado (1.1.2) - 10/07/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -27,13 +28,14 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-addon_id  = 'plugin.video.filmeseseriesonline'
-selfAddon = xbmcaddon.Addon(id=addon_id)
-addonfolder = selfAddon.getAddonInfo('path')
-artfolder   = addonfolder + '/resources/img/'
-fanart      = addonfolder + '/fanart.png'
+version		 = '1.1.2'
+addon_id     = 'plugin.video.filmeseseriesonline'
+selfAddon    = xbmcaddon.Addon(id=addon_id)
+addonfolder  = selfAddon.getAddonInfo('path')
+artfolder    = addonfolder + '/resources/img/'
+fanart       = addonfolder + '/fanart.png'
 addon_handle = int(sys.argv[1])
-base        = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNlc2VyaWVzb25saW5lLm5ldC8=')
+base         = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNlc2VyaWVzb25saW5lLm5ldC8=')
 
 ############################################################################################################
 
@@ -343,6 +345,10 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
 
+		elif 'vidoza' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
+
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
@@ -482,6 +488,10 @@ def player_series(name,url,iconimage):
 		elif 'ok2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
+
+		elif 'vidoza' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
 								
 		elif 'thevid2' in urlVideo :
 				fxID = urlVideo.split('e/')[1]
