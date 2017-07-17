@@ -17,6 +17,7 @@
 # Atualizado (1.1.0) - 19/06/2017
 # Atualizado (1.1.1) - 28/06/2017
 # Atualizado (1.1.2) - 10/07/2017
+# Atualizado (1.1.3) - 17/07/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -28,7 +29,7 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version		 = '1.1.2'
+version		 = '1.1.3'
 addon_id     = 'plugin.video.filmeseseriesonline'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
@@ -654,7 +655,7 @@ def sinopse(urlF):
 		link = unicode(link, 'utf-8', 'ignore')
 		soup = BeautifulSoup(link)
 		#conteudo = soup("div", {"class": "content clearfix"})
-		p = soup('p', limit=11)[5]
+		p = soup('p', limit=5)[1]
 		#print conteudo
 		plot = p.text.replace('kk-star-ratings','')
 		return plot
