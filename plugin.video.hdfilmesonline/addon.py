@@ -7,38 +7,40 @@
 # Atualizado (1.0.0) - 12/06/2017
 # Atualizado (1.0.1) - 14/06/2017
 # Atualizado (1.0.2) - 15/06/2017
+# Atualizado (1.0.3) - 17/07/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import urlresolver
 from urlparse import urlparse
 
-from resources.lib.BeautifulSoup import BeautifulSoup
-from resources.lib               import jsunpack
+from resources.lib.BeautifulSoup		import BeautifulSoup
+from resources.lib						import jsunpack
 
+version   = '1.0.3'
 addon_id  = 'plugin.video.hdfilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
-addonfolder  = selfAddon.getAddonInfo('path')
-artfolder    = addonfolder + '/resources/img/'
-fanart       = addonfolder + '/fanart.png'
+addonfolder	= selfAddon.getAddonInfo('path')
+artfolder	= addonfolder + '/resources/img/'
+fanart		= addonfolder + '/fanart.png'
 addon_handle = int(sys.argv[1])
-base         = base64.b64decode('aHR0cDovL2hkZmlsbWVzb25saW5lZ3JhdGlzLm5ldC8=')
+base		= base64.b64decode('aHR0cDovL2hkZmlsbWVzb25saW5lZ3JhdGlzLm5ldC8=')
 
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base							,	10, artfolder + 'categorias.png')
-		addDir('Coleções'                  , base + 'colecoes/'				,	15, artfolder + 'filmes.png')
-		addDir('Lançamentos'               , base + 'genero/lancamentos/'	,	20, artfolder + 'new.png')
-		addDir('Filmes Dublados'           , base + '?s=dublado' 			,	20, artfolder + 'filmes.png')
-		addDir('Filmes 720p'               , base + 'qualidade/720p/' 		,	20, artfolder + 'filmes.png')
-		addDir('Filmes 2016'               , base + 'ano/2016/'				,	20, artfolder + 'filmes.png')
-		addDir('Series'                    , base + '?post_type=tvshows'	,   25, artfolder + 'series.png')
-		addDir('Pesquisa Series'           , '--'                           ,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'           , '--'                           ,   35, artfolder + 'pesquisa.png')
-		addDir('Configurações'             , base                           ,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo', base                           , 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'					, base							,	10, artfolder + 'categorias.png')
+		addDir('Coleções'					, base + 'colecoes/'				,	15, artfolder + 'filmes.png')
+		addDir('Lançamentos'				, base + 'genero/lancamentos/'	,	20, artfolder + 'new.png')
+		addDir('Filmes Dublados'			, base + '?s=dublado'			,	20, artfolder + 'filmes.png')
+		addDir('Filmes 720p'				, base + 'qualidade/720p/'		,	20, artfolder + 'filmes.png')
+		addDir('Filmes 2016'				, base + 'ano/2016/'				,	20, artfolder + 'filmes.png')
+		addDir('Series'						, base + '?post_type=tvshows'		,	25, artfolder + 'series.png')
+		addDir('Pesquisa Series'			, '--'							,	30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'			, '--'							,	35, artfolder + 'pesquisa.png')
+		addDir('Configurações'				, base							,	 999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo'	,base							,  1000, artfolder + 'config.png', 1, False)
 			
 		setViewMenu()		
 		
@@ -148,8 +150,9 @@ def getTemporadas(url):
 		for i in range(totF):
 			a = links[i]('span',{'class':'title'})
 			titF = a[0].text.encode('utf-8','replace')
+			titF = titF.replace('&#8217;', '\'')
 			xbmc.log('[plugin.video.hdfilmes] L125 ' + str(titF), xbmc.LOGNOTICE)
-			addDir(titF, urlF, 27, imgF, False, totF)
+			addDir(titF, urlF, 27, imgF, totF)
 
 
 def getEpisodios(name, url):
@@ -187,9 +190,9 @@ def pesquisa():
 		keyb.doModal()
 
 		if (keyb.isConfirmed()):
-				texto    = keyb.getText()
+				texto	 = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				url      = base + '?s=%s' % str(pesquisa)
+				url		 = base + '?s=%s' % str(pesquisa)
 				hosts = []
 				
 				link = openURL(url)
@@ -202,31 +205,36 @@ def pesquisa():
 					titF = databox.img['alt'].encode('utf-8','replace')
 					urlF = databox.a['href']
 					soup = BeautifulSoup(str(databox))
-					#sinopse = soup.findAll("div", {"class":"boxinfo"})
-					#sinopse = sinopse[0]("span", {"class":"ttx"})
-					#pltF = sinopse[0].text.encode('utf-8','replace')
-					#pltF = sinopse(urlF)
-					temp = [urlF, titF, imgF]
+					sinopse = soup.findAll("div", {"class":"boxinfo"})
+					if sinopse :
+						sinop = sinopse[0]("span", {"class":"ttx"})
+						pltF = sinopse[0].text.encode('utf-8','replace')
+						xbmc.log('[plugin.video.hdfilmes] L97 ' + str(sinop), xbmc.LOGNOTICE)
+					else:
+						pltF = ""
+					temp = [urlF, titF, imgF, pltF]
 					hosts.append(temp)
 					
 				a = []
-				for url, titulo, img in hosts:
-					temp = [url, titulo, img]
+				for url, titulo, img, pltf in hosts:
+					temp = [url, titulo, img, pltf]
 					a.append(temp);
 				return a
 
 def doPesquisaSeries():
 		a = pesquisa()
 		total = len(a)
-		for url2, titulo, img in a:
+		for url2, titulo, img, pltf in a:
 			addDir(titulo, url2, 26, img, False, total)
 			
 def doPesquisaFilmes():
 		a = pesquisa()
 		total = len(a)
-		for url2, titulo, img in a:
-			addDir(titulo, url2, 100, img, False, total)
-			
+		for url2, titulo, img, pltF in a:
+			#addDir(titulo, url2, 100, img, False, total)
+			addDirF(titulo, url2, 100, img, False, total, pltF)
+		setViewFilmes()
+		
 def player(name,url,iconimage):
 		if "#" in url: 
 			addon = xbmcaddon.Addon()
@@ -244,7 +252,7 @@ def player(name,url,iconimage):
 		matriz = []
 		urlF = []
 		
-		xbmc.log('[plugin.video.hdfilmes] L245 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L253 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)
 		link  = unicode(link, 'utf-8', 'ignore')
 		soup  = BeautifulSoup(link)
@@ -252,14 +260,18 @@ def player(name,url,iconimage):
 
 		for i in  range (0,len(links)):
 			link = links[i].iframe['src']
-			#xbmc.log('[plugin.video.hdfilmes] L253 - ' + str(link), xbmc.LOGNOTICE)
-			domain = urlparse(link)
-			domain = domain.netloc.split('.')[0]
-			if not "hdfilmesonlinegratis" in link : 
-				urlF.append(link)
-				titsT.append(domain)
+			xbmc.log('[plugin.video.hdfilmes] L261 - ' + str(link), xbmc.LOGNOTICE)
+			#if not "hdfilmesonlinegratis" in link :
+			urllink = ""
+			if not "filmeshd.php" in link:
+				if not "/hd/embed/" in link:
+					urllink = link.split('url=')[1]
+					domain = urlparse(urllink)
+					domain = domain.netloc.split('.')[0]
+					urlF.append(urllink)
+					titsT.append(domain)
 			
-		xbmc.log('[plugin.video.hdfilmes] L259 ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L268 ' + str(urlF), xbmc.LOGNOTICE)
 		
 		if not titsT : return
 		
@@ -271,7 +283,7 @@ def player(name,url,iconimage):
 		
 		urlVideo = urlF[i]
 
-		#links  = conteudo[0]('a')
+		#links	= conteudo[0]('a')
 		
 		#if len(links) == 0 : links = conteudo[0]("a")
 		
@@ -297,7 +309,7 @@ def player(name,url,iconimage):
 		elif 'thevid2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
-				linkTV  = openURL(urlVideo)		
+				linkTV	= openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
@@ -380,12 +392,12 @@ def player_series(name,url,iconimage):
 		links = conteudo[0]("a")
 		
 		for i in links:
-			link =  i["onclick"]
+			link =	i["onclick"]
 			link2 = link.split("=")[1]
 			link2 = link2.replace("\'","")
 			link = link.split("=")[2]
 			link = link.replace("\'","")
-			srv  = i.text.encode('utf-8','replace')
+			srv	 = i.text.encode('utf-8','replace')
 			#xbmc.log('[plugin.video.hdfilmes] L341 - ' + str(link), xbmc.LOGNOTICE)
 			if not "hdfilmesonlinegratis" in link : 
 				urlF.append(link)
@@ -404,7 +416,7 @@ def player_series(name,url,iconimage):
 		
 		urlVideo = base + "v/t/" + hosts[i]
 
-		#links  = conteudo[0]('a')
+		#links	= conteudo[0]('a')
 		
 		#if len(links) == 0 : links = conteudo[0]("a")
 		
@@ -503,7 +515,7 @@ def openConfigEI():
 
 def openURL(url):
 		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64; Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
@@ -540,14 +552,16 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
 
 def getInfo(url)	:
 		link = openURL(url)
-		titO = re.findall('<h1 id="tt-site" class="hidden-xs">(.*?)</h1>', link)[0]
+		#titO = re.findall('<h1 itemprop="name"><a href=".*?" title="(.*?)">.*?</a></h1>', link)[0]
+		titO = re.findall('<span class="titulo_o"><i itemprop="name">(.*?)</i>.*?</span>', link)[0]
 		titO = titO.replace('Assistir','').replace('Dublado','').replace('Legendado','').replace('Online','')
 						
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
 		link = openURL(url)
-		ytID = re.findall('<iframe width="100%" height="100%" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen>.*?</iframe>', link)[0]
+		link  = unicode(link, 'utf-8', 'ignore')
+		ytID = re.findall('<iframe width=".*?" height=".*?" src="//www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen></iframe>', link)[0]
 
 		if not ytID : 
 			addon = xbmcaddon.Addon()
@@ -556,14 +570,15 @@ def playTrailer(name, url,iconimage):
 			xbmcgui.Dialog().ok(addonname, line1)	
 			return
 
-		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s)' % ytID)
+		xbmc.executebuiltin('XBMC.RunPlugin("plugin://plugin.video.youtube/play/?video_id=%s")' % ytID)
+		#xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s)' % ytID)
 	
 def setViewMenu() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 		
 		opcao = selfAddon.getSetting('menuVisu')
 		
-		if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
+		if	 opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
 		elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
 		elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
 		
@@ -572,7 +587,7 @@ def setViewFilmes() :
 
 		opcao = selfAddon.getSetting('filmesVisu')
 
-		if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
+		if	 opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
 		elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
 		elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
 		elif opcao == '3': xbmc.executebuiltin("Container.SetViewMode(501)")
@@ -600,40 +615,40 @@ def sinopse(urlF):
 		#print conteudo
 		plot = conteudo[0].span.text
 		return plot
-'''			
+'''
 ############################################################################################################
  
 def get_params():
-        param=[]
-        paramstring=sys.argv[2]
-        if len(paramstring)>=2:
-                params=sys.argv[2]
-                cleanedparams=params.replace('?','')
-                if (params[len(params)-1]=='/'):
-                        params=params[0:len(params)-2]
-                pairsofparams=cleanedparams.split('&')
-                param={}
-                for i in range(len(pairsofparams)):
-                        splitparams={}
-                        splitparams=pairsofparams[i].split('=')
-                        if (len(splitparams))==2:
-                                param[splitparams[0]]=splitparams[1]
-                                
-        return param
+		param=[]
+		paramstring=sys.argv[2]
+		if len(paramstring)>=2:
+				params=sys.argv[2]
+				cleanedparams=params.replace('?','')
+				if (params[len(params)-1]=='/'):
+						params=params[0:len(params)-2]
+				pairsofparams=cleanedparams.split('&')
+				param={}
+				for i in range(len(pairsofparams)):
+						splitparams={}
+						splitparams=pairsofparams[i].split('=')
+						if (len(splitparams))==2:
+								param[splitparams[0]]=splitparams[1]
+								
+		return param
 
-params    = get_params()
-url       = None
-name      = None
-mode      = None
+params	  = get_params()
+url		  = None
+name	  = None
+mode	  = None
 iconimage = None
 
-try    : url=urllib.unquote_plus(params["url"])
+try	   : url=urllib.unquote_plus(params["url"])
 except : pass
-try    : name=urllib.unquote_plus(params["name"])
+try	   : name=urllib.unquote_plus(params["name"])
 except : pass
-try    : mode=int(params["mode"])
+try	   : mode=int(params["mode"])
 except : pass
-try    : iconimage=urllib.unquote_plus(params["iconimage"])
+try	   : iconimage=urllib.unquote_plus(params["iconimage"])
 except : pass
 
 print "Mode: "+str(mode)
@@ -643,21 +658,21 @@ print "Iconimage: "+str(iconimage)
 
 ###############################################################################################################
 
-if   mode == None : menuPrincipal()
-elif mode == 10   : getCategorias(url)
-elif mode == 15   : getColecoes(url)
-elif mode == 20   : getFilmes(url)
-elif mode == 25   : getSeries(url)
-elif mode == 26   : getTemporadas(url)
-elif mode == 27   : getEpisodios(name,url)
-elif mode == 30   : doPesquisaSeries()
-elif mode == 35   : doPesquisaFilmes()
-elif mode == 40   : getFavoritos()
-elif mode == 41   : addFavoritos(name,url,iconimage)
-elif mode == 42   : remFavoritos(name,url,iconimage)
-elif mode == 43   : cleanFavoritos()
-elif mode == 98   : getInfo(url)
-elif mode == 99   : playTrailer(name,url,iconimage)
+if	 mode == None : menuPrincipal()
+elif mode == 10	  : getCategorias(url)
+elif mode == 15	  : getColecoes(url)
+elif mode == 20	  : getFilmes(url)
+elif mode == 25	  : getSeries(url)
+elif mode == 26	  : getTemporadas(url)
+elif mode == 27	  : getEpisodios(name,url)
+elif mode == 30	  : doPesquisaSeries()
+elif mode == 35	  : doPesquisaFilmes()
+elif mode == 40	  : getFavoritos()
+elif mode == 41	  : addFavoritos(name,url,iconimage)
+elif mode == 42	  : remFavoritos(name,url,iconimage)
+elif mode == 43	  : cleanFavoritos()
+elif mode == 98	  : getInfo(url)
+elif mode == 99	  : playTrailer(name,url,iconimage)
 elif mode == 100  : player(name,url,iconimage)
 elif mode == 110  : player_series(name,url,iconimage)
 elif mode == 999  : openConfig()
