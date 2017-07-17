@@ -15,7 +15,7 @@ except:
 	import simplejson as json
 h = HTMLParser.HTMLParser()
 
-versao = '0.0.5'
+versao = '0.0.6'
 addon_id = 'plugin.video.filmesonlinex'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -167,7 +167,7 @@ def player(name,url,iconimage):
 	imgF =	re.compile(r'image:.*."(.*?)",').findall(html)[0]
 	addDir('[B]Adicionar aos Favoritos[/B]',name+','+iconimage+','+url,17,url_base2+'jNC8q5',False)
 	try:
-		link_video = re.compile(r'"file":"(.*?)","type":".*?","label":"(.*?)".').findall(html)
+		link_video = re.compile(r'file: "(.*?)", type: ".*?", label: "(.*?)".').findall(html)
 		sfile = re.compile(r'file: "(.*?)",label: ".*?",').findall(html)
 		for urlF, qual in link_video:
 			urlF = urlF.replace("\\", "")
