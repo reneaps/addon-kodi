@@ -6,6 +6,7 @@
 # Atualizado (1.0.1) - 15/12/2015
 # Atualizado (1.1.0) - 12/03/2016
 # Atualizado (1.2.0) - 14/06/2017
+# Atualizado (1.3.0) - 18/07/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -14,6 +15,7 @@ import urlresolver
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
+version   = '1.3.0'
 addon_id  = 'plugin.video.megafilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -277,8 +279,8 @@ def player(name,url,iconimage):
 				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
 				
 		elif 'mail.ru' in urlVideo :
-				url2Play = str(urlVideo)
-				xbmc.log('[plugin.video.megafilmesonline] L393 ' + str(url2Play), xbmc.LOGNOTICE)
+				urlVideo = str(urlVideo)
+				xbmc.log('[plugin.video.megafilmesonline] L281 ' + str(urlVideo), xbmc.LOGNOTICE)
 				
 		elif 'flashx.php' in urlVideo :
 				fxID = urlVideo.split('id=')[1]
@@ -298,7 +300,7 @@ def player(name,url,iconimage):
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 		
-		xbmc.log('[plugin.video.megafilmesonline] L323 ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megafilmesonline] L301 ' + str(url2Play), xbmc.LOGNOTICE)
 		
 		if not url2Play : return
 		
