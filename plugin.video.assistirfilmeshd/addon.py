@@ -11,6 +11,7 @@
 # Atualizado (1.0.6) - 25/05/2017
 # Atualizado (1.0.7) - 03/07/2017
 # Atualizado (1.0.8) - 05/07/2017
+# Atualizado (1.0.9) - 21/07/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -19,7 +20,7 @@ import urlresolver
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-versao      = '1.0.8'
+versao      = '1.0.9'
 addon_id    = 'plugin.video.assistirfilmeshd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -30,14 +31,14 @@ base        = base64.b64decode('aHR0cDovL3d3dy5hc3Npc3RpcmZpbG1lc2hkLm9yZw==')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base + '/categoria/'			,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/categoria/lancamento-de-2016/' 	,	20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'           , base + '/search.php?s=dublado&btn-busca=' 	,	20, artfolder + 'pesquisa.png')
-		addDir('Series'		               , base + '/categoria/series/'	,   25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'           , '--'                           ,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'           , '--'                           ,   35, artfolder + 'pesquisa.png')
-		addDir('Configurações'             , base                           ,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo', base                           , 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'                , base + '/categoria/'						,   10, artfolder + 'categorias.png')
+		addDir('Lançamentos'               , base + '/categoria/lancamento-de-2016/' 	,	20, artfolder + 'new.png')
+		addDir('Filmes Dublados'           , base + '/search.php?s=dublado&btn-busca=' 	,	20, artfolder + 'filmes.png')
+		addDir('Series'		               , base + '/categoria/series/'				,   25, artfolder + 'series.png')
+		addDir('Pesquisa Series'           , '--'										,   30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'           , '--'										,   35, artfolder + 'pesquisa.png')
+		addDir('Configurações'             , base										,  999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo', base										, 1000, artfolder + 'config.png', 1, False)
 			
 		setViewMenu()		
 		
