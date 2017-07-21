@@ -470,7 +470,7 @@ def player_series(name,url,iconimage):
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[0]['src'])
 		
-		xbmc.log('[plugin.video.filmeseseriesonline] L456 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmeseseriesonline] L473 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -491,7 +491,7 @@ def player_series(name,url,iconimage):
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 
 		elif 'vidoza' in urlVideo :
-				fxID = urlVideo.split('=')[1]
+				fxID = urlVideo.split('-')[1]
 				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
 								
 		elif 'thevid2' in urlVideo :
