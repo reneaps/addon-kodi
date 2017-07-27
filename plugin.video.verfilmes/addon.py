@@ -5,6 +5,7 @@
 # Addon : VerFilmes
 # By AddonReneSilva - 17/02/2017
 # Atualizado (1.0.0) - 17/02/2017
+# Atualizado (1.0.1) - 27/07/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -127,6 +128,7 @@ def getTemporadas(url):
 
 
 def getEpisodios(name, url):
+		xbmc.log('[plugin.video.verfilmesBiz] L130 - ' + str(url), xbmc.LOGNOTICE)
 		n = name.replace('ª Temporada', '')	
 		n = int(n)
 		temp = []
@@ -226,6 +228,10 @@ def doPesquisaSeries():
 			
 def doPesquisaFilmes():
 		a = pesquisa()
+		xbmc.log('[plugin.video.verfilmes] L229 - ' + str(a), xbmc.LOGNOTICE)
+		if a is None:
+			xbmcgui.Dialog().ok('VerFilmes', 'Conteudo temporariamente indisponivel,desculpe o transtorno.')
+			return 
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 100, img, False, total)
@@ -271,7 +277,7 @@ def player(name,url,iconimage):
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
-		xbmc.log('[plugin.video.verfilmes] L274 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmes] L279 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if 'openload2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
@@ -281,7 +287,7 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed%s' % fxID
 				
-		elif 'thevid' in urlVideo :
+		elif 'thevid2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		

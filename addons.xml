@@ -248,11 +248,11 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.verfilmes" name="VerfilmesBiz" version="1.0.0" provider-name="AddonReneSilva">
+<addon id="plugin.video.verfilmes" name="VerfilmesBiz" version="1.0.1" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.urlresolver" version="2.10.8"/>
-        <import addon="script.extendedinfo" version="3.0.0"/>
+		<import addon="script.module.urlresolver" version="2.10.8"/>
+		<import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
 
   <extension point="xbmc.python.pluginsource" library="addon.py">
@@ -264,10 +264,10 @@
     <platform>all</platform>
     <summary lang="en">Filmes e Series Online</summary>
     <description lang="en">
-            No addon VerFilmes.biz voce assiste filmes separados por categorias, lancamentos,filmes HD, etc.
-            Voce tambem pode ver as informacoes ou assistir ao trailer do filme no submenu do addon (Botao direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
-        </description>
+			No addon VerFilmes.biz voce assiste filmes separados por categorias, lancamentos,filmes HD, etc.
+			Voce tambem pode ver as informacoes ou assistir ao trailer do filme no submenu do addon (Botao direito do mouse ou tecla "C").
+			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+		</description>
   </extension>
 </addon>
 
