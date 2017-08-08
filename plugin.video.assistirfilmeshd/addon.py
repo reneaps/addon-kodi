@@ -12,6 +12,7 @@
 # Atualizado (1.0.7) - 03/07/2017
 # Atualizado (1.0.8) - 05/07/2017
 # Atualizado (1.0.9) - 21/07/2017
+# Atualizado (1.1.0) - 08/08/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -32,7 +33,7 @@ base        = base64.b64decode('aHR0cDovL3d3dy5hc3Npc3RpcmZpbG1lc2hkLm9yZw==')
 
 def menuPrincipal():
 		addDir('Categorias'                , base + '/categoria/'						,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/categoria/lancamento-de-2016/' 	,	20, artfolder + 'new.png')
+		addDir('Lançamentos'               , base + '/categoria/lancamento-de-2017/' 	,	20, artfolder + 'new.png')
 		addDir('Filmes Dublados'           , base + '/search.php?s=dublado&btn-busca=' 	,	20, artfolder + 'filmes.png')
 		addDir('Series'		               , base + '/categoria/series/'				,   25, artfolder + 'series.png')
 		addDir('Pesquisa Series'           , '--'										,   30, artfolder + 'pesquisa.png')
@@ -66,6 +67,7 @@ def getCategorias(url):
 def getFilmes(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
+		#xbmc.log('[plugin.video.assistirfilmeshd] L70 - ' + str(url), xbmc.LOGNOTICE)
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"id": "wrap"})
 		filmes   = conteudo[0]("div", {"class": "box-filme"})
