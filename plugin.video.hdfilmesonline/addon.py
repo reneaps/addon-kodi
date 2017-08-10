@@ -8,6 +8,7 @@
 # Atualizado (1.0.1) - 14/06/2017
 # Atualizado (1.0.2) - 15/06/2017
 # Atualizado (1.0.3) - 17/07/2017
+# Atualizado (1.0.4) - 10/08/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -265,11 +266,12 @@ def player(name,url,iconimage):
 			urllink = ""
 			if not "filmeshd.php" in link:
 				if not "/hd/embed/" in link:
-					urllink = link.split('url=')[1]
-					domain = urlparse(urllink)
-					domain = domain.netloc.split('.')[0]
-					urlF.append(urllink)
-					titsT.append(domain)
+					if not "id=5090" in link:
+						urllink = link.split('url=')[1]
+						domain = urlparse(urllink)
+						domain = domain.netloc.split('.')[0]
+						urlF.append(urllink)
+						titsT.append(domain)
 			
 		xbmc.log('[plugin.video.hdfilmes] L268 ' + str(urlF), xbmc.LOGNOTICE)
 		
