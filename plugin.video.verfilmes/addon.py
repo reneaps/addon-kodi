@@ -6,6 +6,8 @@
 # By AddonReneSilva - 17/02/2017
 # Atualizado (1.0.0) - 17/02/2017
 # Atualizado (1.0.1) - 27/07/2017
+# Atualizado (1.0.2) - 13/08/2017
+# Atualizado (1.0.3) - 14/08/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -78,7 +80,7 @@ def getFilmes(url):
 		except : 
 				pass
 				
-		#setViewFilmes()
+		setViewFilmes()
 							
 def getSeries(url):
 		link = openURL(url)
@@ -104,7 +106,7 @@ def getSeries(url):
 				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
-		#setViewFilmes()
+		setViewFilmes()
 		
 def getTemporadas(url):
 		link  = openURL(url)
@@ -125,7 +127,6 @@ def getTemporadas(url):
 			titF = str(i) + "ª Temporada"
 			xbmc.log('[plugin.video.verfilmes] L125 ' + str(imgF), xbmc.LOGNOTICE)
 			addDir(titF, urlF, 27, imgF, False, totF)
-
 
 def getEpisodios(name, url):
 		xbmc.log('[plugin.video.verfilmesBiz] L130 - ' + str(url), xbmc.LOGNOTICE)
@@ -185,8 +186,10 @@ def getEpisodios(name, url):
 		total = len(episodios)
 		
 		for titF, urlF in episodios:
-				addDir(titF, urlF, 110, imgF, False, totF)
+				addDirF(titF, urlF, 110, imgF, False, totF)
 
+		setViewFilmes()
+		
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
@@ -277,7 +280,7 @@ def player(name,url,iconimage):
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
-		xbmc.log('[plugin.video.verfilmes] L279 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmes] L280 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if 'openload2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
@@ -285,7 +288,7 @@ def player(name,url,iconimage):
 				
 		elif 'ok' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://ok.ru/videoembed%s' % fxID
+				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 				
 		elif 'thevid2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
@@ -384,9 +387,10 @@ def player_series(name,url,iconimage):
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup.findAll("iframe")
-		urlVideo = conteudo[1].get('src')
+		xbmc.log('[plugin.video.verfilmesBiz - player_series -L387] ' + str(conteudo), xbmc.LOGNOTICE)
+		urlVideo = conteudo[0].get('src')
 		
-		xbmc.log('[plugin.video.verfilmesBiz - player_series -L383] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmesBiz - player_series -L390] ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -402,11 +406,11 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidto.me/embed-%s-850x550.html' % fxID
 
-		elif 'vidzi2' in urlVideo :
+		elif 'vidzi' in urlVideo :
 				fxID = urlVideo.split('-')[1]
 				urlVideo = 'http://vidzi.tv/%s.html' % fxID
 						
-		elif 'thevid' in urlVideo :
+		elif 'thevid2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		
@@ -462,8 +466,6 @@ def player_series(name,url,iconimage):
 			else:
 				xbmcPlayer.setSubtitles(legendas)
 
-		return ok
-				
 ############################################################################################################
 		
 def openConfig():
