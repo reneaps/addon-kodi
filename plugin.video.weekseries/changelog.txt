@@ -1,0 +1,12 @@
+[B]06/02/2017 v 1.0.3[/B]
+- Correção no bug da opção series apartir da 2a pagina não estava
+trazendo as temporadas.
+
+[B]21/12/2016 v 1.0.2[/B]
+
+[B]06/12/2016 v 1.0.1[/B]
+
+[B]02/11/2016 v 1.0.0[/B]
+- Versao inicial do Addon by AddonReneSilva
+
+

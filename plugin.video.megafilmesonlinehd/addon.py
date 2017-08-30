@@ -7,6 +7,7 @@
 # Atualizado (1.0.2) - 01/03/2017
 # Atualizado (1.0.3) - 14/06/2017
 # Atualizado (1.0.4) - 22/06/2017
+# Atualizado (1.0.5) - 30/08/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -14,6 +15,7 @@ import urlresolver
 
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
+from urlparse import urlparse
 
 addon_id  = 'plugin.video.megafilmesonlinehd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
@@ -21,20 +23,19 @@ selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
 fanart      = addonfolder + '/fanart.png'
-base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhZmlsbWVzb25saW5laGQub3Jn')
+base        = base64.b64decode('aHR0cDovL21lZ2FmaWxtZXNoZHBsdXMub3Jn') #
+#base        = base64.b64decode('aHR0cDovL3d3dy5tbWZpbG1lcy5jb20v') #http://www.mmfilmes.com/
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base + '/'						,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/filmes-lancamentos'	,   20, artfolder + 'ultimos.png')
-		addDir('Filmes Dublados'           , base + '/?s=dublado&btn-busca=',   20, artfolder + 'filmes.png')
-		addDir('Filmes 1080p'              , base + '/?s=dublado&btn-busca=',   20, artfolder + 'filmes.png')
-		addDir('Filmes 720p'               , base + '/?s=dublado&btn-busca=',   20, artfolder + 'filmes.png')
-		addDir('Seriados'	               , base + '/seriados/'  			,   25, artfolder + 'series.png')
-		addDir('Pesquisa Series'           , '--'                           ,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'           , '--'                           ,   35, artfolder + 'pesquisa.png')
-		addDir('Configurações'             , base                           ,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo', base                           , 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'                , base + '/'							,   10, artfolder + 'categorias.png')
+		addDir('Lançamentos'               , base + '/category/lancamentos/'	,   20, artfolder + 'ultimos.png')
+		addDir('Filmes Dublados'           , base + '/?s=dublado'				,   20, artfolder + 'filmes.png')
+		addDir('Seriados'	               , base + '/series/'  				,   25, artfolder + 'series.png')
+		addDir('Pesquisa Series'           , '--'                           	,   30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'           , '--'                           	,   35, artfolder + 'pesquisa.png')
+		addDir('Configurações'             , base                           	,  999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo', base                           	, 1000, artfolder + 'config.png', 1, False)
 			
 		setViewMenu()		
 		
@@ -43,31 +44,35 @@ def getCategorias(url):
 		link = unicode(link, 'utf-8', 'ignore')	
 		
 		soup = BeautifulSoup(link)
-		conteudo   = soup("ul", {"class": "menu"})
-		categorias = conteudo[0]("li")
+		conteudo = soup("div", {"class": "fundo"})
+		dados = conteudo[0]("ul", {"id": "menu"})
+		categorias = dados[0]('li')
 				
 		totC = len(categorias)
 		
 		for categoria in categorias:
-				titC = categoria.a.text.encode('utf-8','replace')
+				titC = categoria.span.text.encode('utf-8','replace')
 				if not 'Lançamento' in titC :
+					if not 'Séries' in titC:
 						urlC = categoria.a["href"]
 						imgC = artfolder + limpa(titC) + '.png'
 						addDir(titC,urlC,20,imgC)
 			
-		setViewMenu()		
+		setViewMenu()
 		
 def getFilmes(url):
 		xbmc.log('[plugin.video.megafilmesonlinehd] L59 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "galeria"})
-		filmes   = conteudo[0]("div", {"class": "center"})
+		conteudo = soup("div", {"class": "cont_marg"})
+		dados = conteudo[1]("ul", {"class": "lista-filmes"})
+		filmes = dados[0]('li')
 		totF = len(filmes)
 
 		for filme in filmes:
-				titF = filme.a["title"].encode('utf-8')
+				titF = filme.a.getText().encode('utf-8')
+				titF = titF.replace('&#8211;','-')
 				urlF = filme.a["href"].encode('utf-8')
 				#urlF = urlF.replace("http://www.megafilmesonlinehd.com", base)
 				imgF = filme.img["src"].encode('utf-8')
@@ -86,14 +91,14 @@ def getSeries(url):
 		link = unicode(link, 'utf-8', 'ignore')		
 		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "galeria"})
-		filmes   = conteudo[0]("div", {"class": "center"})
+		conteudo = soup("div", {"class": "cont_marg"})
+		dados = conteudo[1]("ul", {"class": "lista-filmes"})
+		filmes = dados[0]('li')
 		totF = len(filmes)
 
 		for filme in filmes:
-				titF = filme.a["title"].encode('utf-8')
+				titF = filme.a.getText().encode('utf-8')
 				urlF = filme.a["href"].encode('utf-8')
-				#urlF = urlF.replace("http://www.megafilmesonlinehd.com", base)
 				imgF = filme.img["src"].encode('utf-8')
 				addDir(titF, urlF, 26, imgF)
 				
@@ -102,17 +107,30 @@ def getSeries(url):
 				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
+		setViewFilmes()
 		
 def getTemporadas(url):
 		link  = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')		
+		link = unicode(link, 'utf-8', 'ignore')
 		soup = BeautifulSoup(link)
-		conteudo = soup.find("div", {"class": "top-menu-abas full-hidden"})
-		temporadas = conteudo('a')
+		conteudo = soup("div", {"class": "btn-ver"})
+		b=re.findall(r'<div class="btn-flm" alt=".*?" onclick="boxp\(\'(.*?)\)" data-toggle="modal" data-target=".open_box">',link)[0]
+		url=re.findall(r'[\'"]?([^\'" >]+)', str(b))[0]
+		link = openURL(url)
+		soup = BeautifulSoup(link)	
+		conteudo = soup("div", {"class": "list_play"})
+		srvsdub = conteudo[0]("li")
+		urlF = srvsdub[0].a['href']
+		link  = openURL(urlF)
+		link = unicode(link, 'utf-8', 'ignore')
+		soup = BeautifulSoup(link)
+		conteudo = soup("div", {"class": "box"})
+		linhas = conteudo[0]("ul", {"class": "menu-temps"})
+		temporadas = linhas[0]("li")
 		totF = len(temporadas)
 		img = ''
-		urlF = url
 		i = 1
+		xbmc.log('[plugin.video.megafilmesonlinehd] L129 - ' + str(urlF), xbmc.LOGNOTICE)
 		while i <= totF:
 			titF = str(i) + "ª Temporada"
 			try:
@@ -122,58 +140,68 @@ def getTemporadas(url):
 			i = i + 1
 		
 def getEpisodios(name, url):
+		xbmc.log('[plugin.video.megafilmesonlinehd] L138 - ' + str(url), xbmc.LOGNOTICE)
 		n = name.replace('ª Temporada', '')	
 		n = int(n)
-		n = (n-1)
 		temp = []
-		tempor = []
 		episodios = []
 	
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		
-		
-		soup = BeautifulSoup(link)
-		conteudo = soup('div',{'id':'player-filme'})
-		arquivo = conteudo[0]('div', {'class':'aba-menu full-hidden item'+str(n)+' atual esconder'})
-		tipo = arquivo[0]('div', {'class': 'p-temporada'})
-		imgF = ""
-		img = soup.find("div", {"class": "content relative"})
-		imgF = re.findall(r'<img src="(.*?) alt=.*?" />', str(img))
-		img = imgF[0]
 
+		soup = BeautifulSoup(link)
+		conteudo = soup("div", {"class": "box"})
+		linhas = conteudo[0]("div", {"class": "content"})
+		arquivo = linhas[0]("div")
+		domain = urlparse(url)
+		host = host = domain.scheme + "://" + domain.netloc + "/series/"
+	
 		try:
-			dtable = tipo[0]('table')
-			dublados = dtable[0]('tr')
-			for link in dublados:
-					urlF  = link.findAll('a')[0]['href']
-					try:
-						url2 = link.findAll('a')[1]['href']
-					except:
-						pass
-					titulo = "Episodio " + link.findAll('td')[0].contents[0] + " Dublado"
-					tempor = (titulo, urlF, img)
-					episodios.append(tempor)
+			temporadas = arquivo[n - 1]('table')
+			filmes = temporadas[0]('a')		
+			audio = str(temporadas[0].span.text)
+
+			totF = len(filmes)
+
+			for filme in filmes:
+					titF = filme.text.encode('utf-8', 'ignore')
+					titF = titF.replace('Assistir ','').replace('Filme ','') + " " + audio #" Dublado"
+					titF = str(n) + "T " + titF
+					urlF = filme.get("href").encode('utf-8', 'ignore')
+					urlF = host + urlF
+					temp = (titF, urlF)
+					episodios.append(temp)
 		except:
 			pass
+			
 		try:
-			dtable = tipo[1]('table')
-			dublados = dtable[0]('tr')
-			for link in dublados:
-					urlF  = link.findAll('a')[0]['href']
-					try:
-						url2 = link.findAll('a')[1]['href']
-					except:
-						pass
-					titulo = "Episodio " + link.findAll('td')[0].contents[0] + " Legendado"
-					tempor = (titulo, urlF, img)
-					episodios.append(tempor)
+			temporadas = arquivo[n - 1]('table')
+			filmes = temporadas[1]('a')		
+			audio = str(temporadas[1].span.text)
+
+			totF = len(filmes)
+
+			for filme in filmes:
+					titF = filme.text.encode('utf-8', 'ignore')
+					titF = titF.replace('Assistir ','').replace('Filme ','') + " " + audio #" Legendado"
+					titF = str(n) + "T " + titF
+					urlF = filme.get("href").encode('utf-8', 'ignore')
+					urlF = host + urlF
+					temp = (titF, urlF)
+					episodios.append(temp)
 		except:
-			pass		
-
+			pass
+			
+		audio = []
+		imgF = []
+		img = soup.findAll("meta")[3]
+		imgF = img['content']
+		
 		total = len(episodios)
-
-		for titulo, url, img in episodios:
-				addDirF(titulo, url, 110, iconimage, False, total)
+		
+		for titF, urlF in episodios:
+				addDirF(titF, urlF, 110, imgF, False, totF)
+		setViewFilmes()				
 		
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -183,21 +211,24 @@ def pesquisa():
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
 				url      = base + '/?s=%s&btn-busca=' % str(pesquisa)
+				hosts = []
 
 				link  = openURL(url)
 				link = unicode(link, 'utf-8', 'ignore')		
 
 				soup     = BeautifulSoup(link)
-				conteudo = soup("div", {"class": "galeria"})
-				filmes   = conteudo[0]("div", {"class": "center"})
+				conteudo = soup("div", {"class": "cont_marg"})
+				dados = conteudo[1]("ul", {"class": "lista-filmes"})
+				filmes = dados[0]('li')
+				
 				totF = len(filmes)
-				hosts = []
+
 				for filme in filmes:
-					titF = filme.a["title"].encode('utf-8')
-					urlF = filme.a["href"].encode('utf-8')
-					imgF = filme.img["src"].encode('utf-8')
-					temp = [urlF, titF, imgF]
-					hosts.append(temp)
+						titF = filme.a.getText().encode('utf-8')
+						urlF = filme.a["href"].encode('utf-8')
+						imgF = filme.img["src"].encode('utf-8')
+						temp = [urlF, titF, imgF]
+						hosts.append(temp)
 					
 				a = []
 				for url, titulo, img in hosts:
@@ -217,7 +248,8 @@ def doPesquisaFilmes():
 		total = len(a)
 		for url2, titulo, img in a:
 			addDirF(titulo, url2, 100, img, False, total)
-			
+		setViewFilmes()
+
 def player(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
@@ -232,18 +264,25 @@ def player(name,url,iconimage):
 		link     = openURL(url)
 		link     = unicode(link, 'utf-8', 'ignore')		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("main", {"id": "content-site"})
+		conteudo = soup("div", {"class": "btn-ver"})
 		xbmc.log('[plugin.video.megafilmesonlinehd] L235 ' + str(url), xbmc.LOGNOTICE)
-		article  = conteudo[0]("div",{'class':"content-top full-hidden"})
-		srvsdub  = article[0]("div",{"class":"full-hidden"})
-		serv = srvsdub[0]("div",{"class":"top-menu-abas full-hidden"})
-		srvsdub = serv[0]("a")
+		b=re.findall(r'<div class="btn-flm" alt=".*?" onclick="boxp\(\'(.*?)\)" data-toggle="modal" data-target=".open_box">',link)[0]
+		url=re.findall(r'[\'"]?([^\'" >]+)', str(b))[0]
+		print b
+		link = openURL(url)
+		soup = BeautifulSoup(link)	
+		conteudo = soup("div", {"class": "list_play"})
+		srvsdub = conteudo[0]("li")
 		print srvsdub
 		totD = len(srvsdub)
 		print totD
 		for i in range(totD) :
-				srv = srvsdub[i].text
-				titsT.append(srv)
+				urlF = srvsdub[i].a['href']
+				srv = srvsdub[i].a['href']
+				domain = urlparse(srv)
+				domain = domain.netloc.split('.')[0]
+				titsT.append(domain)
+				idsT.append(urlF)
 				
 		if not titsT : return
 		
@@ -251,14 +290,16 @@ def player(name,url,iconimage):
 		
 		if index == -1 : return
 		
-		i = (index + 1)
+		#i = (index + 1)
+		i = index
 
-		conteudo = soup("div", {"class": "content-player"})
-		links = conteudo[i]("iframe")
+		#conteudo = soup("div", {"class": "content-player"})
+		#links = conteudo[i]("iframe")
 								
-		if len(links) == 0 : links = conteudo[0]("a")
+		#if len(links) == 0 : links = conteudo[0]("a")
 
-		urlVideo = re.findall(r'data-src=[\'"]?([^\'" >]+)', str(links))[0]
+		#urlVideo = re.findall(r'data-src=[\'"]?([^\'" >]+)', str(links))[0]
+		urlVideo = idsT[i]
 		
 		xbmc.log('[plugin.video.megafilmesonlinehd] L262 ' + str(urlVideo), xbmc.LOGNOTICE)
 	
@@ -351,17 +392,19 @@ def player_series(name,url,iconimage):
 		
 		matriz = []
 		
+		xbmc.log('[plugin.video.megafilmesonlinehd] L389 ' + str(url), xbmc.LOGNOTICE)
 		link     = openURL(url)
 		link     = unicode(link, 'utf-8', 'ignore')		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "itens"})
-		xbmc.log('[plugin.video.megafilmesonlinehd] L358 ' + str(url), xbmc.LOGNOTICE)
+		conteudo = soup("div",{"class":"player"})
+		xbmc.log('[plugin.video.megafilmesonlinehd] L396 ' + str(url), xbmc.LOGNOTICE)
 		srvsdub = conteudo[0]("a")
 		print srvsdub
 		totD = len(srvsdub)
 		print totD
 		for i in range(totD) :
 				srv = srvsdub[i].text
+				srv = srv.replace('Assistir no ', '')
 				titsT.append(srv)
 				
 		if not titsT : return
@@ -372,19 +415,23 @@ def player_series(name,url,iconimage):
 		
 		i = index
 
-		urlVideo = srvsdub[i]['data-href']
+		urlVideo = srvsdub[i]['href']
 		
 		xbmc.log('[plugin.video.megafilmesonlinehd] L385 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
-		if 'nowvideo.php' in urlVideo :
-				nowID = urlVideo.split("id=")[1]
-				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
+		if 'vm' in urlVideo :
+				nowID = urlVideo.split('?')[1].split('=')[1].split('/')[0]
+				urlVideo = 'http://videomega.tv/view.php?ref=%s' % nowID
 				
-		elif 'video.tt' in urlVideo :
-				vttID = urlVideo.split('e/')[1]
-				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
+		elif 'vz' in urlVideo :
+				vttID = urlVideo.split('?')[1].split('=')[1].split('/')[0]
+				urlVideo = 'http://vidzi.tv/embed-%s-640x430.html' % vttID
+
+		elif 'strplay' in urlVideo :
+				vttID = urlVideo.split('?')[1].split('=')[1].split('&')[0]
+				urlVideo = 'http://streamplay.to/%s' % vttID
 				
 		elif 'flashx.php' in urlVideo :
 				fxID = urlVideo.split('id=')[1]
@@ -394,13 +441,13 @@ def player_series(name,url,iconimage):
 				okID = urlVideo.split('id=')[1]
 				urlVideo = 'https://ok.ru/videoembed/%s' % okID
 				
-		elif 'open.php' in urlVideo :
-				okID = urlVideo.split('id=')[1]
+		elif 'opload' in urlVideo :
+				okID = urlVideo.split('?')[1].split('=')[1].split('/')[0]
 				urlVideo = 'https://openload.co/embed/%s' % okID
 				
-		elif 'drive.php' in urlVideo :
-				okID = urlVideo.split('id=')[1]
-				urlVideo = 'https://docs.google.com/file/d/%s/preview' % okID
+		elif 'vt' in urlVideo :
+				okID = urlVideo.split('?')[1].split('=')[1].split('/')[0]
+				urlVideo = 'http://vidto.me/embed-%s-640x430.html' % okID
 
 		elif 'netu.php' in urlVideo :
 				okID = urlVideo.split('id=')[1]
