@@ -84,12 +84,14 @@ def getSeries(url):
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "row"})
-		filmes  = conteudo[0]("div", {"class": "col-md-4 col-sm-6"})
+		filmes  = conteudo[1]("div", {"class": "col-md-4 col-sm-6"})
 
 		totF = len(filmes)
 
 		for filme in filmes:
 				titF = filme.a.text.encode('utf-8','replace')
+				titF = titF.replace('Assistir ','').replace(' Online','').replace('–', '').replace('&#038;', "&")
+				xbmc.log('[plugin.video.weekseries] L94 - ' + str(titF), xbmc.LOGNOTICE)
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
 				imgF = re.findall(r' style="background: url\((.*?)\).+"', str(filme.div))[0]
 				addDirF(titF, urlF, 26, imgF)
@@ -220,6 +222,7 @@ def pesquisa():
 
 				for filme in filmes:
 					titF = filme.a.text.encode('utf-8','replace')
+					titF = titF.replace('Assistir ','').replace(' Online','').replace('–', '').replace('&#038;', "&")
 					urlF = filme.a["href"].encode('utf-8', 'ignore')
 					imgF = re.findall(r' style="background: url\((.*?)\).+"', str(filme.div))[0]
 					temp = [urlF, titF, imgF]
