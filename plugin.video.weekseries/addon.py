@@ -23,12 +23,12 @@ base        = base64.b64decode('aHR0cDovL3dlZWtzZXJpZXMub3JnLw==')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base + '/categoria/'						,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/categoria/lancamento-de-2017/' 	,	20, artfolder + 'new.png')
-		addDir('Filmes Dublados'           , base + '/search.php?s=dublado&btn-busca=' 	,	20, artfolder + 'filmes.png')
-		addDir('Series'		               , base + '/categoria/series/'				,   25, artfolder + 'series.png')
+		#addDir('Categorias'                , base + '/categoria/'						,   10, artfolder + 'categorias.png')
+		#addDir('Lançamentos'               , base + '/categoria/lancamento-de-2017/' 	,	20, artfolder + 'new.png')
+		#addDir('Filmes Dublados'           , base + '/search.php?s=dublado&btn-busca=' 	,	20, artfolder + 'filmes.png')
+		addDir('Series'		               , base 										,   25, artfolder + 'series.png')
 		addDir('Pesquisa Series'           , '--'										,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'           , '--'										,   35, artfolder + 'pesquisa.png')
+		#addDir('Pesquisa Filmes'           , '--'										,   35, artfolder + 'pesquisa.png')
 		addDir('Configurações'             , base										,  999, artfolder + 'config.png', 1, False)
 		addDir('Configurações ExtendedInfo', base										, 1000, artfolder + 'config.png', 1, False)
 			
@@ -79,6 +79,7 @@ def getFilmes(url):
 		setViewFilmes()
 					
 def getSeries(url):
+		
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
@@ -97,13 +98,17 @@ def getSeries(url):
 				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
+				
 		setViewFilmes()
 		
-def getTemporadas(url):	
+def getTemporadas(url):
+		xbmc.log('[plugin.video.weekseries] L105 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')						
+		link = unicode(link, 'utf-8', 'ignore')		
+
 		soup     = BeautifulSoup(link)
 		conteudo  = soup("div", {"class": "col-md-6"})
+		xbmc.log('[plugin.video.weekseries] L111 - ' + str(conteudo), xbmc.LOGNOTICE)
 
 		totF = len(conteudo)/2
 		print totF
@@ -112,15 +117,13 @@ def getTemporadas(url):
 		#imgF = img.img['src']
 		#imgF = imgF.split('?src=')[1]
 		#imgF = imgF.split('&')[0]
+		imgF = ''
 		urlF = url
-		i = 1
-		while i <= totF:
-			titF = str(i) + "ª Temporada"
-			try:
-				addDirF(titF, urlF, 27, imgF)
-			except:
-				pass
+		for i in range(totF):
 			i = i + 1
+			titF = str(i) + "ª Temporada"
+			addDirF(titF, urlF, 27, imgF)
+			
 		
 def getEpisodios(name, url):
 		n = name.replace('ª Temporada', '')	
@@ -132,52 +135,63 @@ def getEpisodios(name, url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		
 
-		soup = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "videos"})
-		arquivo = conteudo[0]("li", {"class": "video" + str(n) + "-code"})
-			
+		soup     = BeautifulSoup(link)
+		arquivo  =  soup("div", {"class": "col-md-6"})
+		temporadas = soup("div", {"class": "col-md-6"})
+		
+		totF = len(arquivo)
+		  
 		try:
-			temporadas = arquivo[0]('table')
-			filmes = temporadas[0]('a')		
-			audio = str(arquivo[0].span.text)
-
-			totF = len(filmes)
-
+			y = 2 * n - 2
+			if y == -1 : y = 0
+			print y
+			filmes = temporadas[y]("a")
+			audio = temporadas[y].text.encode('utf-8')
+			if 'legendado' in audio:
+				audio = 'legendado'
+			elif 'dublado' in audio:
+				audio = 'dublado'
+			else:
+				filmes = []
 			for filme in filmes:
-							titF = filme.text.encode('utf-8', 'ignore')
-							titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Dublado"
-							titF = str(n) + "T " + titF
-							urlF = filme.get("href").encode('utf-8', 'ignore')
-							urlF = base + "/" + urlF
+							titF = filme.getText().encode('utf-8', 'ignore')
+							titF = titF.replace('Assistir ','').replace('Filme ','') + " " + audio
+							titF = str(n) + 'T ' + titF
+							urlF = filme["href"].encode('utf-8', 'ignore')
 							temp = (titF, urlF)
 							episodios.append(temp)
 		except:
 			pass
 			
 		try:
-			temporadas = arquivo[0]('table')
-			filmes = temporadas[1]('a')		
-			audio = str(temporadas[1].span.text)
-
-			totF = len(filmes)
-
+			y = 2 * n - 1
+			if y == 0 : y=300
+			print y
+			filmes = temporadas[y]("a")
+			audio = temporadas[y].text.encode('utf-8')
+			if 'legendado' in audio:
+				audio = 'legendado'
+			elif 'dublado' in audio:
+				audio = 'dublado'
+			else:
+				filmes = []
 			for filme in filmes:
-							titF = filme.text.encode('utf-8', 'ignore')
-							titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Legendado"
-							titF = str(n) + "T " + titF
-							urlF = filme.get("href").encode('utf-8', 'ignore')
-							urlF = base + "/" + urlF
+							titF = filme.getText().encode('utf-8', 'ignore')
+							titF = titF.replace('Assistir ','').replace('Filme ','') + " " + audio
+							titF = str(n) + 'T ' + titF
+							urlF = filme["href"].encode('utf-8', 'ignore')
 							temp = (titF, urlF)
 							episodios.append(temp)
 		except:
 			pass
 		
 		audio = []
-		imgF = []
-		img = soup.find("div", {"id": "postimg"})
-		imgF = img.img['src']
-		imgF = imgF.split('?src=')[1]
-		imgF = imgF.split('&')[0]
+		imgF = ''
+		#imgF = []
+		#img = soup.find("div", {"id": "postimg"})
+		#imgF = img.img['src']
+		#imgF = imgF.split('?src=')[1]
+		#imgF = imgF.split('&')[0]
 		
 		total = len(episodios)
 
@@ -191,23 +205,23 @@ def pesquisa():
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				url      = base + '/search.php?s=%s&btn-busca=' % str(pesquisa)
-
-				link  = openURL(url)
-				link = unicode(link, 'utf-8', 'ignore')		
-		
-				soup     = BeautifulSoup(link)
-				conteudo = soup("div", {"id": "wrap"})
-				filmes   = conteudo[0]("div", {"class": "box-filme"})
-				totF = len(filmes)
+				url      = base + '?cat=2&s=%s' % str(pesquisa)
+				
 				hosts = []
+				
+				link = openURL(url)
+				link = unicode(link, 'utf-8', 'ignore')
+				soup = BeautifulSoup(link)
+				conteudo = soup("div", {"class": "row"})
+				filmes = conteudo[1]("div", {"class": "col-md-4 col-sm-6"})
+				xbmc.log('[plugin.video.weekseries] L111 - ' + str(conteudo), xbmc.LOGNOTICE)
+
+				totF = len(filmes)
+
 				for filme in filmes:
-					titF = filme.img["alt"].encode('utf-8','replace')
-					titF = titF.replace('Assistir ','').replace('Filme ','')
+					titF = filme.a.text.encode('utf-8','replace')
 					urlF = filme.a["href"].encode('utf-8', 'ignore')
-					imgF = filme.img["src"].encode('utf-8', 'ignore')
-					imgF = imgF.split('?src=')[1]
-					imgF = imgF.split('&')[0]
+					imgF = re.findall(r' style="background: url\((.*?)\).+"', str(filme.div))[0]
 					temp = [urlF, titF, imgF]
 					hosts.append(temp)
 					
@@ -361,51 +375,28 @@ def player_series(name,url,iconimage):
 		links = []
 		hosts = []
 		matriz = []
+		
+		xbmc.log('[plugin.video.weekseries - L373] ' + str(url), xbmc.LOGNOTICE)
 
+		urlF = url.split('bg=')[1]
+		url = ('http://weekseries.org/plays/bg.php?v=' + urlF)
 		link = openURL(url)
 		soup  = BeautifulSoup(link)
+		urlVideo = re.findall(r' src="(.*?)"', str(link))[1]
+		
+		print "Veja: ", urlVideo
+		url2Play = urlVideo
 
-		conteudo = soup("div", {"class": "itens"})
-		srvsdub = conteudo[0]('a')
-								
-		totD = len(srvsdub)
-
-		titsT = []
-		for i in range(totD) :
-						titS = srvsdub[i].text
-						titS = titS.replace('Assistir no', '')
-						titsT.append(titS)
-						print titsT
-		
-		if not titsT : return
-		
-		index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-		
-		if index == -1 : return
-		
-		i = int(index)
-
-		links  = conteudo[0]('a')
-		
-		if len(links) == 0 : links = conteudo[0]("a")
-		
-		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
-		
-		xbmc.log('[plugin.video.weekseries - player_series -L401] ' + str(urlVideo), xbmc.LOGNOTICE)
-		
-		link = openURL(urlVideo)
-		soup  = BeautifulSoup(link)
-		conteudo = soup("iframe")
-
-		urlVideo = str(conteudo[0]['src'])
-
-		xbmc.log('[plugin.video.weekseries - player_series -L412] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.weekseries - player_series -L383] ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
-		if 'nowvideo.php' in urlVideo :
-				nowID = urlVideo.split("id=")[1]
-				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
+		if 'videofolder' in urlVideo :
+				nowID = urlVideo.split("v=")[1]
+				nowID = base64.b64decode(nowID)
+				urlVideo = 'https://www.blogger.com/video-play.mp4?contentId=%s' % nowID
+				url2Play = urlVideo
+				OK = False
 				
 		elif 'video.tt' in urlVideo :
 				vttID = urlVideo.split('e/')[1]
@@ -432,10 +423,14 @@ def player_series(name,url,iconimage):
 				url2Play = str(url2Play[0])				
 	
 				OK = False
-						
+
+		xbmc.log('[plugin.video.weekseries - player_series -L419] ' + str(urlVideo), xbmc.LOGNOTICE)
+		
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		if not url2Play : return
+		
+		xbmc.log('[plugin.video.weekseries - player_series -L425] ' + str(url2Play), xbmc.LOGNOTICE)
 
 		legendas = '-'
 		
@@ -486,13 +481,18 @@ def openConfigEI():
 		xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C)')
-		#req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64; Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-		response = urllib2.urlopen(req)
-		link=response.read()
-		response.close()
-		return link
+        headers = {
+        "Referer": url,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"
+    }
+        req = urllib2.Request(url, "",headers)
+        #req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        req.get_method = lambda: 'GET'
+        response = urllib2.urlopen(req)
+        link=response.read()
+        response.close()
+        del response
+        return link
 
 def addDir(name, url, mode, iconimage, total=1, pasta=True):
 		u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
