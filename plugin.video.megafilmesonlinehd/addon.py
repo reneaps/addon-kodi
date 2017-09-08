@@ -8,6 +8,7 @@
 # Atualizado (1.0.3) - 14/06/2017
 # Atualizado (1.0.4) - 22/06/2017
 # Atualizado (1.0.5) - 30/08/2017
+# Atualizado (1.0.6) - 08/09/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -301,7 +302,7 @@ def player(name,url,iconimage):
 		#urlVideo = re.findall(r'data-src=[\'"]?([^\'" >]+)', str(links))[0]
 		urlVideo = idsT[i]
 		
-		xbmc.log('[plugin.video.megafilmesonlinehd] L262 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megafilmesonlinehd] L304 ' + str(urlVideo), xbmc.LOGNOTICE)
 	
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -333,17 +334,18 @@ def player(name,url,iconimage):
 				okID = urlVideo.split('id=')[1]
 				urlVideo = 'http://hqq.tv/player/embed_player.php?vid=%s' % okID	
 
-		elif 'thevid.php' in urlVideo :
-				fxID = urlVideo.split('id=')[1]
+		elif 'thevid' in urlVideo :
+				fxID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
-				'''linkTV  = openURL(urlVideo)		
+				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])				
+				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
+				if not url2Play : url2Play = re.findall('var url_\d+="(.*?)"', sUnpacked)
+				url2Play = str(url2Play[0])					
 	
-				OK = False'''
+				OK = False
 					
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
