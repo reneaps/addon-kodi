@@ -330,6 +330,10 @@ def player(name,url,iconimage):
 				okID = urlVideo.split('id=')[1]
 				urlVideo = 'https://docs.google.com/file/d/%s/preview' % okID
 
+		elif 'rvid' in urlVideo :
+				fxID = urlVideo.split('id=')[1]
+				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
+				
 		elif 'netu.php' in urlVideo :
 				okID = urlVideo.split('id=')[1]
 				urlVideo = 'http://hqq.tv/player/embed_player.php?vid=%s' % okID	
@@ -451,6 +455,10 @@ def player_series(name,url,iconimage):
 				okID = urlVideo.split('?')[1].split('=')[1].split('/')[0]
 				urlVideo = 'http://vidto.me/embed-%s-640x430.html' % okID
 
+		elif 'rvid' in urlVideo :
+				fxID = urlVideo.split('id=')[1]
+				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
+				
 		elif 'netu.php' in urlVideo :
 				okID = urlVideo.split('id=')[1]
 				urlVideo = 'http://hqq.tv/player/embed_player.php?vid=%s' % okID	
@@ -567,7 +575,7 @@ def getInfo(url)	:
 
 def playTrailer(name, url,iconimage):
 		link = openURL(url)
-		ytID = re.findall('<iframe width=".*?" height=".*?" src="http://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen></iframe>', link)[0]
+		ytID = re.findall('<iframe width=".*?" height=".*?" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen></iframe>', link)[0]
 		
 		xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
 	
