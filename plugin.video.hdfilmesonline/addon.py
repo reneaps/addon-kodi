@@ -9,6 +9,7 @@
 # Atualizado (1.0.2) - 15/06/2017
 # Atualizado (1.0.3) - 17/07/2017
 # Atualizado (1.0.4) - 10/08/2017
+# Atualizado (1.0.5) - 12/09/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -97,7 +98,7 @@ def getFilmes(url):
 				if sinopse :
 					sinop = sinopse[0]("span", {"class":"ttx"})
 					pltF = sinopse[0].text.encode('utf-8','replace')
-					xbmc.log('[plugin.video.hdfilmes] L97 ' + str(sinop), xbmc.LOGNOTICE)
+					xbmc.log('[plugin.video.hdfilmes] L100 ' + str(sinop), xbmc.LOGNOTICE)
 				else:
 					pltF = ""
 				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
@@ -152,7 +153,7 @@ def getTemporadas(url):
 			a = links[i]('span',{'class':'title'})
 			titF = a[0].text.encode('utf-8','replace')
 			titF = titF.replace('&#8217;', '\'')
-			xbmc.log('[plugin.video.hdfilmes] L125 ' + str(titF), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.hdfilmes] L155 ' + str(titF), xbmc.LOGNOTICE)
 			addDir(titF, urlF, 27, imgF, totF)
 
 
@@ -210,7 +211,7 @@ def pesquisa():
 					if sinopse :
 						sinop = sinopse[0]("span", {"class":"ttx"})
 						pltF = sinopse[0].text.encode('utf-8','replace')
-						xbmc.log('[plugin.video.hdfilmes] L97 ' + str(sinop), xbmc.LOGNOTICE)
+						xbmc.log('[plugin.video.hdfilmes] L213 ' + str(sinop), xbmc.LOGNOTICE)
 					else:
 						pltF = ""
 					temp = [urlF, titF, imgF, pltF]
@@ -253,7 +254,7 @@ def player(name,url,iconimage):
 		matriz = []
 		urlF = []
 		
-		xbmc.log('[plugin.video.hdfilmes] L253 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L256 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)
 		link  = unicode(link, 'utf-8', 'ignore')
 		soup  = BeautifulSoup(link)
@@ -261,7 +262,7 @@ def player(name,url,iconimage):
 
 		for i in  range (0,len(links)):
 			link = links[i].iframe['src']
-			xbmc.log('[plugin.video.hdfilmes] L261 - ' + str(link), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.hdfilmes] L264 - ' + str(link), xbmc.LOGNOTICE)
 			#if not "hdfilmesonlinegratis" in link :
 			urllink = ""
 			if not "filmeshd.php" in link:
@@ -273,7 +274,7 @@ def player(name,url,iconimage):
 						urlF.append(urllink)
 						titsT.append(domain)
 			
-		xbmc.log('[plugin.video.hdfilmes] L268 ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L276 ' + str(urlF), xbmc.LOGNOTICE)
 		
 		if not titsT : return
 		
@@ -298,7 +299,7 @@ def player(name,url,iconimage):
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
-		xbmc.log('[plugin.video.hdfilmes] L284 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L301 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if 'openload2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
@@ -309,14 +310,15 @@ def player(name,url,iconimage):
 				urlVideo = 'http://ok.ru/videoembed%s' % fxID
 				
 		elif 'thevid2' in urlVideo :
-				fxID = urlVideo.split('=')[1]
+				fxID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
-				linkTV	= openURL(urlVideo)		
+				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])				
+				xbmc.log('[plugin.video.hdfilmes] L318 ' + str(sUnpacked), xbmc.LOGNOTICE)
+				url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				url2Play = str(url2Play[0])					
 	
 				OK = False
 								
@@ -382,7 +384,7 @@ def player_series(name,url,iconimage):
 		hosts = []
 		matriz = []
 		
-		xbmc.log('[plugin.video.hdfilmes] L245 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L386 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)
 		link  = unicode(link, 'utf-8', 'ignore')
 		soup  = BeautifulSoup(link)
@@ -400,13 +402,13 @@ def player_series(name,url,iconimage):
 			link = link.split("=")[2]
 			link = link.replace("\'","")
 			srv	 = i.text.encode('utf-8','replace')
-			#xbmc.log('[plugin.video.hdfilmes] L341 - ' + str(link), xbmc.LOGNOTICE)
+			#xbmc.log('[plugin.video.hdfilmes] L404 ' + str(link), xbmc.LOGNOTICE)
 			if not "hdfilmesonlinegratis" in link : 
 				urlF.append(link)
 				hosts.append(link2)
 				titsT.append(srv)
 			
-		xbmc.log('[plugin.video.hdfilmes] L348 ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L410 ' + str(urlF), xbmc.LOGNOTICE)
 		
 		if not titsT : return
 		
@@ -429,7 +431,7 @@ def player_series(name,url,iconimage):
 		#conteudo = soup.findAll("iframe")
 		#urlVideo = conteudo[2].get('src')
 		
-		xbmc.log('[plugin.video.hdfilmes] L381 - ' + str(titsT[i]), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L433 - ' + str(titsT[i]), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -452,8 +454,17 @@ def player_series(name,url,iconimage):
 		elif 'thevid' in titsT[i].lower() :
 				fxID = urlF[i]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
+				linkTV  = openURL(urlVideo)
+				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+				aMatches = re.compile(sPattern).findall(linkTV)
+				sUnpacked = jsunpack.unpack(aMatches[1])
+				xbmc.log('[plugin.video.hdfilmes] L460 ' + str(sUnpacked), xbmc.LOGNOTICE)
+				url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				url2Play = str(url2Play[0])					
+	
+				OK = False
 				
-		xbmc.log('[plugin.video.hdfilmes] 407 - ' + str(urlVideo), xbmc.LOGNOTICE)	
+		xbmc.log('[plugin.video.hdfilmes] 466 - ' + str(urlVideo), xbmc.LOGNOTICE)	
 		
 		if OK : 
 			try:
