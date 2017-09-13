@@ -18,6 +18,7 @@
 # Atualizado (1.1.1) - 28/06/2017
 # Atualizado (1.1.2) - 10/07/2017
 # Atualizado (1.1.3) - 17/07/2017
+# Atualizado (1.1.4) - 13/00/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -135,7 +136,8 @@ def getSeries(url):
 		except : 
 				pass
 				
-		xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
+		#xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
+		setViewFilmes()
 		
 def getTemporadas(url):
 		link  = openURL(url)
@@ -155,7 +157,7 @@ def getTemporadas(url):
 				pass
 			i = i + 1
 			
-		xbmcplugin.setContent(int(sys.argv[1]), 'seasons')
+		#xbmcplugin.setContent(int(sys.argv[1]), 'seasons')
 		
 def getEpisodios(name, url):
 		n = name.replace('ª Temporada', '')	
@@ -222,7 +224,10 @@ def getEpisodios(name, url):
 		for url, titulo in episodios:
 				addDirF(titulo, url, 110, img, False, total)
 				
-		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+		#xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+		
+		setViewFilmes()
+		xbmc.executebuiltin("Container.SetViewMode(50)")
 		
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -350,21 +355,32 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
 
+		elif 'vidlox' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://vidlox.tv/embed-%s' % fxID
+
+		elif 'stream' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://estream.to/embed-%s.html' % fxID	
+				
+		elif 'streamango' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://streamango.com/embed/%s' % fxID
+
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
-				'''
-				linkTV  = openURL(urlVideo)		
+				'''linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
 				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
+				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])				
 	
-				OK = False
-				'''
+				OK = False'''
 
-		xbmc.log('[plugin.video.filmeseseriesonline] L357 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		if OK : 			
 			try:
