@@ -325,7 +325,11 @@ def player(name,url,iconimage):
 		elif 'open.php' in urlVideo :
 				okID = urlVideo.split('id=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % okID
-				
+
+		elif 'streamango2' in urlVideo :
+				vttID = urlVideo.split('?')[1].split('=')[1].split('&')[0]
+				urlVideo = 'http://streamplay.to/f/%s' % vttID
+								
 		elif 'drive.php' in urlVideo :
 				okID = urlVideo.split('id=')[1]
 				urlVideo = 'https://docs.google.com/file/d/%s/preview' % okID
@@ -341,7 +345,7 @@ def player(name,url,iconimage):
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
-				linkTV  = openURL(urlVideo)
+				'''linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
@@ -349,7 +353,7 @@ def player(name,url,iconimage):
 				if not url2Play : url2Play = re.findall('var url_\d+="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])					
 	
-				OK = False
+				OK = False'''
 					
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
