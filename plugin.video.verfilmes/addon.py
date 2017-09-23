@@ -8,6 +8,7 @@
 # Atualizado (1.0.1) - 27/07/2017
 # Atualizado (1.0.2) - 13/08/2017
 # Atualizado (1.0.3) - 14/08/2017
+# Atualizado (1.0.4) - 23/09/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -29,7 +30,7 @@ base         = base64.b64decode('aHR0cDovL3d3dy52ZXJmaWxtZXMuYml6Lw==')
 
 def menuPrincipal():
 		addDir('Categorias'                , base							,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + 'categoria/lancamento-de-2016/'	,	20, artfolder + 'lancamentos.png')
+		addDir('Lançamentos'               , base + 'categoria/lancamento-de-2017/'	,	20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + 'search.php?s=dublado' 	,	20, artfolder + 'pesquisa.png')
 		addDir('Series'		               , base + 'categoria/series/'		,   25, artfolder + 'legendados.png')
 		addDir('Pesquisa Series'           , '--'                           ,   30, artfolder + 'pesquisa.png')
