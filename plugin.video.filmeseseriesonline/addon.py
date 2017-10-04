@@ -18,7 +18,8 @@
 # Atualizado (1.1.1) - 28/06/2017
 # Atualizado (1.1.2) - 10/07/2017
 # Atualizado (1.1.3) - 17/07/2017
-# Atualizado (1.1.4) - 13/00/2017
+# Atualizado (1.1.4) - 13/08/2017
+# Atualizado (1.1.5) - 03/10/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -350,7 +351,19 @@ def player(name,url,iconimage):
 		elif 'raptu' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
-
+				
+		elif 'megavid' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://megavid.tv/embed-%s.html' % fxID
+				linkTV  = openURL(urlVideo)		
+				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+				aMatches = re.compile(sPattern).findall(linkTV)
+				sUnpacked = jsunpack.unpack(aMatches[0])
+				url2Play = re.findall(r'var player=new Clappr\.Player\(\{sources:\["(.*?)"\].+', sUnpacked)
+				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				url2Play = str(url2Play[0])	
+				OK = False
+				
 		elif 'vidoza' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
@@ -370,15 +383,16 @@ def player(name,url,iconimage):
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
-				'''linkTV  = openURL(urlVideo)		
+				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
 				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
 				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = str(url2Play[0])				
 	
-				OK = False'''
+				OK = False
 
 		xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
@@ -497,8 +511,20 @@ def player_series(name,url,iconimage):
 		elif 'raptu.com' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
-
-		if 'vidzi2' in urlVideo :
+				
+		elif 'megavid' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://megavid.tv/embed-%s.html' % fxID
+				linkTV  = openURL(urlVideo)		
+				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+				aMatches = re.compile(sPattern).findall(linkTV)
+				sUnpacked = jsunpack.unpack(aMatches[0])
+				url2Play = re.findall(r'var player=new Clappr\.Player\(\{sources:\["(.*?)"\].+', sUnpacked)
+				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				url2Play = str(url2Play[0])	
+				OK = False
+				
+		elif 'vidzi2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidzi.tv/embed-%s.html' % fxID
 				
@@ -510,15 +536,16 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('-')[1]
 				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
 								
-		elif 'thevid2' in urlVideo :
-				fxID = urlVideo.split('e/')[1]
+		elif 'thevid' in urlVideo :
+				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				xbmc.log('[plugin.video.filmeseseriesonline] L485 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-				url2Play = re.findall('var vurl_\d+a="(.*?)"', sUnpacked)
+				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
+				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = str(url2Play[0])				
 	
 				OK = False
