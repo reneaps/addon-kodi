@@ -20,6 +20,7 @@
 # Atualizado (1.1.3) - 17/07/2017
 # Atualizado (1.1.4) - 13/08/2017
 # Atualizado (1.1.5) - 03/10/2017
+# Atualizado (1.1.6) - 09/11/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -344,7 +345,7 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
 				
-		elif 'ok2' in urlVideo :
+		elif 'ok' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 
@@ -492,15 +493,15 @@ def player_series(name,url,iconimage):
 		i = int(index)
 		
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
-		
-		urlVideo = 'http://www.pirataplay.com/embed/' + urlVideo
+		xbmc.log('[plugin.video.filmeseseriesonline] L495 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		#urlVideo = 'http://www.pirataplay.com/embed/' + urlVideo
 
-		link = openURL(urlVideo)
-		soup  = BeautifulSoup(link)
-		conteudo = soup("iframe")
-		urlVideo = str(conteudo[0]['src'])
+		#link = openURL(urlVideo)
+		#soup  = BeautifulSoup(link)
+		#conteudo = soup("iframe")
+		#urlVideo = str(conteudo[0]['src'])
 		
-		xbmc.log('[plugin.video.filmeseseriesonline] L473 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmeseseriesonline] L503 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -528,7 +529,7 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidzi.tv/embed-%s.html' % fxID
 				
-		elif 'ok2' in urlVideo :
+		elif 'ok' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 
