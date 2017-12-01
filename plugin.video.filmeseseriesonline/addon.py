@@ -21,6 +21,7 @@
 # Atualizado (1.1.4) - 13/08/2017
 # Atualizado (1.1.5) - 03/10/2017
 # Atualizado (1.1.6) - 09/11/2017
+# Atualizado (1.1.7) - 01/12/2017
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -174,7 +175,10 @@ def getEpisodios(name, url):
 		soup = BeautifulSoup(link)
 		conteudo = soup('div',{'class':'tab_content'})
 		arquivo = conteudo[n]('ul')
-
+		if not arquivo :
+			n = n + 1
+			arquivo = conteudo[n]('ul')
+			
 		imgF = ""
 		#img = soup.find("div", {"class": "capa-single"})
 		img = soup.find("div", {"class": "capa-post"})
@@ -505,7 +509,7 @@ def player_series(name,url,iconimage):
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
-		if 'openload2' in urlVideo :
+		if 'openload' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
 
@@ -525,7 +529,7 @@ def player_series(name,url,iconimage):
 				url2Play = str(url2Play[0])	
 				OK = False
 				
-		elif 'vidzi2' in urlVideo :
+		elif 'vidzi' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidzi.tv/embed-%s.html' % fxID
 				
@@ -534,8 +538,20 @@ def player_series(name,url,iconimage):
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 
 		elif 'vidoza' in urlVideo :
-				fxID = urlVideo.split('-')[1]
+				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
+
+		elif 'vidlox' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://vidlox.tv/embed-%s' % fxID
+
+		elif 'stream' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://estream.to/embed-%s.html' % fxID	
+				
+		elif 'streamango' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://streamango.com/embed/%s' % fxID
 								
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
