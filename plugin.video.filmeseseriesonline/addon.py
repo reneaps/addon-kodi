@@ -556,17 +556,18 @@ def player_series(name,url,iconimage):
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
+				'''
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
 				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
-				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				if not url2Play : url2Play = re.findall('var vfile?\w+\s*=\s*"(.*?)"', sUnpacked)
 				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = str(url2Play[0])				
 	
 				OK = False
-						
+						'''
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		if not url2Play : return

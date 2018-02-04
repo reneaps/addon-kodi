@@ -384,7 +384,7 @@ def player_series(name,url,iconimage):
 		hosts = []
 		matriz = []
 		
-		xbmc.log('[plugin.video.hdfilmes] L386 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L387 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)
 		link  = unicode(link, 'utf-8', 'ignore')
 		soup  = BeautifulSoup(link)
@@ -392,23 +392,38 @@ def player_series(name,url,iconimage):
 		link = links[0].get("src")
 		html = openURL(link)
 		soup = BeautifulSoup(html)
-		conteudo = soup("div",{"class":"geral"})
-		links = conteudo[0]("a")
-		
-		for i in links:
-			link =	i["onclick"]
-			link2 = link.split("=")[1]
-			link2 = link2.replace("\'","")
-			link = link.split("=")[2]
-			link = link.replace("\'","")
-			srv	 = i.text.encode('utf-8','replace')
-			#xbmc.log('[plugin.video.hdfilmes] L404 ' + str(link), xbmc.LOGNOTICE)
-			if not "hdfilmesonlinegratis" in link : 
-				urlF.append(link)
+		conteudo = soup("div",{"class":"itens"})
+		if not conteudo :
+				conteudo = soup("div",{"class":"video"})
+				links = conteudo[0].img.get("data-video")
+		else:
+				links = conteudo[0]("a")
+				
+		#if len(links) > 1 :		
+		if "onclick" in str(links):
+			for i in links:
+				xbmc.log('[plugin.video.hdfilmes] L404 ' + str(links), xbmc.LOGNOTICE)
+				link =	i["onclick"]
+				link2 = link.split("=")[1]
+				link2 = link2.replace("\'","")
+				link = link.split("=")[2]
+				link = link.replace("\'","")
+				srv	 = i.text.encode('utf-8','replace')
+				if not "hdfilmesonlinegratis" in link : 
+					urlF.append(link)
+					hosts.append(link2)
+					titsT.append(srv)
+		else:
+			srv = links
+			if not "hdfilmesonlinegratis" in links : 
+				domain = urlparse(srv)
+				link2 = domain.netloc.split('.')[0]
+				#link2 = link2.replace("\'","")
+				urlF.append(srv)
 				hosts.append(link2)
-				titsT.append(srv)
-			
-		xbmc.log('[plugin.video.hdfilmes] L410 ' + str(urlF), xbmc.LOGNOTICE)
+				titsT.append(link2)
+				
+		xbmc.log('[plugin.video.hdfilmes] L424 ' + str(urlF), xbmc.LOGNOTICE)
 		
 		if not titsT : return
 		
@@ -431,7 +446,7 @@ def player_series(name,url,iconimage):
 		#conteudo = soup.findAll("iframe")
 		#urlVideo = conteudo[2].get('src')
 		
-		xbmc.log('[plugin.video.hdfilmes] L433 - ' + str(titsT[i]), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmes] L447 - ' + str(titsT[i]), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -454,7 +469,7 @@ def player_series(name,url,iconimage):
 		elif 'thevid' in titsT[i].lower() :
 				fxID = urlF[i]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
-				linkTV  = openURL(urlVideo)
+				'''linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
@@ -462,9 +477,9 @@ def player_series(name,url,iconimage):
 				url2Play = re.findall('var rick="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])					
 	
-				OK = False
+				OK = False'''
 				
-		xbmc.log('[plugin.video.hdfilmes] 466 - ' + str(urlVideo), xbmc.LOGNOTICE)	
+		xbmc.log('[plugin.video.hdfilmes] 480 - ' + str(urlVideo), xbmc.LOGNOTICE)	
 		
 		if OK : 
 			try:
