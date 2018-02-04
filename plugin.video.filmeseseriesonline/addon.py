@@ -22,6 +22,7 @@
 # Atualizado (1.1.5) - 03/10/2017
 # Atualizado (1.1.6) - 09/11/2017
 # Atualizado (1.1.7) - 01/12/2017
+# Atualizado (1.1.8) - 04/02/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -388,6 +389,7 @@ def player(name,url,iconimage):
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
+				'''
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
@@ -397,7 +399,7 @@ def player(name,url,iconimage):
 				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = str(url2Play[0])				
 	
-				OK = False
+				OK = False'''
 
 		xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
