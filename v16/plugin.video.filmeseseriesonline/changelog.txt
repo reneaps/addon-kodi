@@ -1,0 +1,4 @@
+[B]11/12/2015 v 1.0.0[/B]
+- Versao inicial do Addon by AddonBrasil
+
+

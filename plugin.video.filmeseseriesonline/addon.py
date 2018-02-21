@@ -23,6 +23,7 @@
 # Atualizado (1.1.6) - 09/11/2017
 # Atualizado (1.1.7) - 01/12/2017
 # Atualizado (1.1.8) - 04/02/2018
+# Atualizado (1.1.9) - 21/02/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -34,12 +35,12 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version		 = '1.1.3'
+version		 = '1.1.9'
 addon_id     = 'plugin.video.filmeseseriesonline'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
-artfolder    = addonfolder + '/resources/img/'
-fanart       = addonfolder + '/fanart.png'
+artfolder    = addonfolder + '/resources/media/'
+fanart       = addonfolder + '/resources/fanart.png'
 addon_handle = int(sys.argv[1])
 base         = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNlc2VyaWVzb25saW5lLm5ldC8=')
 
