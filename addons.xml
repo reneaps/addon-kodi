@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.assistirfilmeshd" name="AssistirFilmesHD" version="1.1.0" provider-name="AddonReneSilva">
+<addon id="plugin.video.megafilmesonlinehd" name="Megafilmesonlinehd" version="1.0.6" provider-name="AddonReneSilva">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.urlresolver" version="2.10.8"/>
+    <import addon="script.extendedinfo" version="3.0.0"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">Mega Filmes OnlineHD</summary>
+    <description lang="en">
+        No addon Megafilmesonlinehd você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+        Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+        </description>
+  </extension>
+</addon>
+
+<addon id="plugin.video.assistirfilmeshd" name="AssistirFilmesHD" version="1.1.1" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.urlresolver" version="2.10.8"/>
@@ -21,7 +44,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.1.9" provider-name="AddonReneSilva">
+<addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.2.0" provider-name="AddonReneSilva">
   <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.urlresolver" version="1.0.0"/>
@@ -129,29 +152,6 @@
 			Vocêtambém pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
 			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
 		</description>
-  </extension>
-</addon>
-
-<addon id="plugin.video.megafilmesonlinehd" name="Megafilmesonlinehd" version="1.0.6" provider-name="AddonReneSilva">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.urlresolver" version="2.10.8"/>
-    <import addon="script.extendedinfo" version="3.0.0"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Mega Filmes OnlineHD</summary>
-    <description lang="en">
-        No addon Megafilmesonlinehd você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-        Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-        Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
-        </description>
   </extension>
 </addon>
 
