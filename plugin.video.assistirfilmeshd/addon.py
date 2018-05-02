@@ -304,6 +304,10 @@ def player(name,url,iconimage):
 		elif 'ok.ru' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://ok.ru/videoembed/%s' % okID
+
+		elif 'vdoza' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
 				
 		elif 'openload2' in urlVideo :
 				okID = urlVideo.split('/')[4]
@@ -311,7 +315,7 @@ def player(name,url,iconimage):
 				
 		elif 'thevid.net' in urlVideo :
 				okID = urlVideo.split('v/')[1]
-				urlVideo = 'http://thevid.net/v/%s' % okID
+				urlVideo = 'http://thevid.net/e/%s' % okID
 				xbmc.log('[plugin.video.assistirfilmeshd] L310 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				'''
 				linkTV  = openURL(urlVideo)		
@@ -433,17 +437,26 @@ def player_series(name,url,iconimage):
 				
 		elif 'ok2.ru' in urlVideo :
 				fxID = urlVideo.split('embed')[1]
-				urlVideo = 'https://ok.ru/videoembed%s' % fxID
-				
+				urlVideo = 'https://ok.ru/videoembed/%s' % fxID
+
+		elif 'vdoza' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
+
 		elif 'thevid.net' in urlVideo :
+				fxID = urlVideo.split('e/')[1]
+				urlVideo = 'http://thevid.net/e/%s' % fxID
+				'''
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
 				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
+				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = str(url2Play[0])				
 	
-				OK = False
+				OK = False'''
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
