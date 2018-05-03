@@ -260,7 +260,7 @@ def player(name,url,iconimage):
 		soup  = BeautifulSoup(link)
 		links = soup.findAll('div', {'class':'movieplay'})
 
-		for i in  range (0,len(links)):
+		for i in  range (1,len(links)):
 			link = links[i].iframe['src']
 			xbmc.log('[plugin.video.hdfilmes] L264 - ' + str(link), xbmc.LOGNOTICE)
 			#if not "hdfilmesonlinegratis" in link :
@@ -309,10 +309,14 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed%s' % fxID
 				
-		elif 'thevid2' in urlVideo :
+		elif 'hqq.tv' in urlVideo :
+				url2Play = str(urlVideo)
+				OK = False
+
+		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
-				linkTV  = openURL(urlVideo)
+				'''linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
@@ -320,7 +324,7 @@ def player(name,url,iconimage):
 				url2Play = re.findall('var rick="(.*?)"', sUnpacked)
 				url2Play = str(url2Play[0])					
 	
-				OK = False
+				OK = False'''
 								
 		if OK : 
 			try:
