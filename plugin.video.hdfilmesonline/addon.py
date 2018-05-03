@@ -265,7 +265,7 @@ def player(name,url,iconimage):
 			xbmc.log('[plugin.video.hdfilmes] L264 - ' + str(link), xbmc.LOGNOTICE)
 			#if not "hdfilmesonlinegratis" in link :
 			urllink = ""
-			if not "filmeshd.php" in link:
+			if not "embed_player.php" in link:
 				if not "/hd/embed/" in link:
 					if not "id=5090" in link:
 						urllink = link.split('url=')[1]
