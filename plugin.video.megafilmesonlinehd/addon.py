@@ -9,6 +9,7 @@
 # Atualizado (1.0.4) - 22/06/2017
 # Atualizado (1.0.5) - 30/08/2017
 # Atualizado (1.0.6) - 08/09/2017
+# Atualizado (1.0.7) - 03/05/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -266,6 +267,7 @@ def player(name,url,iconimage):
 		link     = unicode(link, 'utf-8', 'ignore')		
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "btn-ver"})
+		if not conteudo : return
 		xbmc.log('[plugin.video.megafilmesonlinehd] L235 ' + str(url), xbmc.LOGNOTICE)
 		b=re.findall(r'<div class="btn-flm" alt=".*?" onclick="boxp\(\'(.*?)\)" data-toggle="modal" data-target=".open_box">',link)[0]
 		url=re.findall(r'[\'"]?([^\'" >]+)', str(b))[0]
