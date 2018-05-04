@@ -22,13 +22,13 @@ selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
 fanart      = addonfolder + '/fanart.png'
-base        = base64.b64decode('aHR0cDovL21lZ2FmaWxtZXNvbmxpbmUubmV0')
+base        = base64.b64decode('aHR0cDovL3d3dy5tZWdhaGZpbG1lc2hkLm5ldC8=')
 
 ############################################################################################################
 
 def menuPrincipal():
 		addDir('Categorias'                , base                          ,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/lancamentos/'        ,   20, artfolder + 'lancamentos.png')
+		addDir('Lançamentos'               , base + 'filmes-category/lancamentos/'		   ,   20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + '/?s=dublado'          ,   20, artfolder + 'pesquisa.png')
 		#addDir('Seriados'	               , base + '/series/'             ,   25, artfolder + 'legendados.png')
 		#addDir('Pesquisa Series'           , '--'                          ,   30, artfolder + 'pesquisa.png')
@@ -59,17 +59,19 @@ def getFilmes(url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "galeria-videos"})
-		filmes   = conteudo[0]("div", {"class": "box-video"})
+		conteudo = soup("div", {"class": "row movies-list theRow"})
+		filmes   = conteudo[0]("div", {"class": "item category-item year-2018"})
+		
 		totF = len(filmes)
 		for filme in filmes:
 				titF = filme.a["title"].encode('utf-8')
 				urlF = filme.a["href"].encode('utf-8')
-				imgF = filme.img["src"].encode('utf-8')
+				imgF = filme.div["data-original"].encode('utf-8')
 				addDirF(titF, urlF, 100, imgF, False, totF)
 				
 		try : 
-				proxima = re.findall('<a class="page larger" href="(.*?)"', link)[0]
+				proxima = re.findall('<link rel="next" href="(.*?)"', link)[0]
+				xbmc.log('[plugin.video.megafilmesonline] L74 ' + str(proxima), xbmc.LOGNOTICE)
 				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
 		except : 
 				pass
@@ -81,15 +83,15 @@ def getSeries(url):
 		link = unicode(link, 'utf-8', 'ignore')		
 		
 		soup     = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "galeria-videos"})
-		filmes   = conteudo[0]("div", {"class": "box-video"})
-
+		conteudo = soup("div", {"class": "row movies-list theRow"})
+		filmes   = conteudo[0]("div", {"class": "item category-item year-2018"})
+		
 		totF = len(filmes)
 
 		for filme in filmes:
 				titF = filme.a["title"].encode('utf-8')
 				urlF = filme.a["href"].encode('utf-8')
-				imgF = filme.img["src"].encode('utf-8')
+				imgF = filme.div["data-original"].encode('utf-8')
 				addDir(titF, urlF, 26, imgF)
 				
 		try : 
