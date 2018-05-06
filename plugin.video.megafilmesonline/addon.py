@@ -257,25 +257,9 @@ def player(name,url,iconimage):
 		if 'nowvideo.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
-				
-		elif 'video.tt' in urlVideo :
-				vttID = urlVideo.split('e/')[1]
-				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
-				
-		elif 'mail.ru' in urlVideo :
-				urlVideo = str(urlVideo)
-				xbmc.log('[plugin.video.megahfilmeshd] L281 ' + str(urlVideo), xbmc.LOGNOTICE)
-				
-		elif 'flashx.php' in urlVideo :
-				fxID = urlVideo.split('id=')[1]
-				urlVideo = 'http://www.flashx.tv/embed-%s.html' % fxID
-				
-		elif 'ok.ru2' in urlVideo :
-				okID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://ok.ru/videoembed/%s' % okID
-				
-		elif 'openload2' in urlVideo :
-				okID = urlVideo.split('embed/')[1]
+	
+		elif 'megahfilmeshd.net' in urlVideo :
+				okID = urlVideo.split('id=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % okID			
 				
 		elif 'thevid.net' in urlVideo :
@@ -393,29 +377,11 @@ def player_series(name,url,iconimage):
 		if 'nowvideo.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
-				
-		elif 'video.tt' in urlVideo :
-				vttID = urlVideo.split('e/')[1]
-				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
 
-		elif 'flashx.php' in urlVideo :
-				fxID = urlVideo.split('id=')[1]
-				urlVideo = 'http://www.flashx.tv/playvid-%s.html' % fxID
-				
-		elif 'ok.ru' in urlVideo :
-				fxID = urlVideo.split('embed')[1]
-				urlVideo = 'https://ok.ru/videoembed%s' % fxID
-				
 		elif 'thevid.net' in urlVideo :
-				linkTV	= openURL(urlVideo)		
-				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
-				aMatches = re.compile(sPattern).findall(linkTV)
-				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])				
-
-				OK = False
-		
+				okID = urlVideo.split('e/')[1]
+				urlVideo = 'http://thevid.net/e/%s' % okID	
+				
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		if not url2Play : return
