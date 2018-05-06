@@ -28,10 +28,10 @@ base		= base64.b64decode('aHR0cDovL3d3dy5tZWdhaGZpbG1lc2hkLm5ldC8=')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'				   , base						   ,   10, artfolder + 'categorias.png')
+		addDir('Categorias'				   , base + 'filmes/'				,   10, artfolder + 'categorias.png')
 		addDir('Lançamentos'			   , base + 'filmes-category/lancamentos/'		   ,   20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'		   , base + '/?s=dublado'		   ,   20, artfolder + 'pesquisa.png')
-		#addDir('Seriados'				   , base + 'series/'			   ,   25, artfolder + 'legendados.png')
+		addDir('Filmes Dublados'		   , base + '?s=dublado'		   ,   20, artfolder + 'pesquisa.png')
+		addDir('Seriados'				   , base + 'series/'			   ,   25, artfolder + 'legendados.png')
 		#addDir('Pesquisa Series'			, '--'							,	30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'		   , '--'						   ,   35, artfolder + 'pesquisa.png')
 		addDir('Configurações'			   , base						   ,  999, artfolder + 'config.png', 1, False)
@@ -41,18 +41,17 @@ def menuPrincipal():
 		
 def getCategorias(url):
 		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore') 
+		link = unicode(link, 'utf-8', 'ignore')
 		soup = BeautifulSoup(link)
-		conteudo   = soup("div", {"id": "menu-principal"})
-		categorias = conteudo[0]("li")
+		conteudo   = soup("div", {"id": "homepage-items"})
+		categorias = conteudo[0].findAll("a")
 		totC = len(categorias)
 		for categoria in categorias:
-				titC = categoria.a.text.encode('utf-8','replace')
-				if not 'Lançamento' in titC :
-					if not 'Porno' in titC :
-						urlC = categoria.a["href"]
-						imgC = artfolder + limpa(titC) + '.png'
-						addDir(titC,urlC,20,imgC)
+				xbmc.log('[plugin.video.megahfilmeshd] L50 ' + str(categoria['href']), xbmc.LOGNOTICE)
+				titC = categoria.text.encode('utf-8','replace')
+				urlC = categoria["href"]
+				imgC = artfolder + limpa(titC) + '.png'
+				addDir(titC,urlC,20,imgC)
 			
 		setViewMenu()		
 		
@@ -60,8 +59,6 @@ def getFilmes(url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		
 		soup	 = BeautifulSoup(link)
-		#conteudo = soup("div", {"class": "row movies-list theRow"})
-		#filmes	 = conteudo[0]("div", {"class": "item category-item year-2018"})
 		filmes   = soup.findAll('div',{'class':re.compile('201')})
 		totF = len(filmes)
 		for filme in filmes:
@@ -84,19 +81,20 @@ def getSeries(url):
 		link = unicode(link, 'utf-8', 'ignore')		
 		
 		soup	 = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "row movies-list theRow"})
-		filmes	 = conteudo[0]("div", {"class": "item category-item year-2018"})
-		
+		conteudo   = soup.findAll('div',{'id':'series-list'})
+		filmes = conteudo[0]('a')
+		#print filmes
 		totF = len(filmes)
 
 		for filme in filmes:
-				titF = filme.a["title"].encode('utf-8')
-				urlF = filme.a["href"].encode('utf-8')
-				imgF = filme.div["data-original"].encode('utf-8')
+				titF = filme.find('div',{'class':'title'}).text.encode('utf-8')
+				urlF = filme["href"].encode('utf-8')
+				imgF = filme.img["src"].encode('utf-8')
 				addDir(titF, urlF, 26, imgF)
 				
 		try : 
-				proxima = re.findall('<a class="next page-numbers" href="(.*?)"', link)[0]
+				proxima = re.findall('<link rel="next" href="(.*?)"', link)[0]
+				#proxima = re.findall('<a class="next page-numbers" href="(.*?)"', link)[0]
 				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except : 
 				pass
@@ -104,13 +102,9 @@ def getSeries(url):
 def getTemporadas(url):
 		link  = openURL(url)	
 		soup	 = BeautifulSoup(link)	
-		conteudo = soup("div", {"class": "container"})
-		article = conteudo[1]("article",{'class':"galeria-padrao"})
-		srvsdub	 = article[0]("div",{"class":"box-info-video lista-temporadas"})
-		serv = srvsdub[0]("div",{"class":"top-menu-abas lista-players servers-filme"})
-		srvsdub = serv[0]("a")
+		filmes   = soup.findAll('div',{'class':re.compile('item get_episodes changePlayer')})
 		urlF = url
-		totD = len(srvsdub)
+		totD = len(filmes)
 
 		i = 1
 		while i <= totD:
@@ -132,51 +126,19 @@ def getEpisodios(name, url):
 		link = unicode(link, 'utf-8', 'ignore')		
 		
 		soup = BeautifulSoup(link)
-		conteudo = soup('div',{'class':'box-info-video lista-temporadas'})
+		filmes   = soup.findAll('div',{'class':re.compile('item get_player changePlayer')})
 
 		imgF = ""
-		img = soup.find("div", {"class": "content"})
-		imgF = re.findall(r'src=[\'"]?([^\'" >]+)', str(img))
+		img = soup.find("meta", {"property": "og:image"})
+		imgF = re.findall(r'content=[\'"]?([^\'" >]+)', str(img))
 		img = imgF[0]
 											
-		try:
-			#arquivo = conteudo[n]('div', {'class': 'lista-relacionados servers'})
-			#dublados = arquivo[0]('div', {'class': 'player-video box-temp-old'})
-			arquivo = conteudo[0]('div', {'class': 'content-menu-abas box-delay servers item'+n+' atual esconder'})
-			dublados = arquivo[0]('div', {'class': 'player-video box-temp-old'})
-			au = arquivo[0].text.encode('utf-8')
-			result= re.split(r'Epi', au)
-			audio = result[0]
-			audio = audio.replace('Assistir', '')
 
-			for link in dublados:
-					url = link.a["href"].encode('utf-8', 'ignore')
-					titulo = link.a.text.encode('utf-8', 'ignore')
-					titulo = titulo.replace('Assistir - ', '')
-					titulo = str(audio)+" "+titulo
-					tempor = (url, titulo)
-					episodios.append(tempor)
-		except:
-			pass
-		try:
-			#arquivo = conteudo[n]('div', {'class': 'lista-relacionados servers'})
-			#dublados = arquivo[0]('div', {'class': 'player-video box-temp-old'})
-			arquivo = conteudo[0]('div', {'class': 'content-menu-abas box-delay servers item'+n+' atual esconder'})
-			dublados = arquivo[0]('div', {'class': 'player-video box-temp-old'})
-			au = arquivo[0].text.encode('utf-8')
-			result= re.split(r'Epi', au)
-			audio = result[0]
-			audio = audio.replace('Assistir', '')
-			for link in legendados:
-					url = link.a["href"].encode('utf-8', 'ignore')
-					titulo = link.a.text.encode('utf-8', 'ignore')
-					titulo = titulo.replace('Assistir - ', '')
-					titulo = str(audio)+" "+titulo
-					tempor = (url, titulo)
-					episodios.append(tempor)
-		except:
-			pass		
-
+		for filme in filmes:
+				titF = filme.find('div',{'class':'title'}).text.encode('utf-8')
+				urlF = filme["href"].encode('utf-8')
+				imgF = filme.img["src"].encode('utf-8')
+				
 		total = len(episodios)
 
 		for url, titulo in episodios:
@@ -191,18 +153,17 @@ def pesquisa():
 				pesquisa = urllib.quote(texto)
 				url		 = base + '?s=%s' % str(pesquisa)
 
+				hosts = []
 				link  = openURL(url)
 				link = unicode(link, 'utf-8', 'ignore')		
 				soup	 = BeautifulSoup(link)
-				conteudo = soup("div", {"class": "galeria-videos"})
-				filmes	 = conteudo[0]("div", {"class": "box-video"})
-				#print filmes
+				conteudo = soup.findAll('div',{'class':'row movies-list'})
+				filmes = conteudo[0]('a')
 				totF = len(filmes)
-				hosts = []
 				for filme in filmes:
-						titF = filme.a["title"].encode('utf-8')
-						urlF = filme.a["href"].encode('utf-8')
-						imgF = filme.img["src"].encode('utf-8')		
+						titF = filme["title"].encode('utf-8')
+						urlF = filme["href"].encode('utf-8')
+						imgF = filme.div.div["data-original"].encode('utf-8')	
 						temp = [urlF, titF, imgF]
 						hosts.append(temp)
 					
@@ -251,18 +212,21 @@ def player(name,url,iconimage):
 				urlF = srvsdub[i]['data-player-content']
 				iframe = BeautifulSoup(urlF)
 				urlD = iframe.iframe['src']
-				link  = openURL(urlD)
-				link  = unicode(link, 'utf-8', 'ignore')
-				soup	 = BeautifulSoup(link)
-				#urlVideo = soup.iframe['src']
-				links = soup.findAll('iframe')
-				if len(links) == 1 :
-					urlVideo = links[0]['src']
+				if totD == 1 :
+					urlVideo = urlD
 				else:
-					urlVideo = links[1]['src']
-					opID =	urlVideo.split('?')[1]
-					opID = opID.split('=')[1]
-					urlVideo = "http://openload.co/embed/" + opID
+					link  = openURL(urlD)
+					link  = unicode(link, 'utf-8', 'ignore')
+					soup	 = BeautifulSoup(link)
+					#urlVideo = soup.iframe['src']
+					links = soup.findAll('iframe')
+					if len(links) == 1 :
+						urlVideo = links[0]['src']
+					else:
+						urlVideo = links[1]['src']
+						opID =	urlVideo.split('?')[1]
+						opID = opID.split('=')[1]
+						urlVideo = "http://openload.co/embed/" + opID
 				srv = srvsdub[i].text
 				titsT.append(srv)
 				url2.append(urlVideo)
