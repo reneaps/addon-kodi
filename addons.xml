@@ -132,7 +132,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.megafilmesonline" name="Megafilmesonline" version="1.3.0" provider-name="AddonReneSilva">
+<addon id="plugin.video.megafilmesonline" name="MegaFilmesHD" version="1.4.0" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.urlresolver" version="2.10.8"/>
@@ -148,7 +148,7 @@
     <platform>all</platform>
     <summary lang="en">Filmes e Series Online</summary>
     <description lang="en">
-			No addon Megafilmesonline você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+			No addon MegaFilmesHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
 			Vocêtambém pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
 			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
 		</description>
