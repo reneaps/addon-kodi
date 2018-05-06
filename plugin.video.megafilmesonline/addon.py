@@ -7,7 +7,7 @@
 # Atualizado (1.1.0) - 12/03/2016
 # Atualizado (1.2.0) - 14/06/2017
 # Atualizado (1.3.0) - 18/07/2017
-# Atualizado (1.4.0) - 05/05/2018
+# Atualizado (1.4.0) - 06/05/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
