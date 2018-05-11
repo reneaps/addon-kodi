@@ -6,6 +6,7 @@
 # Atualizado (1.0.1) - 02/11/2016
 # Atualizado (1.0.2) - 08/06/2017
 # Atualizado (1.0.3) - 09/06/2017
+# Atualizado (1.0.4) - 10/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -67,7 +68,7 @@ def getFilmes(url):
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
 				urlF = "http:" + filme["href"].encode('utf-8')
-				imgF = "http:" + filme.img["src"].encode('utf-8')
+				imgF = filme.img["src"].encode('utf-8')
 				addDirF(titF, urlF, 100, imgF, False, totF)
 
 		try :
@@ -89,7 +90,7 @@ def getSeries(url):
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
 				urlF = "http:" + filme["href"].encode('utf-8')
-				imgF = "http:" + filme.img["src"].encode('utf-8')
+				imgF = filme.img["src"].encode('utf-8')
 				addDir(titF, urlF, 26, imgF)
 				
 		try : 
@@ -212,7 +213,7 @@ def pesquisa():
 				for filme in filmes:
 						titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
 						urlF = "http:" + filme["href"].encode('utf-8')
-						imgF = "http:" + filme.img["src"].encode('utf-8')
+						imgF = filme.img["src"].encode('utf-8')
 						temp = [urlF, titF, imgF]
 						hosts.append(temp)
 					
