@@ -13,6 +13,8 @@
 # Atualizado (1.0.8) - 05/07/2017
 # Atualizado (1.0.9) - 21/07/2017
 # Atualizado (1.1.0) - 08/08/2017
+# Atualizado (1.1.1) - 29/04/2018
+# Atualizado (1.1.2) - 20/05/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -314,7 +316,7 @@ def player(name,url,iconimage):
 				urlVideo = 'https://openload.co/embed/%s' % okID
 				
 		elif 'thevid.net' in urlVideo :
-				okID = urlVideo.split('v/')[1]
+				okID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % okID
 				xbmc.log('[plugin.video.assistirfilmeshd] L310 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				'''
