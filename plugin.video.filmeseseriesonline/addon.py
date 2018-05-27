@@ -52,7 +52,7 @@ def menuPrincipal():
 		addDir('Lançamentos'				, base + '/filmes/lancamentos/' 	, 20, artfolder + 'ultimos.png')
 		addDir('Filmes em HD'				, base + '/filmes/filmes-hd/' 		, 20, artfolder + 'filmes.png')
 		addDir('Filmes Dublados'			, base + '/?s=dublado&tipo=video' 	, 20, artfolder + 'filmes.png')
-		addDir('Series'						, base + '/series/'					, 25, artfolder + 'series.png')
+		addDir('Series'						, base + '/series-hd/'				, 25, artfolder + 'series.png')
 		addDir('Pesquisa Series'			, '--'                           	, 30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'			, '--'                           	, 35, artfolder + 'pesquisa.png')
 		addDir('Configurações'				, base                             , 999, artfolder + 'config.png', 1, False)
