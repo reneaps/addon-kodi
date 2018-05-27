@@ -161,7 +161,7 @@ def pesquisar_filmes():
 def player(name,url,iconimage):
 	imgF = False
 	html = abrir_url(url)
-	imgF = re.compile(r'<div class="poster"><img width="182" height="268" src="(.*?)" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" />').findall(html)[0]
+	imgF = re.compile(r'<div class="poster"><img width=".+?" height=".+?" src="(.*?)" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" />').findall(html)[0]
 	xbmc.log('[plugin.video.filmesonlinex] L164 - ' + str(imgF), xbmc.LOGNOTICE)
 	link_houst = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[1]
 	if not link_houst:
