@@ -6,6 +6,7 @@
 ############################################################################################################
 
 import urllib,urllib2,re,xbmcplugin,xbmcgui,xbmc,xbmcaddon,HTMLParser,xmltosrt,os
+import urlresolver
 
 import jsunpack
 from bs4 import BeautifulSoup
@@ -23,7 +24,7 @@ artfolder = addonfolder + '/resources/img/'
 fanart = addonfolder + '/fanart.jpg'
 fav = addonfolder + '/fav'
 upnp = addonfolder + '/upnp'
-url_base = 'http://www.filmesonlinex.net/'
+url_base = 'http://www.filmesonlinex.co'
 url_base2 = 'https://ibb.co/'
 
 ############################################################################################################
@@ -44,7 +45,7 @@ def todas_categorias(url):
 		titulo = categoria.a.text
 		url = categoria.a["href"]
 		#img = categoria.img["src"]
-		addDir("[B]"+titulo.encode('utf-8')+"[/B]",url,3,'img')
+		addDir("[B]"+titulo.encode('utf-8')+"[/B]",url_base+url,3,'img')
 		xbmcplugin.setContent(int(sys.argv[1]), 'movies')
 		xbmc.executebuiltin('Container.SetViewMode(502)')
 		
@@ -69,7 +70,8 @@ def listar_filmes(url):
 					try:
 						img = filme.img["data-src"]
 					except KeyError:
-						img = filme.img["src"]
+						img = filme.img["src"].encode('utf-8')
+						#xbmc.log('[plugin.video.filmesonlinex] L60 -  ' + str(img), xbmc.LOGNOTICE)
 					addDir(titulo,url,20,img)
 					
 	xbmc.executebuiltin('Container.SetViewMode(502)') 
@@ -124,8 +126,10 @@ def categoria_favorito():
 	
 def trailer(name,url,iconimage):  
 		html = abrir_url(url)
-		link = re.compile(r'<a id="trailer" class="video" href="https://www.youtube.com/embed/(.+?)" rel="nofollow">trailer</a>').findall(html)[0]
+		link = re.compile(r'<a id="trailer" class="video" rel=\'nofollow\' href=\'https://www.youtube.com/embed/(.+?)\'>trailer</a>').findall(html)
 		print link
+		xbmc.log('[plugin.video.filmesonlinex] L130 - ' + str(link), xbmc.LOGNOTICE)
+		link = link[0]
 		xbmcPlayer = xbmc.Player()
 		xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id='+link)
 		del xbmcPlayer
@@ -149,49 +153,52 @@ def pesquisar_filmes():
 
 		parametro_pesquisa=urllib.quote(search)
 
-		url = 'https://www.filmesonlinex.net/search.php?key=%s' % str(parametro_pesquisa)
+		url = 'http://www.filmesonlinex.co/search.php?key=%s' % str(parametro_pesquisa)
 
 		print url
 		listar_filmes_p(url)
 
 def player(name,url,iconimage):
-	xbmc.log('[plugin.video.filmesonlinex] L158 - ' + str(url), xbmc.LOGNOTICE)
+	imgF = False
 	html = abrir_url(url)
-	link_houst = re.compile(r"<a class=\'video\' rel=\'nofollow\' href=\'(.+?)'\>.+?</a>").findall(html)[0]
+	imgF = re.compile(r'<div class="poster"><img width="182" height="268" src="(.*?)" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" />').findall(html)[0]
+	xbmc.log('[plugin.video.filmesonlinex] L164 - ' + str(imgF), xbmc.LOGNOTICE)
+	link_houst = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[1]
 	if not link_houst:
-		link_houst = re.compile(r"<a class=\'video cboxElement\' rel=\'nofollow\' href=\'(.+?)'\>.+?</a>").findall(html)[0]
-	if not link_houst:
-		link_video = re.compile(r'<div class="gdr"><a class="video" rel="nofollow" href="(.*?)">(.*?)</a></div>').findall(html)
+		link_houst = re.compile(r'<div class=\'mob\'><a class=\'video\' rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[1]
 	print link_houst
-	html = abrir_url(link_houst)
-	imgF =	re.compile(r'image:.*."(.*?)",').findall(html)[0]
-	addDir('[B]Adicionar aos Favoritos[/B]',name+','+iconimage+','+url,17,url_base2+'jNC8q5',False)
+	if not "openload" in link_houst: html = abrir_url(link_houst)
+	if "INDISPONÍVEL" in html: return
 	try:
-		link_video = re.compile(r'file: "(.*?)", type: ".*?", label: "(.*?)".').findall(html)
-		sfile = re.compile(r'file: "(.*?)",label: ".*?",').findall(html)
-		for urlF, qual in link_video:
-			urlF = urlF.replace("\\", "")
-			addLink(name.replace('Assistir Agora: ','')+' Full HD '+str(qual),urlF,imgF,sfile)
+		imgF = re.compile(r'image: \'(.+?)\'').findall(html)[0]
 	except:
 		pass
+	xbmc.log('[plugin.video.filmesonlinex] L175 - ' + str(link_houst), xbmc.LOGNOTICE)
+	addDir('[B]Adicionar aos Favoritos[/B]',name+','+iconimage+','+url,17,url_base2+'jNC8q5',False)
+	#link_video = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'(.+?)\'>(.+?)</a></div>').findall(html)[1]
+	#sfile = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'.+?\'>(.+?)</a></div>').findall(html)[1]
+	#link_video = re.compile(r'\{\"file\":"(.*?)",\"type\":".+?",\"label\":"(.*?)"',re.DOTALL).findall(html)[1]
+	#xbmc.log('[plugin.video.filmesonlinex] L176 - ' + str(link_video), xbmc.LOGNOTICE)
+	try:
+		link_video = re.compile(r'\{\"file\":"(.*?)",\"type\":".+?",\"label\":"(.*?)"',re.DOTALL).findall(html)
+		sfile = re.compile(r'\{\"file\":".*?",\"type\":".+?",\"label\":"(.*?)"',re.DOTALL).findall(html)
+		for urlF, qual in link_video:
+			urlF = urlF.replace("\\", "")
+			addLink(name.replace('Assistir Agora: ','') +' Full HD '+ str(qual),urlF,imgF,sfile)
+	except:
+		pass
+	#xbmc.log('[plugin.video.filmesonlinex] L186 - ' + str(link_video), xbmc.LOGNOTICE)
 	if not link_video:
 		try:
-			link_video = re.compile(r'sources: \[\{file:\'(.*?)\',type:\'.*\'}]').findall(html)
-			sfile = re.compile(r'file: "(.*?)",label: ".*?",').findall(html)
-			xbmc.log('[plugin.video.filmesonlinex] L181 - ' + str(link_video), xbmc.LOGNOTICE)
-			for urlF in link_video:
-				addLink(name.replace('Assistir Agora: ',''),urlF,imgF,sfile)
+			link_video = urlresolver.resolve(link_houst)
+			urlF = link_video #.split("|")[0]
+			sfile = ['720p']
+			xbmc.log('[plugin.video.filmesonlinex] L194 - ' + str(sfile), xbmc.LOGNOTICE)
+			#for urlF in link_video:
+			addLink(name.replace('Assistir Agora: ','') + ' ' + str(sfile),urlF,imgF,sfile)
 		except:
 			pass
-	if not link_video:
-		try:
-			link_video = re.compile(r'playerInstance.load\(\{sources: \[\{file:*\'(.*?).\'').findall(html)
-			xbmc.log('[plugin.video.filmesonlinex] L189 - ' + str(link_video), xbmc.LOGNOTICE)
-			sfile = re.compile(r'file: "(.*?)",label: ".*?",').findall(html)
-			for urlF in link_video:
-				addLink(name.replace('Assistir Agora: ',''),urlF,imgF,sfile)
-		except:
-			pass
+	#xbmc.log('[plugin.video.filmesonlinex] L201 - ' + str(link_video), xbmc.LOGNOTICE)
 			
 def player2(name,url,iconimage):
 	print url
@@ -264,7 +271,7 @@ def addLink(name,url,iconimage,subtitle):
 	ok=True
 	liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
 	liz.setProperty('fanart_image', iconimage)
-	liz.setInfo( type="Video", infoLabels={ "Title": name } )
+	liz.setInfo(type="Video", infoLabels={ "Title": name })
 	liz.setSubtitles(subtitle)
 	ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=liz)
 	return ok	
