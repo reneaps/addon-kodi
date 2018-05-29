@@ -10,6 +10,10 @@
 # Atualizado (1.0.3) - 17/07/2017
 # Atualizado (1.0.4) - 10/08/2017
 # Atualizado (1.0.5) - 12/09/2017
+# Atualizado (1.0.6) - 04/02/2018
+# Atualizado (1.0.7) - 03/05/2018
+# Atualizado (1.0.8) - 05/05/2018
+# Atualizado (1.0.9) - 29/05/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -305,7 +309,7 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
 				
-		elif 'ok' in urlVideo :
+		elif 'ok.ru' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed%s' % fxID
 				
