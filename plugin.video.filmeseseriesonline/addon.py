@@ -25,6 +25,7 @@
 # Atualizado (1.1.8) - 04/02/2018
 # Atualizado (1.1.9) - 21/02/2018
 # Atualizado (1.2.0) - 01/05/2018
+# Atualizado (1.2.1) - 03/06/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -36,7 +37,7 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version		 = '1.1.9'
+version		 = '1.2.1'
 addon_id     = 'plugin.video.filmeseseriesonline'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
@@ -48,15 +49,15 @@ base         = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNlc2VyaWVzb25saW5lLm5ldC8
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'					, base                          	, 10, artfolder + 'categorias.png')
-		addDir('Lançamentos'				, base + '/filmes/lancamentos/' 	, 20, artfolder + 'ultimos.png')
-		addDir('Filmes em HD'				, base + '/filmes/filmes-hd/' 		, 20, artfolder + 'filmes.png')
-		addDir('Filmes Dublados'			, base + '/?s=dublado&tipo=video' 	, 20, artfolder + 'filmes.png')
-		addDir('Series'						, base + '/series/'					, 25, artfolder + 'series.png')
-		addDir('Pesquisa Series'			, '--'                           	, 30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'			, '--'                           	, 35, artfolder + 'pesquisa.png')
-		addDir('Configurações'				, base                             , 999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo'	, base                            , 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'			, base                          	, 10, artfolder + 'categorias.png')
+		addDir('Lançamentos'			, base + '/filmes/lancamentos/' 	, 20, artfolder + 'ultimos.png')
+		addDir('Filmes em HD'			, base + '/filmes/filmes-hd/' 		, 20, artfolder + 'filmes.png')
+		addDir('Filmes Dublados'		, base + '/?s=dublado&tipo=video' 	, 20, artfolder + 'filmes.png')
+		addDir('Series'				, base + '/series-hd/'			, 25, artfolder + 'series.png')
+		addDir('Pesquisa Series'		, '--'                           	, 30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'		, '--'                           	, 35, artfolder + 'pesquisa.png')
+		addDir('Configurações'			, base					, 999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo'	, base                            	, 1000, artfolder + 'config.png', 1, False)
 			
 		setViewMenu()		
 		
@@ -308,28 +309,28 @@ def player(name,url,iconimage):
 		soup  = BeautifulSoup(link)
 
 		try :
-				conteudo = soup("div", {"class": "geral"})
-				srvsdub  = conteudo[0]("a")
-				totD = len(srvsdub)
-				for i in range(totD) :
-						titS = srvsdub[i].text
-						idS = srvsdub[i]["id"]
-						titsT.append(titS)
-						idsT.append(idS)
+			conteudo = soup("div", {"class": "geral"})
+			srvsdub  = conteudo[0]("a")
+			totD = len(srvsdub)
+			for i in range(totD) :
+				titS = srvsdub[i].text
+				idS = srvsdub[i]["id"]
+				titsT.append(titS)
+				idsT.append(idS)
 		except :
-				pass
+			pass
 				
 		try :
-				conteudo = soup("div", {"class": "geral'"})
-				srvsleg  = conteudo[0]("a")
-				totL = len(srvsleg)
-				for i in range(totL) :
-						titS = srvsdub[i].text
-						idS = srvsleg[i]["id"]
-						titsT.append(titS)
-						idsT.append(idS)
+			conteudo = soup("div", {"class": "geral'"})
+			srvsleg  = conteudo[0]("a")
+			totL = len(srvsleg)
+			for i in range(totL) :
+				titS = srvsdub[i].text
+				idS = srvsleg[i]["id"]
+				titsT.append(titS)
+				idsT.append(idS)
 		except :
-				pass
+			pass
 		
 		if not titsT : return
 		
@@ -380,11 +381,11 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidlox.tv/embed-%s' % fxID
 
-		elif 'stream' in urlVideo :
+		elif 'stream=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://estream.to/embed-%s.html' % fxID
 				
-		elif 'streamango' in urlVideo :
+		elif 'streamango=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://streamango.com/embed/%s' % fxID
 
@@ -397,7 +398,7 @@ def player(name,url,iconimage):
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
 				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
-				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				if not url2Play : url2Play = re.findall('var tfilea="(.*?)"', sUnpacked)
 				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = str(url2Play[0])				
 	
@@ -549,14 +550,14 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidlox.tv/embed-%s' % fxID
 
-		elif 'stream' in urlVideo :
+		elif 'stream=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://estream.to/embed-%s.html' % fxID	
 				
-		elif 'streamango' in urlVideo :
+		elif 'streamango=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://streamango.com/embed/%s' % fxID
-								
+				urlVideo = 'https://fruitstreams.com/embed/%s' % fxID
+			
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://thevid.net/e/%s' % fxID
@@ -566,12 +567,12 @@ def player_series(name,url,iconimage):
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
 				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
-				if not url2Play : url2Play = re.findall('var vfile?\w+\s*=\s*"(.*?)"', sUnpacked)
+				if not url2Play : url2Play = re.findall('var tfilea\s*=\s*"(.*?)"', sUnpacked)
 				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = str(url2Play[0])				
 	
-				OK = False
-						'''
+				OK = False'''
+						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		if not url2Play : return
@@ -627,6 +628,7 @@ def openURL(url):
         "Referer": url,
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"
     }
+	
         req = urllib2.Request(url, "",headers)
         req.get_method = lambda: 'GET'
         response = urllib2.urlopen(req)
