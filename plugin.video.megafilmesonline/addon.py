@@ -17,6 +17,7 @@ import urlresolver
 
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib				 import jsunpack
+from time						 import time
 
 version	  = '1.5.0'
 addon_id  = 'plugin.video.megafilmesonline'
@@ -162,6 +163,18 @@ def getEpisodios(name, url):
 				addDir(titulo, url, 110, img, False, total)
 
 def pega(idname):
+	idtime = int(round(time() * 1000))
+	idtime = str(idtime)
+	data = urllib.urlencode({'action':'downloadPage','id':idname,'_':idtime})
+	url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+	#req.add_header('Referer', 'http://www.megahfilmeshd.net/series/game-of-thrones-todas-as-temporadas/')
+	r = urllib2.urlopen(url+'?'+data)
+	html = r.read()
+	xbmc.log('[plugin.video.megahfilmeshd] L173 ' + str(html), xbmc.LOGNOTICE)		
+	urlF = re.compile(r'<a target="_BLANK" href="(.+?)" class="player">').findall(html)[0]
+	return urlF
+	
+'''
 	data = urllib.urlencode({'action':'players','id':idname})
 	url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
 	req = urllib2.Request(url=url,data=data)
@@ -177,7 +190,7 @@ def pega(idname):
 	urlF = s.iframe['src']
 	#print urlF
 	return urlF
-
+'''
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
@@ -353,9 +366,10 @@ def player_series(name,url,iconimage):
 
 		link = openURL(url)
 		soup  = BeautifulSoup(link)
-		xbmc.log('[plugin.video.megahfilmeshd] L353 ' + str(url), xbmc.LOGNOTICE)
-		conteudo = soup('iframe')
-		urlVideo = conteudo[0]['src']
+		xbmc.log('[plugin.video.megahfilmeshd] L369 ' + str(url), xbmc.LOGNOTICE)
+		urlVideo = url
+		#conteudo = soup('iframe')
+		#urlVideo = conteudo[0]['src']
 		'''
 		try :
 				conteudo = soup('iframe')
@@ -407,14 +421,22 @@ def player_series(name,url,iconimage):
 		okID = urlVideo.split('embed/?v=')[1]
 		urlVideo = okID
 		'''
-		print "URLVIDEO " + urlVideo
+		xbmc.log('[plugin.video.megahfilmeshd] L423 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
-		if 'nowvideo.php' in urlVideo :
+		if 'open.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
-				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
-
+				urlVideo = 'https://openload.co/embed/%s' % nowID
+				
+		elif 'video.php' in urlVideo :
+				nowID = urlVideo.split("id=")[1]
+				urlVideo = 'https://openload.co/embed/%s' % nowID
+				
+		elif 'openload.php' in urlVideo :
+				nowID = urlVideo.split("id=")[1]
+				urlVideo = 'https://openload.co/embed/%s' % nowID
+				
 		elif 'thevid.net' in urlVideo :
 				okID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % okID	
