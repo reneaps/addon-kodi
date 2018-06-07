@@ -30,12 +30,12 @@ base		= base64.b64decode('aHR0cDovL3d3dy5tZWdhaGZpbG1lc2hkLm5ldC8=')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'			, base + 'filme/'			,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'			, base + 'filmes-category/lancamentos/'	,   20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'		, base + '?s=dublado'			,   20, artfolder + 'pesquisa.png')
-		addDir('Seriados'			, base + 'series/'			,   25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'		, '--'					,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'		, '--'					,   35, artfolder + 'pesquisa.png')
+		addDir('Categorias'			, base + 'filme/'			,	10, artfolder + 'categorias.png')
+		addDir('Lançamentos'			, base + 'filmes-category/lancamentos/'	,	20, artfolder + 'lancamentos.png')
+		addDir('Filmes Dublados'		, base + '?s=dublado'			,	20, artfolder + 'pesquisa.png')
+		addDir('Seriados'			, base + 'series/'			,	25, artfolder + 'legendados.png')
+		addDir('Pesquisa Series'		, '--'					,	30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'		, '--'					,	35, artfolder + 'pesquisa.png')
 		addDir('Configurações'			, base					,  999, artfolder + 'config.png', 1, False)
 		addDir('Configurações ExtendedInfo'	, base					, 1000, artfolder + 'config.png', 1, False)
 			
@@ -49,7 +49,7 @@ def getCategorias(url):
 		categorias = conteudo[0].findAll("a")
 		totC = len(categorias)
 		for categoria in categorias:
-				xbmc.log('[plugin.video.megahfilmeshd] L50 ' + str(categoria['href']), xbmc.LOGNOTICE)
+				#xbmc.log('[plugin.video.megahfilmeshd] L50 ' + str(categoria['href']), xbmc.LOGNOTICE)
 				titC = categoria.text.encode('utf-8','replace')
 				urlC = categoria["href"]
 				imgC = artfolder + limpa(titC) + '.png'
@@ -84,7 +84,7 @@ def getSeries(url):
 		soup = BeautifulSoup(link)
 		conteudo = soup.findAll('div',{'id':'series-list'})
 		filmes = conteudo[0]('a')
-		xbmc.log('[plugin.video.megahfilmeshd] L87 ' + str(filmes), xbmc.LOGNOTICE)
+		#xbmc.log('[plugin.video.megahfilmeshd] L87 ' + str(filmes), xbmc.LOGNOTICE)
 		totF = len(filmes)
 
 		for filme in filmes:
@@ -141,7 +141,7 @@ def getEpisodios(name, url):
 		content = urllib2.urlopen(req).read()
 		d = json.loads(content)
 		b = d['episodes']
-
+		#xbmc.log('[plugin.video.megahfilmeshd] L87 ' + str(b), xbmc.LOGNOTICE)
 		imgF = ""
 		img = soup.find("meta", {"property": "og:image"})
 		imgF = re.findall(r'content=[\'"]?([^\'" >]+)', str(img))
@@ -151,6 +151,7 @@ def getEpisodios(name, url):
 				titF = b[str(i)]['name'].encode('utf-8')
 				idname = b[str(i)]['id']
 				urlF = pega(idname)
+				if urlF == "" : titF = titF + ">>Indisponivel"
 				imgF = ''
 				temp = (urlF, titF)
 				episodios.append(temp)
@@ -161,17 +162,21 @@ def getEpisodios(name, url):
 				addDir(titulo, url, 110, img, False, total)
 
 def pega(idname):
-    data = urllib.urlencode({'action':'players','id':idname})
-    url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
-    req = urllib2.Request(url=url,data=data)
-    content = urllib2.urlopen(req).read()
-    #print content
-    soup = BeautifulSoup(content)
-    ef = soup.div['data-player-content']
-    s = BeautifulSoup(ef)
-    urlF = s.iframe['src']
-    #print urlF
-    return urlF
+	data = urllib.urlencode({'action':'players','id':idname})
+	url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+	req = urllib2.Request(url=url,data=data)
+	content = urllib2.urlopen(req).read()
+	#print content
+	soup = BeautifulSoup(content)
+	try:
+		ef = soup.div['data-player-content']
+	except TypeError:
+		urlF = ''
+		return urlF
+	s = BeautifulSoup(ef)
+	urlF = s.iframe['src']
+	#print urlF
+	return urlF
 
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -337,7 +342,7 @@ def player(name,url,iconimage):
 def player_series(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
-		mensagemprogresso.create('FilmesESeriesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+		mensagemprogresso.create('MegaFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
 		mensagemprogresso.update(0)
 		
 		titsT = []
@@ -449,6 +454,8 @@ def player_series(name,url,iconimage):
 					xbmcPlayer.setSubtitles(sfile)
 			else:
 				xbmcPlayer.setSubtitles(legendas)
+				
+		return OK
 
 ############################################################################################################
 		
@@ -508,13 +515,13 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 
 def getInfo(url)	:
 		link = openURL(url)
-		titO = re.findall('<h2 class="titulo-destaque">(.*?)</h2>', link)[0]
+		titO = re.findall('<h2 class="title">(.*?)</h2>', link)[0]
 
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
 		link = openURL(url)
-		ytID = re.findall('<iframe width=".*?" height=".*?" src="http://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen></iframe>', link)[0]
+		ytID = re.findall('<a id="open-trailer" class="btn iconized trailer" data-trailer="https://www.youtube.com/embed/(.*?)rel=0&amp;controls=1&amp;showinfo=0&autoplay=0"><b>Trailler</b> <i class="icon fa fa-play"></i></a>', link)[0]
 		ytID = ytID.replace('?','')
 		
 		xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
