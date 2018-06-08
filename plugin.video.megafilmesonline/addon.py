@@ -93,6 +93,8 @@ def getSeries(url):
 				urlF = filme["href"].encode('utf-8')
 				titF = urlF.replace('http://www.megahfilmeshd.net/series/','')
 				titF = titF.replace('/','').replace('-',' ')
+				titF = titF.replace(' as','').replace('todas','').replace('temporadas','')
+				titF = titF.title()
 				imgF = filme.img["data-original"].encode('utf-8')
 				addDir(titF, urlF, 26, imgF)
 				
@@ -113,11 +115,16 @@ def getTemporadas(url):
 		urlF = url
 		totD = len(seasons)
 		
+		imgF = ""
+		img = soup.find("meta", {"property": "og:image"})
+		imgF = re.findall(r'content=[\'"]?([^\'" >]+)', str(img))
+		imgF = imgF[0]
+				
 		i = 1
 		while i <= totD:
 			titF = str(i) + "ª Temporada"
 			try:
-				addDir(titF, urlF, 27, iconimage)
+				addDir(titF, urlF, 27, imgF)
 			except:
 				pass
 			i = i + 1
@@ -160,7 +167,7 @@ def getEpisodios(name, url):
 		total = len(episodios)
 
 		for url, titulo in episodios:
-				addDir(titulo, url, 110, img, False, total)
+				addDirF(titulo, url, 110, img, False, total)
 
 def pega(idname):
 	idtime = int(round(time() * 1000))
