@@ -11,6 +11,7 @@
 # Atualizado (1.0.6) - 08/09/2017
 # Atualizado (1.0.7) - 03/05/2018
 # Atualizado (1.0.8) - 08/06/2018
+# Atualizado (1.0.9) - 09/06/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -20,8 +21,9 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 from urlparse import urlparse
 
-addon_id  = 'plugin.video.megafilmesonlinehd'
-selfAddon = xbmcaddon.Addon(id=addon_id)
+version		= '1.0.9'
+addon_id    = 'plugin.video.megafilmesonlinehd'
+selfAddon   = xbmcaddon.Addon(id=addon_id)
 
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
@@ -64,7 +66,6 @@ def getCategorias(url):
 		setViewMenu()
 
 def getFilmes(url):
-		xbmc.log('[plugin.video.megafilmesonlinehd] L59 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
@@ -103,7 +104,6 @@ def getSeries(url):
 				titF = filme.a.getText().encode('utf-8')
 				titF = titF.replace('&#8211;','-')
 				urlF = filme.a["href"].encode('utf-8')
-				xbmc.log('[plugin.video.megafilmesonlinehd] L105 - ' + str(filme), xbmc.LOGNOTICE)
 				try:
 					imgF = filme.img["src"].encode('utf-8')
 				except:
@@ -149,7 +149,6 @@ def getTemporadas(url):
 			pass
 		img = ''
 		i = 1
-		xbmc.log('[plugin.video.megafilmesonlinehd] L129 - ' + str(totF), xbmc.LOGNOTICE)
 		while i <= totF:
 			titF = str(i) + "ª Temporada"
 			try:
@@ -175,7 +174,7 @@ def getEpisodios(name, url):
 			linhas = conteudo[0]("div", {"class": "noload ac_"+p+"_"+str(n)})
 			totF = len(linhas)
 			arquivo = linhas[0]("div")
-			xbmc.log('[plugin.video.megafilmesonlinehd] L153 - ' + str(totF), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.megafilmesonlinehd] L175 - ' + str(totF), xbmc.LOGNOTICE)
 			domain = urlparse(url)
 			host = host = domain.scheme + "://" + domain.netloc + "/series/"
 
@@ -188,8 +187,8 @@ def getEpisodios(name, url):
 						titF = str(n) + "T " + titF
 						urlF = filme["onclick"]
 						urlF = urlF.replace('boxp(\'','').replace('\')','')
-						#if "thevid.net" in urlF:
-							#urlF = urlF.replace('/e/','/v/')
+						if "thevid.net" in urlF:
+							urlF = urlF.replace('/v/','/e/')
 						temp = (titF, urlF)
 						episodios.append(temp)
 			except:
@@ -205,7 +204,7 @@ def getEpisodios(name, url):
 						urlF = filme["onclick"]
 						urlF = urlF.replace('boxp(\'','').replace('\')','')
 						if "thevid.net" in urlF:
-							urlF = urlF.replace('/e/','/v/')
+							urlF = urlF.replace('/v/','/e/')
 						temp = (titF, urlF)
 						episodios.append(temp)
 			except:
@@ -331,7 +330,7 @@ def player(name,url,iconimage):
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "btn-ver"})
 		if not conteudo : return
-		xbmc.log('[plugin.video.megafilmesonlinehd] L235 ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megafilmesonlinehd] L331 ' + str(url), xbmc.LOGNOTICE)
 		b=re.findall(r'<div class="btn-flm" alt=".*?" onclick="boxp\(\'(.*?)\)" data-toggle="modal" data-target=".open_box">',link)[0]
 		url=re.findall(r'[\'"]?([^\'" >]+)', str(b))[0]
 		print b
@@ -367,7 +366,7 @@ def player(name,url,iconimage):
 		#urlVideo = re.findall(r'data-src=[\'"]?([^\'" >]+)', str(links))[0]
 		urlVideo = idsT[i]
 
-		xbmc.log('[plugin.video.megafilmesonlinehd] L304 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megafilmesonlinehd] L367 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -467,7 +466,7 @@ def player_series(name,url,iconimage):
 
 		matriz = []
 
-		xbmc.log('[plugin.video.megafilmesonlinehd] L469 ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megafilmesonlinehd] L467 ' + str(url), xbmc.LOGNOTICE)
 		link     = openURL(url)
 		link     = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
@@ -508,9 +507,9 @@ def player_series(name,url,iconimage):
 				nowID = urlVideo.split('?')[1].split('=')[1].split('/')[0]
 				urlVideo = 'http://streamango.com/embed/%s' % nowID
 
-		elif 'vz.net' in urlVideo :
+		elif 'play.php?vt=' in urlVideo :
 				vttID = urlVideo.split('?')[1].split('=')[1].split('/')[0]
-				urlVideo = 'http://vidzi.tv/embed-%s-640x430.html' % vttID
+				urlVideo = 'http://vidto.me/embed-%s-640x430.html' % vttID
 
 		elif 'strplay' in urlVideo :
 				vttID = urlVideo.split('?')[1].split('=')[1].split('&')[0]
