@@ -12,6 +12,7 @@
 # Atualizado (1.0.7) - 03/05/2018
 # Atualizado (1.0.8) - 08/06/2018
 # Atualizado (1.0.9) - 09/06/2018
+# Atualizado (1.1.0) - 14/06/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -21,7 +22,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 from urlparse import urlparse
 
-version		= '1.0.9'
+version	    = '1.1.0'
 addon_id    = 'plugin.video.megafilmesonlinehd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 
