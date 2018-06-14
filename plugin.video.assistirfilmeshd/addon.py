@@ -15,6 +15,7 @@
 # Atualizado (1.1.0) - 08/08/2017
 # Atualizado (1.1.1) - 29/04/2018
 # Atualizado (1.1.2) - 20/05/2018
+# Atualizado (1.1.3) - 14/06/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -23,7 +24,7 @@ import urlresolver
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-versao      = '1.0.9'
+versao      = '1.1.3'
 addon_id    = 'plugin.video.assistirfilmeshd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -317,7 +318,7 @@ def player(name,url,iconimage):
 				
 		elif 'thevid.net' in urlVideo :
 				okID = urlVideo.split('e/')[1]
-				urlVideo = 'http://thevid.net/e/%s' % okID
+				urlVideo = 'http://thevid.net/v/%s' % okID
 				xbmc.log('[plugin.video.assistirfilmeshd] L310 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				'''
 				linkTV  = openURL(urlVideo)		
@@ -332,7 +333,7 @@ def player(name,url,iconimage):
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 		
-		xbmc.log('[plugin.video.assistirfilmeshd] L324 - ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd] L335 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		if not url2Play : return
 		
@@ -447,7 +448,7 @@ def player_series(name,url,iconimage):
 
 		elif 'thevid.net' in urlVideo :
 				fxID = urlVideo.split('e/')[1]
-				urlVideo = 'http://thevid.net/e/%s' % fxID
+				urlVideo = 'http://thevid.net/v/%s' % fxID
 				'''
 				linkTV  = openURL(urlVideo)		
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
@@ -455,12 +456,14 @@ def player_series(name,url,iconimage):
 				sUnpacked = jsunpack.unpack(aMatches[1])
 				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
 				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
-				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.assistirfilmeshd] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = str(url2Play[0])				
 	
 				OK = False'''
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
+
+		xbmc.log('[plugin.video.assistirfilmeshd] L465 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		if not url2Play : return
 
