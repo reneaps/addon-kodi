@@ -9,11 +9,13 @@
 # Atualizado (1.0.4) - 10/05/2019
 # Atualizado (1.0.5) - 21/05/2019
 # Atualizado (1.0.6) - 14/06/2019
+# Atualizado (1.0.7) - 16/06/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import urlresolver
 import json
+import resources.lib.moonwalk as moonwalk
 
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
@@ -168,12 +170,13 @@ def getEpisodios(name, url, iconimage):
 		episodes = re.findall(r'episodes\: \[(.+?)\],',link)[0]
 		episodes = episodes.split(",")
 		ref = re.findall(r'ref\: encodeURIComponent\(\'(.+?)\'\)',link)[0]
-		serial = re.findall(r'serial_token\: \'(.+?)\'',link)[0]
+		#serial = re.findall(r'serial_token\: \'(.+?)\'',link)[0]
+		serial = re.findall(r'video_token\: \'(.+?)\'',link)[0]
 		totD = len(episodes)
 		for i in episodes:
 				titF = i.encode('utf-8')	
 				titF = titF + " - Episodio"
-				urlF = "http://moonwalk.cc/serial/%s" % serial + "/iframe?season=%s" % s + "&episode=%s" % i + "&nocontrols=&nocontrols_translations=1&nocontrols_seasons=&nocontrols_episodes=&nocontrols_trailer=&ref=%s" % ref + "&autoplay=null&start_time=null"
+				urlF = "http://apollocdn.cc/serial/%s" % serial + "/iframe?season=%s" % s + "&episode=%s" % i + "&nocontrols=&nocontrols_translations=1&nocontrols_seasons=&nocontrols_episodes=&nocontrols_trailer=&ref=%s" % ref + "&autoplay=null&start_time=null"
 				addDirF(titF, urlF, 110, imgF, False, totD)
 
 def pesquisa():
@@ -284,6 +287,22 @@ def player(name,url,iconimage):
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://openload.co/embed/%s' % okID			
 				
+		elif 'apollocdn.cc' in urlVideo :
+				okID = urlVideo.split('/')[4]
+				urlVideo = 'http://moonwalk.cc/video/%s/iframe' % okID
+				xbmc.log('[plugin.video.filmesonlinehd11] L290 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				urlVideo = moonwalk.get_playlist(urlVideo)
+				urlVideo = urlVideo[0]
+				qual = []
+				for i in urlVideo:
+						qual.append(str(i))
+				index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
+				if index == -1 : return
+				i = int(qual[index])
+				url2Play = urlVideo[i]
+				OK = False
+				#xbmc.log('[plugin.video.filmesonlinehd11] L293 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				
 		elif 'thevid2.net' in urlVideo :
 				okID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/v/%s' % okID
@@ -350,10 +369,10 @@ def player_series(name,url,iconimage):
 
 		xbmc.log('[plugin.video.filmesonlinehd11] L350 - ' + str(url), xbmc.LOGNOTICE)
 
-		link  = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')	
-		soup = BeautifulSoup(link)
-		xbmc.log('[plugin.video.filmesonlinehd11] L353 - ' + str(soup), xbmc.LOGNOTICE)
+		#link  = openURL(url)
+		#link = unicode(link, 'utf-8', 'ignore')	
+		#soup = BeautifulSoup(link)
+		xbmc.log('[plugin.video.filmesonlinehd11] L353 - ' + str(url), xbmc.LOGNOTICE)
 		urlVideo = url
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
@@ -373,6 +392,23 @@ def player_series(name,url,iconimage):
 		elif 'ok.ru' in urlVideo :
 				fxID = urlVideo.split('embed')[1]
 				urlVideo = 'https://ok.ru/videoembed%s' % fxID
+				
+		elif 'apollocdn.cc' in urlVideo :
+				okID = urlVideo.split('/')[4]
+				urlVideo = 'http://moonwalk.cc/video/%s/iframe' % okID
+				xbmc.log('[plugin.video.filmesonlinehd11] L397 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				urlVideo = moonwalk.get_playlist(urlVideo)
+				xbmc.log('[plugin.video.filmesonlinehd11] L399 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				urlVideo = urlVideo[0]
+				qual = []
+				for i in urlVideo:
+						qual.append(str(i))
+				if qual == None : return
+				index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
+				if index == -1 : return
+				i = int(qual[index])
+				url2Play = urlVideo[i]
+				OK = False
 				
 		elif 'thevid.net' in urlVideo :
 				linkTV  = openURL(urlVideo)		
@@ -427,7 +463,7 @@ def player_series(name,url,iconimage):
 			else:
 				xbmcPlayer.setSubtitles(legendas)
 		
-		return ok
+		return OK
 	
 ############################################################################################################
 		
