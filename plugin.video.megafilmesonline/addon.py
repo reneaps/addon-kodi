@@ -9,11 +9,13 @@
 # Atualizado (1.3.0) - 18/07/2017
 # Atualizado (1.4.0) - 06/05/2018
 # Atualizado (1.5.0) - 06/06/2018
+# Atualizado (1.6.0) - 27/06/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import json
 import urlresolver
+import requests
 
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib				 import jsunpack
@@ -177,11 +179,17 @@ def pega(idname):
 	#req.add_header('Referer', 'http://www.megahfilmeshd.net/series/game-of-thrones-todas-as-temporadas/')
 	r = urllib2.urlopen(url+'?'+data)
 	html = r.read()
-	xbmc.log('[plugin.video.megahfilmeshd] L173 ' + str(html), xbmc.LOGNOTICE)		
+	#xbmc.log('[plugin.video.megahfilmeshd] L180 ' + str(html), xbmc.LOGNOTICE)		
 	urlF = re.compile(r'<a target="_BLANK" href="(.+?)" class="player">').findall(html)[0]
+	html = openURL(urlF)
+	soup = BeautifulSoup(html)
+	#xbmc.log('[plugin.video.megahfilmeshd] L184 ' + str(html), xbmc.LOGNOTICE)	
+	urlF = soup.iframe["src"]
+	html = openURL(urlF)
+	soup = BeautifulSoup(html)
+	xbmc.log('[plugin.video.megahfilmeshd] L188 ' + str(soup), xbmc.LOGNOTICE)	
 	return urlF
-	
-'''
+	'''
 	data = urllib.urlencode({'action':'players','id':idname})
 	url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
 	req = urllib2.Request(url=url,data=data)
@@ -197,7 +205,8 @@ def pega(idname):
 	urlF = s.iframe['src']
 	#print urlF
 	return urlF
-'''
+	'''
+
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
@@ -293,6 +302,9 @@ def player(name,url,iconimage):
 		
 		i = index
 		urlVideo = url2[i]
+		
+		t = requests.get(urlVideo)
+		urlVideo = t.url
 
 		#conteudo = soup("div", {"class": "player-video"})
 		#links = conteudo[i]("iframe")
@@ -304,7 +316,7 @@ def player(name,url,iconimage):
 		#urlVideo = okID
 
 
-		xbmc.log('[plugin.video.megahfilmeshd] L282 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L315 ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -322,7 +334,7 @@ def player(name,url,iconimage):
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 		
-		xbmc.log('[plugin.video.megahfilmeshd] L301 ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L333 ' + str(url2Play), xbmc.LOGNOTICE)
 		
 		if not url2Play : return
 		
@@ -370,11 +382,12 @@ def player_series(name,url,iconimage):
 		links = []
 		hosts = []
 		matriz = []
+			
+		t = requests.get(url)
+		urlVideo = t.url
 
-		link = openURL(url)
-		soup  = BeautifulSoup(link)
-		xbmc.log('[plugin.video.megahfilmeshd] L369 ' + str(url), xbmc.LOGNOTICE)
-		urlVideo = url
+		xbmc.log('[plugin.video.megahfilmeshd] L369 ' + str(urlVideo), xbmc.LOGNOTICE)
+		#urlVideo = url
 		#conteudo = soup('iframe')
 		#urlVideo = conteudo[0]['src']
 		'''
