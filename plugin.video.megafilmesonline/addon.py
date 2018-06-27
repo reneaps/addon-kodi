@@ -187,7 +187,7 @@ def pega(idname):
 	urlF = soup.iframe["src"]
 	html = openURL(urlF)
 	soup = BeautifulSoup(html)
-	xbmc.log('[plugin.video.megahfilmeshd] L188 ' + str(soup), xbmc.LOGNOTICE)	
+	#xbmc.log('[plugin.video.megahfilmeshd] L188 ' + str(soup), xbmc.LOGNOTICE)	
 	return urlF
 	'''
 	data = urllib.urlencode({'action':'players','id':idname})
