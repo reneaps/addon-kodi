@@ -302,7 +302,13 @@ def player(name,url,iconimage):
 		
 		i = index
 		urlVideo = url2[i]
-		
+
+		if 'javascript.vizer' in urlVideo :
+				html = openURL(urlVideo)
+				soup = BeautifulSoup(html)
+				xbmc.log('[plugin.video.megahfilmeshd] L309 ' + str(urlVideo), xbmc.LOGNOTICE)	
+				urlVideo = soup.iframe["src"]
+
 		t = requests.get(urlVideo)
 		urlVideo = t.url
 
@@ -316,7 +322,7 @@ def player(name,url,iconimage):
 		#urlVideo = okID
 
 
-		xbmc.log('[plugin.video.megahfilmeshd] L315 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L325 ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -334,7 +340,7 @@ def player(name,url,iconimage):
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 		
-		xbmc.log('[plugin.video.megahfilmeshd] L333 ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L343 ' + str(url2Play), xbmc.LOGNOTICE)
 		
 		if not url2Play : return
 		
