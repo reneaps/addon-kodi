@@ -27,7 +27,7 @@ base		= base64.b64decode('aHR0cDovL3d3dy5taWRpYWZsaXhoZC5uZXQv')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'				, base + 'filme/'						,	10, artfolder + 'categorias.png')
+		addDir('Categorias'				, base + ''								,	10, artfolder + 'categorias.png')
 		addDir('Lançamentos'			, base + 'categoria/lancamentos/'		,	20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'		, base + '?s=dublado'					,	20, artfolder + 'pesquisa.png')
 		addDir('Seriados'				, base + 'series/'						,	25, artfolder + 'legendados.png')
@@ -42,12 +42,13 @@ def getCategorias(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup = BeautifulSoup(link)
-		conteudo   = soup.find_all('ul',{'class':'sub-menu'})
-		categorias = conteudo[0].findAll("li")
+		conteudo   = soup("ul",{"class":"sub-menu"})
+		categorias = conteudo[0]("li")
+
 		totC = len(categorias)
+
 		for categoria in categorias:
-				#xbmc.log('[plugin.video.megahfilmeshd] L50 ' + str(categoria['href']), xbmc.LOGNOTICE)
-				titC = categoria.a.text.encode('utf-8','replace').title()
+				titC = categoria.a.text.encode('utf-8','')
 				urlC = categoria.a["href"]
 				imgC = artfolder + limpa(titC) + '.png'
 				addDir(titC,urlC,20,imgC)
@@ -58,9 +59,11 @@ def getFilmes(url):
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		
 		soup = BeautifulSoup(link)
-		conteudo = soup.findAll('div',{'class','items'})
-		filmes = conteudo[0].find_all('div',{'class':'poster'})
+		conteudo = soup("div",{"class":"items"})
+		filmes = conteudo[0]('div',{'class':'poster'})
+
 		totF = len(filmes)
+
 		for filme in filmes:
 				titF = filme.img["alt"].encode("utf-8")
 				urlF = filme.a["href"].encode('utf-8')
@@ -82,13 +85,13 @@ def getSeries(url):
 		soup = BeautifulSoup(link)
 		conteudo = soup.findAll('div',{'id':'series-list'})
 		filmes = conteudo[0]('a')
-		#xbmc.log('[plugin.video.megahfilmeshd] L87 ' + str(filmes), xbmc.LOGNOTICE)
+		#xbmc.log('[plugin.video.midiaflixhd] L87 ' + str(filmes), xbmc.LOGNOTICE)
 		totF = len(filmes)
 
 		for filme in filmes:
 				titF = filme.find('div',{'class':'title'}).text.encode('utf-8')
 				urlF = filme["href"].encode('utf-8')
-				titF = urlF.replace('http://www.megahfilmeshd.net/series/','')
+				titF = urlF.replace('http://www.midiaflixhd.net/series/','')
 				titF = titF.replace('/','').replace('-',' ')
 				titF = titF.replace(' as','').replace('todas','').replace('temporadas','')
 				titF = titF.title()
@@ -141,12 +144,12 @@ def getEpisodios(name, url):
 		seasons = filmes[0]('div',{'class':'item get_episodes'})
 		idseasons = seasons[n]['data-row-id']
 		data = urllib.urlencode({'action':'episodes','season':idseasons})
-		url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+		url = 'http://www.midiaflixhd.net/wp-admin/admin-ajax.php'
 		req = urllib2.Request(url=url,data=data)
 		content = urllib2.urlopen(req).read()
 		d = json.loads(content)
 		b = d['episodes']
-		#xbmc.log('[plugin.video.megahfilmeshd] L87 ' + str(b), xbmc.LOGNOTICE)
+		#xbmc.log('[plugin.video.midiaflixhd] L87 ' + str(b), xbmc.LOGNOTICE)
 		imgF = ""
 		img = soup.find("meta", {"property": "og:image"})
 		imgF = re.findall(r'content=[\'"]?([^\'" >]+)', str(img))
@@ -170,23 +173,23 @@ def pega(idname):
 	idtime = int(round(time() * 1000))
 	idtime = str(idtime)
 	data = urllib.urlencode({'action':'downloadPage','id':idname,'_':idtime})
-	url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
-	#req.add_header('Referer', 'http://www.megahfilmeshd.net/series/game-of-thrones-todas-as-temporadas/')
+	url = 'http://www.midiaflixhd.net/wp-admin/admin-ajax.php'
+	#req.add_header('Referer', 'http://www.midiaflixhd.net/series/game-of-thrones-todas-as-temporadas/')
 	r = urllib2.urlopen(url+'?'+data)
 	html = r.read()
-	#xbmc.log('[plugin.video.megahfilmeshd] L180 ' + str(html), xbmc.LOGNOTICE)		
+	#xbmc.log('[plugin.video.midiaflixhd] L180 ' + str(html), xbmc.LOGNOTICE)		
 	urlF = re.compile(r'<a target="_BLANK" href="(.+?)" class="player">').findall(html)[0]
 	html = openURL(urlF)
 	soup = BeautifulSoup(html)
-	#xbmc.log('[plugin.video.megahfilmeshd] L184 ' + str(html), xbmc.LOGNOTICE)	
+	#xbmc.log('[plugin.video.midiaflixhd] L184 ' + str(html), xbmc.LOGNOTICE)	
 	urlF = soup.iframe["src"]
 	html = openURL(urlF)
 	soup = BeautifulSoup(html)
-	#xbmc.log('[plugin.video.megahfilmeshd] L188 ' + str(soup), xbmc.LOGNOTICE)	
+	#xbmc.log('[plugin.video.midiaflixhd] L188 ' + str(soup), xbmc.LOGNOTICE)	
 	return urlF
 	'''
 	data = urllib.urlencode({'action':'players','id':idname})
-	url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+	url = 'http://www.midiaflixhd.net/wp-admin/admin-ajax.php'
 	req = urllib2.Request(url=url,data=data)
 	content = urllib2.urlopen(req).read()
 	#print content
@@ -258,84 +261,26 @@ def player(name,url,iconimage):
 		matriz = []
 		
 		link  = openURL(url) 
-		xbmc.log('[plugin.video.megahfilmeshd] L241 ' + str(url), xbmc.LOGNOTICE)		
-		soup	 = BeautifulSoup(link)	
-		conteudo = soup("div", {"class": "fullplayer"})
-		article = conteudo[0]("div",{'class':"playerList playerListSmall"})
-		srvsdub	 = article[0]("div",{"class":"item get_player_content"})
-		print srvsdub
-		totD = len(srvsdub)
-		print totD
-		for i in range(totD) :
-				urlF = srvsdub[i]['data-player-content']
-				iframe = BeautifulSoup(urlF)
-				urlD = iframe.iframe['src']
-				if totD == 1 :
-					urlVideo = urlD
-				else:
-					link  = openURL(urlD)
-					link  = unicode(link, 'utf-8', 'ignore')
-					soup	 = BeautifulSoup(link)
-					#urlVideo = soup.iframe['src']
-					links = soup.findAll('iframe')
-					if len(links) == 1 :
-						urlVideo = links[0]['src']
-					else:
-						urlVideo = links[1]['src']
-						opID =	urlVideo.split('?')[1]
-						opID = opID.split('=')[1]
-						urlVideo = "http://openload.co/embed/" + opID
-				srv = srvsdub[i].text
-				titsT.append(srv)
-				url2.append(urlVideo)
-		
-		if not titsT : return
-		
-		index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-		
-		if index == -1 : return
-		
-		i = index
-		urlVideo = url2[i]
+		xbmc.log('[plugin.video.midiaflixhd] L241 ' + str(url), xbmc.LOGNOTICE)		
+		soup = BeautifulSoup(link)
+		urlF = soup.iframe["data-lazy-src"]
+		try:
+		    html = openURL(urlF)
+		    urlVideo = re.findall(r'var JWp = \{\'mp4file\': \'(.+?)\',', html)[0]
+		    url2Play = urlVideo
+		    OK = False
+		    print urlVideo
+		except:
+		    print "Video Indisponivel"
+		    return OK
 
-		if 'javascript.vizer' in urlVideo :
-				html = openURL(urlVideo)
-				soup = BeautifulSoup(html)
-				xbmc.log('[plugin.video.megahfilmeshd] L309 ' + str(urlVideo), xbmc.LOGNOTICE)	
-				urlVideo = soup.iframe["src"]
-
-		t = requests.get(urlVideo)
-		urlVideo = t.url
-
-		#conteudo = soup("div", {"class": "player-video"})
-		#links = conteudo[i]("iframe")
-
-		#if len(links) == 0 : links = conteudo[0]("a")
-
-		#urlVideo = re.findall(r'data-src=[\'"]?([^\'" >]+)', str(links))[0]
-		#okID = urlVideo.split('embed/?v=')[1]
-		#urlVideo = okID
-
-
-		xbmc.log('[plugin.video.megahfilmeshd] L325 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.midiaflixhd] L325 ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-		
-		if 'nowvideo.php' in urlVideo :
-				nowID = urlVideo.split("id=")[1]
-				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
-	
-		elif 'megahfilmeshd.net' in urlVideo :
-				okID = urlVideo.split('id=')[1]
-				urlVideo = 'https://openload.co/embed/%s' % okID			
-				
-		elif 'thevid.net' in urlVideo :
-				okID = urlVideo.split('e/')[1]
-				urlVideo = 'http://thevid.net/e/%s' % okID	
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 		
-		xbmc.log('[plugin.video.megahfilmeshd] L343 ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.midiaflixhd] L343 ' + str(url2Play), xbmc.LOGNOTICE)
 		
 		if not url2Play : return
 		
@@ -387,7 +332,7 @@ def player_series(name,url,iconimage):
 		t = requests.get(url)
 		urlVideo = t.url
 
-		xbmc.log('[plugin.video.megahfilmeshd] L369 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.midiaflixhd] L369 ' + str(urlVideo), xbmc.LOGNOTICE)
 		#urlVideo = url
 		#conteudo = soup('iframe')
 		#urlVideo = conteudo[0]['src']
@@ -442,7 +387,7 @@ def player_series(name,url,iconimage):
 		okID = urlVideo.split('embed/?v=')[1]
 		urlVideo = okID
 		'''
-		xbmc.log('[plugin.video.megahfilmeshd] L423 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.midiaflixhd] L423 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
@@ -516,7 +461,9 @@ def openConfigEI():
 
 def openURL(url):
 		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		req.add_header('Referer',url)
+		req.add_header('Upgrade-Insecure-Requests',1)
+		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
