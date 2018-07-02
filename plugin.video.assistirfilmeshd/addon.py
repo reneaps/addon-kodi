@@ -199,7 +199,9 @@ def getEpisodios(name, url):
 
 		for titF, urlF in episodios:
 				addDirF(titF, urlF, 110, imgF, False, totF)
-				
+
+		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+		
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
