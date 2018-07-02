@@ -16,6 +16,7 @@
 # Atualizado (1.1.1) - 29/04/2018
 # Atualizado (1.1.2) - 20/05/2018
 # Atualizado (1.1.3) - 14/06/2018
+# Atualizado (1.1.4) - 01/07/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -24,7 +25,7 @@ import urlresolver
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-versao      = '1.1.3'
+versao      = '1.1.4'
 addon_id    = 'plugin.video.assistirfilmeshd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -559,8 +560,10 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 
 def getInfo(url)	:
 		link = openURL(url)
-		titO = re.findall('<h1 class="titulopostagem">(.*?)</h1>', link)[0]
-		titO = titO.replace('Dublado','').replace('Legendado','')
+		titO = re.findall('<div class="originaltitle"><b>T&iacute;tulo original</b>:(.+?)</div>', link)[0]
+		titO = titO.strip()
+		
+		xbmc.log('[plugin.video.assistirfilmeshd] L565 - ' + str(titO), xbmc.LOGNOTICE)
 						
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
@@ -568,6 +571,9 @@ def playTrailer(name, url,iconimage):
 		link = openURL(url)
 		ytID = re.findall('<a href="http://www.youtube.com/embed/(.*?)autoplay=1" class="trailer">TRAILER</a>', link)[0]
 		ytID = ytID.replace('?','')
+		ytID = ytID.strip()
+		
+		xbmc.log('[plugin.video.assistirfilmeshd] L575 - ' + str(ytID), xbmc.LOGNOTICE)
 
 		if not ytID : 
 			addon = xbmcaddon.Addon()
@@ -577,7 +583,7 @@ def playTrailer(name, url,iconimage):
 			return
 			
 		xbmcPlayer = xbmc.Player()
-		xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id='+ytID)
+		xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id=%s' % ytID)
 		
 def setViewMenu() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
