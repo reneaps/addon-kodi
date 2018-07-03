@@ -1,4 +1,0 @@
-[B]01/02/2017 v 1.0.0[/B]
-- Versao inicial do Addon by AddonReneSilva
-
-
