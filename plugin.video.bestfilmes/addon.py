@@ -113,6 +113,7 @@ def getTemporadas(url):
 		for i in links:
 			if "playtop" in str(i) : urlF = i["src"]
 		img = soup('div', {'id':'dt_galery'})
+		#xbmc.log('[plugin.video.bestfilmes] L116 - ' + str(soup), xbmc.LOGNOTICE)
 		imgF = img[0].img['src']
 		link  = openURL(urlF)
 		link = unicode(link, 'utf-8', 'ignore')
@@ -146,25 +147,48 @@ def getEpisodios(name, url, iconimage):
 		
 		for i in range(0, totF):
 			if n in str(epis[i][0]) :
-				titS = epis[i][0]
-				titE = epis[i][1]
-				titT = epis[i][2]
-				titF = epis[i][3].encode('utf-8','replace')
-				titF = titT + " - " + titF
-				urlF = links2[i]
-				print epis[i][0],epis[i][1], epis[i][2], epis[i][3], links2[i]
-				addDirF(titF, urlF, 110, imgF, False, totF)
+				if not "ximo" in str(epis[i][3]) :
+					titS = epis[i][0]
+					titE = epis[i][1]
+					titT = epis[i][2]
+					titF = epis[i][3].encode('utf-8','replace')
+					titF = titT + " - " + titF
+					urlF = links2[i]
+					print epis[i][0],epis[i][1], epis[i][2], epis[i][3], links2[i]
+					addDirF(titF, urlF, 110, imgF, False, totF)
 
-def doPesquisaSeries():
+def doPesquisaSeries(url):
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
 
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				url      = base + '/?s=%s&' % str(pesquisa)
-				getSeries(url)
+				url      = base2 + '?s=%s&' % str(pesquisa)
+				#getSeries(url)
+				
+				link = openURL(url)
+				link = unicode(link, 'utf-8', 'ignore')
+				xbmc.log('[plugin.video.bestfilmes] L171 - ' + str(url), xbmc.LOGNOTICE)
+				soup     = BeautifulSoup(link, "html.parser")
+				conteudo = soup("div", {"class": "search-page"})
+				filmes   = conteudo[0]("div", {"class": "thumbnail animation-2"})
 
+				totF = len(filmes)
+
+				for filme in filmes:
+						titF = filme.img["alt"].encode('utf-8','replace')
+						urlF = filme.a["href"].encode('utf-8', 'ignore')
+						if not 'teste' in titF: imgF = filme.img["src"].encode('utf-8', 'ignore')
+						pltF = ''
+						addDir(titF, urlF, 26, imgF)
+				try :
+						proxima = re.findall(r'<link rel=\'next\' href=\'(.+?)\' />', link)[0]
+						addDir('Próxima Página >>', proxima, 30, artfolder + 'proxima.png')
+				except :
+						pass
+		setViewFilmes()
+		
 def doPesquisaFilmes():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
 		keyb.doModal()
