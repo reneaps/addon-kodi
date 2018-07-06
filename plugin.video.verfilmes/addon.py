@@ -10,6 +10,7 @@
 # Atualizado (1.0.3) - 14/08/2017
 # Atualizado (1.0.4) - 23/09/2017
 # Atualizado (1.0.5) - 01/07/2018
+# Atualizado (1.0.6) - 05/07/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -70,7 +71,7 @@ def getFilmes(url):
 		for x in range(0, totF):
 				titF = filmes[x].img["title"].encode('utf-8','replace')
 				urlF = urls[x].get("href").encode('utf-8','replace')
-				pltF = sinopse(urlF)
+				pltF = "" #sinopse(urlF)
 				imgF = filmes[x].img["src"].encode('utf-8', 'ignore')
 				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
 		try :
@@ -97,8 +98,10 @@ def getSeries(url):
 		for x in range(0, totF):
 				titF = filmes[x].img["title"].encode('utf-8','replace')
 				urlF = urls[x].get("href").encode('utf-8','replace')
-				pltF = sinopse(urlF)
+				pltF = "" #sinopse(urlF)
 				imgF = filmes[x].img["src"].encode('utf-8', 'ignore')
+				imgF = imgF.split('src=')[1]
+				imgF = imgF.split('&h=')[0]
 				addDirF(titF, urlF, 26, imgF, True, totF, pltF)
 		try :
 				prox = re.findall('<a href="(.*?)/page/(.*?)">.*?</a>', link)
@@ -122,6 +125,8 @@ def getTemporadas(url):
 		imgF = []
 		img = soup.find("div", {"class": "playingconteudo"})
 		imgF = img.img['src']
+		imgF = imgF.split('src=')[1]
+		imgF = imgF.split('&h=')[0]
 		urlF = url
 		i = 0
 
@@ -185,7 +190,9 @@ def getEpisodios(name, url):
 		imgF = []
 		img = soup.find("div", {"class": "playingconteudo"})
 		imgF = img.img['src']
-
+		imgF = imgF.split('src=')[1]
+		imgF = imgF.split('&h=')[0]
+		
 		total = len(episodios)
 
 		for titF, urlF in episodios:
@@ -525,15 +532,17 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
 
 def getInfo(url)	:
 		link = openURL(url)
-		titO = re.findall('<h1 id="tt-site" class="hidden-xs">(.*?)</h1>', link)[0]
+		titO = re.findall(r'<meta property="og:title" content="(.*?)" />', link)[0]
 		titO = titO.replace('Assistir','').replace('Dublado','').replace('Legendado','').replace('Online','')
+		titO = titO.replace('- Todas as Temporadas','')
 
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
 		link = openURL(url)
-		ytID = re.findall('<iframe width="100%" height="100%" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allowfullscreen>.*?</iframe>', link)[0]
-
+		ytID = re.findall('<a href="https://www.youtube.com/embed/(.+?)?autoplay=1" rel="nofollow" class="trailer" target="\_blank" title=".+?"><img src="img/trailer.png" /></a>', link)[0]
+		ytID = ytID.replace('?','')
+		
 		if not ytID :
 			addon = xbmcaddon.Addon()
 			addonname = addon.getAddonInfo('name')
