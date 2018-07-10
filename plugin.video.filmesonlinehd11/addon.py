@@ -10,6 +10,7 @@
 # Atualizado (1.0.5) - 21/05/2019
 # Atualizado (1.0.6) - 14/06/2019
 # Atualizado (1.0.7) - 16/06/2019
+# Atualizado (1.0.8) - 09/07/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -31,35 +32,34 @@ base        = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNvbmxpbmVoZDExLmNj')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base				,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base 				,   20, artfolder + 'lancamentos.png')
+		addDir('Categorias'                , base							,   10, artfolder + 'categorias.png')
+		addDir('Lançamentos'               , base 							,   20, artfolder + 'new.png')
 		addDir('Filmes Dublados'           , base + '/?s=dublado&submit=' 	,   20, artfolder + 'pesquisa.png')
-		addDir('Seriados'		   , base + '/series/'			,   25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'           , '--'				,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'           , '--'				,   35, artfolder + 'pesquisa.png')
-		addDir('Configurações'             , base				,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo', base				, 1000, artfolder + 'config.png', 1, False)
-			
-		setViewMenu()		
-		
+		addDir('Seriados'		   , base + '/series/'						,   25, artfolder + 'series.png')
+		addDir('Pesquisa Series'           , '--'							,   30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'           , '--'							,   35, artfolder + 'pesquisa.png')
+		addDir('Configurações'             , base							,  999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo', base							, 1000, artfolder + 'config.png', 1, False)
+
+		setViewMenu()
+
 def getCategorias(url):
 		link = openURL(url)
 		soup = BeautifulSoup(link)
 		link = unicode(link, 'utf-8', 'ignore')
-		
 		conteudo = soup('div', {'class':'ui two column grid'})
 		categorias = conteudo[0]('a')
-	
+
 		totC = len(categorias)
-		
+
 		for categoria in categorias:
 				titC = categoria.text.encode('utf-8','replace')
 				urlC = "http:" + categoria["href"]
 				imgC = artfolder + limpa(titC) + '.png'
 				addDir(titC,urlC,20,imgC)
-			
-		setViewMenu()		
-		
+
+		setViewMenu()
+
 def getFilmes(url):
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
@@ -76,45 +76,45 @@ def getFilmes(url):
 				addDirF(titF, urlF, 100, imgF, False, totF)
 
 		try :
-				proxima = re.findall('<a class="item" href="(.*?)">Pr.*?<i class="angle right icon"></i></a>', link)[0]				
+				proxima = re.findall('<a class="item" href="(.*?)">Pr.*?<i class="angle right icon"></i></a>', link)[0]
 				addDir('Próxima Página >>', "http:"+proxima, 20, artfolder + 'proxima.png')
-		except : 
+		except :
 				pass
-				
+
 		setViewFilmes()
-				
+
 def getSeries(url):
 		link  = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')		
-		
+		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
 		conteudo = soup.findAll("div", {"class": "ui six special doubling cards"})
 		filmes   = conteudo[0]("a", {"class": "ui card"})
+		
 		totF = len(filmes)
+		
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
 				urlF = "http:" + filme["href"].encode('utf-8')
 				imgF = filme.img["src"].encode('utf-8')
 				imgF = "http:" + imgF
 				addDir(titF, urlF, 26, imgF)
-				
-		try : 
-				proxima = re.findall('<a class="item" href="(.*?)">Pr.*?<i class="angle right icon"></i></a>', link)[0]				
+		try :
+				proxima = re.findall('<a class="item" href="(.*?)">Pr.*?<i class="angle right icon"></i></a>', link)[0]
 				addDir('Próxima Página >>', "http:"+proxima, 25, artfolder + 'proxima.png')
-		except : 
+		except :
 				pass
-				
+
 		setViewFilmes()
 
 def getTemporadas(url):
 		xbmc.log('[plugin.video.filmesonlinehd11] L102 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')	
+		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
 		conteudo = soup.findAll("div", {"class":"ui embed dimmable"})
-		
+
 		urlF  = conteudo[0]["data-url"]
-		
+
 		img = soup.find("div", {"class": "ui embed dimmable"})
 		if not img:
 			img = soup.find("div", {"class": "peli"})
@@ -147,9 +147,9 @@ def getServidores(name, url, iconimage):
 		temp = []
 		episodios = []
 		imgF = iconimage
-		
+
 		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')	
+		link = unicode(link, 'utf-8', 'ignore')
 		episodes = re.findall(r'episodes\: \[(.+?)\],',link)[0]
 		episodes = episodes.split(",")
 		urlF = url
@@ -158,7 +158,7 @@ def getServidores(name, url, iconimage):
 				titF = i.encode('utf-8')
 				titF = titF + "- Episodio"
 				addDir(titF, urlF, 110, imgF, False, totD)
-					
+
 def getEpisodios(name, url, iconimage):
 		s = name.replace("a Temporada","")
 		temp = []
@@ -166,7 +166,7 @@ def getEpisodios(name, url, iconimage):
 		imgF = iconimage
 		xbmc.log('[plugin.video.filmesonlinehd11] L162 - ' + str(s), xbmc.LOGNOTICE)
 		link = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')	
+		link = unicode(link, 'utf-8', 'ignore')
 		episodes = re.findall(r'episodes\: \[(.+?)\],',link)[0]
 		episodes = episodes.split(",")
 		ref = re.findall(r'ref\: encodeURIComponent\(\'(.+?)\'\)',link)[0]
@@ -174,7 +174,7 @@ def getEpisodios(name, url, iconimage):
 		serial = re.findall(r'video_token\: \'(.+?)\'',link)[0]
 		totD = len(episodes)
 		for i in episodes:
-				titF = i.encode('utf-8')	
+				titF = i.encode('utf-8')
 				titF = titF + " - Episodio"
 				urlF = "http://apollocdn.cc/serial/%s" % serial + "/iframe?season=%s" % s + "&episode=%s" % i + "&nocontrols=&nocontrols_translations=1&nocontrols_seasons=&nocontrols_episodes=&nocontrols_trailer=&ref=%s" % ref + "&autoplay=null&start_time=null"
 				addDirF(titF, urlF, 110, imgF, False, totD)
@@ -184,7 +184,7 @@ def pesquisa():
 		keyb.doModal()
 		a = []
 		hosts = []
-		
+
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
@@ -204,11 +204,11 @@ def pesquisa():
 						imgF = filme.img["src"].encode('utf-8')
 						temp = (urlF,titF)
 						hosts.append(temp)
-					
+
 				a = []
 				for url, titulo, img in hosts:
 					temp = [url, titulo, img]
-					a.append(temp);	
+					a.append(temp);
 				return a
 		return
 
@@ -218,33 +218,33 @@ def doPesquisaSeries():
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 26, img, False, total)
-			
+
 def doPesquisaFilmes():
 		a = pesquisa()
 		if not a: return
 		total = len(a)
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 100, img, False, total)
-			
+
 def player(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
 		mensagemprogresso.create('FilmesOnlineHD11', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
 		mensagemprogresso.update(0)
-		
+
 		titsT = []
 		idsT = []
-		
+
 		matriz = []
 
 		link  = openURL(url)
-		link = unicode(link, 'utf-8', 'ignore')	
+		link = unicode(link, 'utf-8', 'ignore')
 		soup = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "ui embed dimmable"})
 		urlF = conteudo[0]['data-url']
 
 		link = openURL(urlF)
-		link = unicode(link, 'utf-8', 'ignore')	
+		link = unicode(link, 'utf-8', 'ignore')
 		soup = BeautifulSoup(link)
 		dados = {}
 		dados = re.findall("links=(.*?);", link)[0]
@@ -256,37 +256,37 @@ def player(name,url,iconimage):
 				srv = srvsdub[i]["Nome"]
 				srv = srv.replace('Assistir Por ', '').replace('Assistir por ', '')
 				titsT.append(srv)
-				
+
 		if not titsT : return
-		
+
 		index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-		
+
 		if index == -1 : return
-		
+
 		i = index
 
 		urlVideo = srvsdub[i]["Url"]
 		print urlVideo
 		xbmc.log('[plugin.video.filmesonlinehd11] L287 - ' + str(urlVideo), xbmc.LOGNOTICE)
-		
+
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-		
+
 		if 'nowvideo.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
-				
+
 		elif 'flashx.php' in urlVideo :
 				fxID = urlVideo.split('id=')[1]
 				urlVideo = 'http://www.flashx.tv/embed-%s.html' % fxID
-				
+
 		elif 'ok.ru' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://ok.ru/videoembed/%s' % okID
-				
+
 		elif 'openload2' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://openload.co/embed/%s' % okID			
-				
+				urlVideo = 'https://openload.co/embed/%s' % okID
+
 		elif 'apollocdn.cc' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'http://moonwalk.cc/video/%s/iframe' % okID
@@ -302,7 +302,7 @@ def player(name,url,iconimage):
 				url2Play = urlVideo[i]
 				OK = False
 				#xbmc.log('[plugin.video.filmesonlinehd11] L293 - ' + str(urlVideo), xbmc.LOGNOTICE)
-				
+
 		elif 'thevid2.net' in urlVideo :
 				okID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/v/%s' % okID
@@ -311,11 +311,11 @@ def player(name,url,iconimage):
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
 				url2Play = re.findall('var vurl\d+="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])				
-	
+				url2Play = str(url2Play[0])
+
 				OK = False
-						
-		if OK : 
+
+		if OK :
 			try:
 				url2Play = urlresolver.resolve(urlVideo)
 			except:
@@ -323,19 +323,19 @@ def player(name,url,iconimage):
 				dialog.ok(" Erro:", " Video removido! ")
 				url2Play = []
 				pass
-				
+
 		if url2Play : xbmc.log('[plugin.video.filmesonlinehd11] L341 - ' + str(url2Play), xbmc.LOGNOTICE)
-		
+
 		if not url2Play : return
 
 		legendas = '-'
-	
+
 		mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
-		
+
 		playlist = xbmc.PlayList(1)
 		playlist.clear()
-		
-		listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage) 
+
+		listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
 		listitem.setPath(url2Play)
 		listitem.setProperty('mimetype','video/mp4')
 		listitem.setProperty('IsPlayable', 'true')
@@ -343,10 +343,10 @@ def player(name,url,iconimage):
 
 		xbmcPlayer = xbmc.Player()
 		xbmcPlayer.play(playlist)
-		
+
 		mensagemprogresso.update(100)
 		mensagemprogresso.close()
-		
+
 		if legendas != '-':
 			if 'timedtext' in legendas:
 					import os.path
@@ -360,7 +360,7 @@ def player(name,url,iconimage):
 			else:
 				xbmcPlayer.setSubtitles(legendas)
 		#return ok
-		
+
 def player_series(name,url,iconimage):
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
@@ -370,17 +370,17 @@ def player_series(name,url,iconimage):
 		xbmc.log('[plugin.video.filmesonlinehd11] L350 - ' + str(url), xbmc.LOGNOTICE)
 
 		#link  = openURL(url)
-		#link = unicode(link, 'utf-8', 'ignore')	
+		#link = unicode(link, 'utf-8', 'ignore')
 		#soup = BeautifulSoup(link)
 		xbmc.log('[plugin.video.filmesonlinehd11] L353 - ' + str(url), xbmc.LOGNOTICE)
 		urlVideo = url
-		
+
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-				
+
 		if 'nowvideo.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
-				
+
 		elif 'video.tt' in urlVideo :
 				vttID = urlVideo.split('e/')[1]
 				urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
@@ -388,11 +388,11 @@ def player_series(name,url,iconimage):
 		elif 'flashx.php' in urlVideo :
 				fxID = urlVideo.split('id=')[1]
 				urlVideo = 'http://www.flashx.tv/playvid-%s.html' % fxID
-				
+
 		elif 'ok.ru' in urlVideo :
 				fxID = urlVideo.split('embed')[1]
 				urlVideo = 'https://ok.ru/videoembed%s' % fxID
-				
+
 		elif 'apollocdn.cc' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'http://moonwalk.cc/video/%s/iframe' % okID
@@ -409,18 +409,18 @@ def player_series(name,url,iconimage):
 				i = int(qual[index])
 				url2Play = urlVideo[i]
 				OK = False
-				
+
 		elif 'thevid.net' in urlVideo :
-				linkTV  = openURL(urlVideo)		
+				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
 				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])				
+				url2Play = str(url2Play[0])
 
 				OK = False
-		
-		if OK : 
+
+		if OK :
 			try:
 				url2Play = urlresolver.resolve(urlVideo)
 			except:
@@ -432,13 +432,13 @@ def player_series(name,url,iconimage):
 		if not url2Play : return
 
 		legendas = '-'
-		
+
 		mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
-		
+
 		playlist = xbmc.PlayList(1)
 		playlist.clear()
 
-		listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage) 
+		listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
 		listitem.setPath(url2Play)
 		listitem.setProperty('mimetype','video/mp4')
 		listitem.setProperty('IsPlayable', 'true')
@@ -449,7 +449,7 @@ def player_series(name,url,iconimage):
 
 		mensagemprogresso.update(100)
 		mensagemprogresso.close()
-		
+
 		if legendas != '-':
 			if 'timedtext' in legendas:
 					import os.path
@@ -462,16 +462,16 @@ def player_series(name,url,iconimage):
 					xbmcPlayer.setSubtitles(sfile)
 			else:
 				xbmcPlayer.setSubtitles(legendas)
-		
+
 		return OK
-	
+
 ############################################################################################################
-		
+
 def openConfig():
 		selfAddon.openSettings()
 		setViewMenu()
 		xbmcplugin.endOfDirectory(int(sys.argv[1]))
-		
+
 def openConfigEI():
 		eiID  = 'script.extendedinfo'
 		eiAD  = xbmcaddon.Addon(id=eiID)
@@ -491,37 +491,37 @@ def openURL(url):
 
 def addDir(name, url, mode, iconimage, total=1, pasta=True):
 		u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
-		
+
 		ok = True
-		
+
 		liz = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
-		
+
 		liz.setProperty('fanart_image', fanart)
 		liz.setInfo(type = "Video", infoLabels = {"title": name})
-		
+
 		ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 
 		return ok
-		
+
 def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 		u  = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
 		ok = True
-		
+
 		liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
-		
+
 		liz.setProperty('fanart_image', fanart)
 		liz.setInfo(type="Video", infoLabels={"Title": name})
-		
+
 		cmItems = []
-		
+
 		cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
 		cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.quote(name), url, urllib.quote(iconimage))))
-		
+
 		liz.addContextMenuItems(cmItems, replaceItems=False)
-				
+
 		ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=pasta,totalItems=total)
-		
-		return ok	
+
+		return ok
 
 def getInfo(url)	:
 		link = openURL(url)
@@ -541,28 +541,28 @@ def playTrailer(name, url,iconimage):
 		ytID = a.split("v=")[1]
 		#ytID = re.findall('<a href="https://www.youtube.com/watch?v=(.*?)" class="negative ui mini fluid button" data-lity.+?<a>', str(link))
 		xbmc.log('[plugin.video.filmesonlinehd11] L512 - ' + str(ytID), xbmc.LOGNOTICE)
-		
-		if not ytID : 
+
+		if not ytID :
 			addon = xbmcaddon.Addon()
 			addonname = addon.getAddonInfo('name')
 			line1 = str("Trailer não disponível!")
 			line2 = str(ytID)
-			xbmcgui.Dialog().ok(addonname, line1, line2)	
+			xbmcgui.Dialog().ok(addonname, line1, line2)
 			return
-			
+
 		#xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s)' % ytID)
 		xbmcPlayer = xbmc.Player()
 		xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id='+ytID)
-	
+
 def setViewMenu() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
-		
+
 		opcao = selfAddon.getSetting('menuVisu')
-		
+
 		if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
 		elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
 		elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
-		
+
 def setViewFilmes() :
 		xbmcplugin.setContent(int(sys.argv[1]), 'movies')
 
@@ -578,18 +578,18 @@ def setViewFilmes() :
 		elif opcao == '7': xbmc.executebuiltin("Container.SetViewMode(515)")
 		elif opcao == '8': xbmc.executebuiltin("Container.SetViewMode(550)")
 		elif opcao == '9': xbmc.executebuiltin("Container.SetViewMode(560)")
-		
+
 def limpa(texto):
 		texto = texto.replace('ç','c').replace('ã','a').replace('õ','o')
 		texto = texto.replace('â','a').replace('ê','e').replace('ô','o')
 		texto = texto.replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u')
 		texto = texto.replace(' ','-')
 		texto = texto.lower()
-		
+
 		return texto
-		
+
 ############################################################################################################
-              
+
 def get_params():
         param=[]
         paramstring=sys.argv[2]
@@ -605,7 +605,7 @@ def get_params():
                         splitparams=pairsofparams[i].split('=')
                         if (len(splitparams))==2:
                                 param[splitparams[0]]=splitparams[1]
-                                
+
         return param
 
 params    = get_params()
@@ -650,4 +650,4 @@ elif mode == 110  : player_series(name,url,iconimage)
 elif mode == 999  : openConfig()
 elif mode == 1000 : openConfigEI()
 
-xbmcplugin.endOfDirectory(int(sys.argv[1]))	
+xbmcplugin.endOfDirectory(int(sys.argv[1]))
