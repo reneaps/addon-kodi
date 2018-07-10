@@ -32,14 +32,14 @@ base        = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNvbmxpbmVoZDExLmNj')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base							,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base 							,   20, artfolder + 'new.png')
-		addDir('Filmes Dublados'           , base + '/?s=dublado&submit=' 	,   20, artfolder + 'pesquisa.png')
-		addDir('Seriados'		   , base + '/series/'						,   25, artfolder + 'series.png')
-		addDir('Pesquisa Series'           , '--'							,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'           , '--'							,   35, artfolder + 'pesquisa.png')
-		addDir('Configurações'             , base							,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo', base							, 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'					, base							,   10, artfolder + 'categorias.png')
+		addDir('Lançamentos'				, base 							,   20, artfolder + 'new.png')
+		addDir('Filmes Dublados'			, base + '/?s=dublado&submit=' 	,   20, artfolder + 'pesquisa.png')
+		addDir('Seriados'					, base + '/series/'				,   25, artfolder + 'series.png')
+		addDir('Pesquisa Series'			, '--'							,   30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'			, '--'							,   35, artfolder + 'pesquisa.png')
+		addDir('Configurações'				, base							,  999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo'	, base							, 1000, artfolder + 'config.png', 1, False)
 
 		setViewMenu()
 
@@ -68,11 +68,13 @@ def getFilmes(url):
 		if not conteudo :
 			conteudo = soup.findAll("div", {"class": "ui six special doubling cards"})
 		filmes   = conteudo[0]("a", {"class": "ui card"})
+		
 		totF = len(filmes)
+		
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
 				urlF = "http:" + filme["href"].encode('utf-8')
-				imgF = filme.img["src"].encode('utf-8')
+				imgF = filme.img["data-src"].encode('utf-8')
 				addDirF(titF, urlF, 100, imgF, False, totF)
 
 		try :
