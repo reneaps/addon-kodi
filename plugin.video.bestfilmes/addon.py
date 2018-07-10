@@ -5,6 +5,7 @@
 # Addon : BestFilmes
 # By AddonReneSilva - 01/02/2017
 # Atualizado (1.0.0) - 03/07/2018
+# Atualizado (1.0.1) - 09/07/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -94,6 +95,7 @@ def getSeries(url):
 				titF = filme.img["alt"].encode('utf-8','replace')
 				urlF = filme.a["href"].encode('utf-8', 'ignore')
 				if not 'teste' in titF: imgF = filme.img["src"].encode('utf-8', 'ignore')
+				xbmc.log('[plugin.video.bestfilmes] L97 - ' + str(imgF), xbmc.LOGNOTICE)
 				pltF = ''
 				addDir(titF, urlF, 26, imgF)
 		try :
@@ -151,8 +153,8 @@ def getEpisodios(name, url, iconimage):
 					titS = epis[i][0]
 					titE = epis[i][1]
 					titT = epis[i][2]
-					titF = epis[i][3].encode('utf-8','replace')
-					titF = titT + " - " + titF
+					titF = epis[i][3].decode('unicode-escape').encode('utf-8')
+					titF = titT.replace('dub', '(D)').replace('leg', '(L)') + " - " + titF
 					urlF = links2[i]
 					print epis[i][0],epis[i][1], epis[i][2], epis[i][3], links2[i]
 					addDirF(titF, urlF, 110, imgF, False, totF)
