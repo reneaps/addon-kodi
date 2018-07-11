@@ -11,6 +11,7 @@
 # Atualizado (1.5.0) - 06/06/2018
 # Atualizado (1.6.0) - 27/06/2018
 # Atualizado (1.7.0) - 06/07/2018
+# Atualizado (1.8.0) - 10/07/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -22,7 +23,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib				 import jsunpack
 from time						 import time
 
-version	  = '1.7.0'
+version	  = '1.8.0'
 addon_id  = 'plugin.video.megafilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -306,7 +307,7 @@ def player(name,url,iconimage):
 		i = index
 		urlVideo = url2[i]
 
-		if 'javascript.vizer' in urlVideo :
+		if 'javascript' in urlVideo :
 				html = openURL(urlVideo)
 				soup = BeautifulSoup(html)
 				xbmc.log('[plugin.video.megahfilmeshd] L309 ' + str(urlVideo), xbmc.LOGNOTICE)
@@ -328,13 +329,13 @@ def player(name,url,iconimage):
 		xbmc.log('[plugin.video.megahfilmeshd] L325 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-
+		
 		if 'nowvideo.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
 
 		elif 'megahfilmeshd.net' in urlVideo :
-				okID = urlVideo.split('id=')[1]
+				okID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % okID
 
 		elif 'thevid.net' in urlVideo :
