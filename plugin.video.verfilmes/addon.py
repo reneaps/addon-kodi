@@ -160,7 +160,6 @@ def getEpisodios(name, url):
 
 			for filme in filmes:
 					titF = filme.text.decode('unicode-escape').encode('utf-8')
-					xbmc.log('[plugin.video.verfilmesBiz] L162 - ' + str(filme), xbmc.LOGNOTICE)
 					titF = titF.replace('Assistir ','').replace('Filme ','').replace('Episdio', 'Episodio') + " " +audio #" Dublado"
 					titF = str(n) + "T " + titF
 					urlF = filme.get("href").encode('utf-8', 'ignore')
@@ -179,7 +178,6 @@ def getEpisodios(name, url):
 
 			for filme in filmes:
 					titF = filme.text .decode('unicode-escape').encode('utf-8')
-					bmc.log('[plugin.video.verfilmesBiz] L181 - ' + str(titF), xbmc.LOGNOTICE)
 					titF = titF.replace('Assistir ','').replace('Filme ','') + " " +audio #" Legendado"
 					titF = str(n) + "T " + titF
 					urlF = filme.get("href").encode('utf-8', 'ignore')
