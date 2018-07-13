@@ -11,6 +11,7 @@
 # Atualizado (1.0.4) - 23/09/2017
 # Atualizado (1.0.5) - 01/07/2018
 # Atualizado (1.0.6) - 05/07/2018
+# Atualizado (1.0.7) - 05/07/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -158,8 +159,9 @@ def getEpisodios(name, url):
 			totF = len(filmes)
 
 			for filme in filmes:
-					titF = filme.text.encode('utf-8', 'ignore')
-					titF = titF.replace('Assistir ','').replace('Filme ','') + " " +audio #" Dublado"
+					titF = filme.text.decode('unicode-escape').encode('utf-8')
+					xbmc.log('[plugin.video.verfilmesBiz] L162 - ' + str(filme), xbmc.LOGNOTICE)
+					titF = titF.replace('Assistir ','').replace('Filme ','').replace('Episdio', 'Episodio') + " " +audio #" Dublado"
 					titF = str(n) + "T " + titF
 					urlF = filme.get("href").encode('utf-8', 'ignore')
 					urlF = base + urlF
@@ -176,7 +178,8 @@ def getEpisodios(name, url):
 			totF = len(filmes)
 
 			for filme in filmes:
-					titF = filme.text.encode('utf-8', 'ignore')
+					titF = filme.text .decode('unicode-escape').encode('utf-8')
+					bmc.log('[plugin.video.verfilmesBiz] L181 - ' + str(titF), xbmc.LOGNOTICE)
 					titF = titF.replace('Assistir ','').replace('Filme ','') + " " +audio #" Legendado"
 					titF = str(n) + "T " + titF
 					urlF = filme.get("href").encode('utf-8', 'ignore')
