@@ -6,15 +6,17 @@
 # By AddonReneSilva - 01/02/2017
 # Atualizado (1.0.0) - 03/07/2018
 # Atualizado (1.0.1) - 09/07/2018
+# Atualizado (1.0.2) - 22/07/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import urlresolver
 import requests
 
-from bs4 import BeautifulSoup
+from bs4 			import BeautifulSoup
+from urlparse 		import urlparse
 #from resources.lib.BeautifulSoup import BeautifulSoup
-from resources.lib               import jsunpack
+from resources.lib	import jsunpack
 
 addon_id  = 'plugin.video.bestfilmes'
 selfAddon = xbmcaddon.Addon(id=addon_id)
@@ -216,6 +218,13 @@ def player(name,url,iconimage):
 		conteudo = soup('div', {'class':'movieplay'})
 		urlF = conteudo[0].iframe["src"].encode('utf-8')
 		link = openURL(urlF)
+		links = re.findall(r'addiframe\(\'(.+?)\'\);', link)
+		for i in links:
+			u = i.replace('www.','')
+			domain = urlparse(u).netloc.split('.')[0]
+			titS = domain.title()
+			if len(titS) > 0 : titsT.append(titS)
+		'''
 		soup  = BeautifulSoup(link, "html.parser")
 		conteudo = soup('div', {'class':'embed'})
 		try:
@@ -233,7 +242,8 @@ def player(name,url,iconimage):
 							titS = i.text
 						if len(titS) > 0 : titsT.append(titS)
 						print titsT
-
+		'''
+		
 		if not titsT : return
 
 		index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
@@ -245,7 +255,7 @@ def player(name,url,iconimage):
 		links = re.findall(r'addiframe\(\'(.+?)\'\);', link)
 
 		urlVideo = links[i]
-		xbmc.log('[plugin.video.bestfilmes] L222 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.bestfilmes] L257 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -274,6 +284,7 @@ def player(name,url,iconimage):
 		playlist.add(url2Play,listitem)
 
 		xbmcPlayer = xbmc.Player()
+		xbmc.sleep(20000)
 		xbmcPlayer.play(playlist)
 
 		mensagemprogresso.update(100)
