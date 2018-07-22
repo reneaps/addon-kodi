@@ -12,6 +12,7 @@
 # Atualizado (1.6.0) - 27/06/2018
 # Atualizado (1.7.0) - 06/07/2018
 # Atualizado (1.8.0) - 10/07/2018
+# Atualizado (1.9.0) - 22/07/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -23,7 +24,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib				 import jsunpack
 from time						 import time
 
-version	  = '1.8.0'
+version	  = '1.9.0'
 addon_id  = 'plugin.video.megafilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -149,9 +150,14 @@ def getEpisodios(name, url):
 		seasons = filmes[0]('div',{'class':'item get_episodes'})
 		idseasons = seasons[n]['data-row-id']
 		data = urllib.urlencode({'action':'episodes','season':idseasons})
-		url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+		url = 'https://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
 		req = urllib2.Request(url=url,data=data)
-		content = urllib2.urlopen(req).read()
+		req.add_header('Referer',url)
+		req.add_header('Upgrade-Insecure-Requests',1)
+		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
+		response = urllib2.urlopen(req)
+		content = response.read()
+		response.close()
 		d = json.loads(content)
 		b = d['episodes']
 		#xbmc.log('[plugin.video.megahfilmeshd] L87 ' + str(b), xbmc.LOGNOTICE)
@@ -176,6 +182,7 @@ def getEpisodios(name, url):
 				addDirF(titulo, url, 110, img, False, total)
 
 def pega(idname):
+	'''
 	idtime = int(round(time() * 1000))
 	idtime = str(idtime)
 	data = urllib.urlencode({'action':'downloadPage','id':idname,'_':idtime})
@@ -197,8 +204,10 @@ def pega(idname):
 	data = urllib.urlencode({'action':'players','id':idname})
 	url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
 	req = urllib2.Request(url=url,data=data)
+	req.add_header('Referer',url)
+	req.add_header('Upgrade-Insecure-Requests',1)
+	req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
 	content = urllib2.urlopen(req).read()
-	#print content
 	soup = BeautifulSoup(content)
 	try:
 		ef = soup.div['data-player-content']
@@ -207,9 +216,8 @@ def pega(idname):
 		return urlF
 	s = BeautifulSoup(ef)
 	urlF = s.iframe['src']
-	#print urlF
 	return urlF
-	'''
+
 
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -397,9 +405,15 @@ def player_series(name,url,iconimage):
 		urlVideo = t.url
 
 		xbmc.log('[plugin.video.megahfilmeshd] L369 ' + str(urlVideo), xbmc.LOGNOTICE)
-		#urlVideo = url
-		#conteudo = soup('iframe')
-		#urlVideo = conteudo[0]['src']
+		if 'javascript' in urlVideo :
+				html = openURL(urlVideo)
+				soup = BeautifulSoup(html)
+				xbmc.log('[plugin.video.megahfilmeshd] L309 ' + str(urlVideo), xbmc.LOGNOTICE)
+				urlVideo = soup.iframe["src"]
+
+		t = requests.get(urlVideo)
+		urlVideo = t.url
+		
 		'''
 		try :
 				conteudo = soup('iframe')
@@ -458,6 +472,10 @@ def player_series(name,url,iconimage):
 		if 'open.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'https://openload.co/embed/%s' % nowID
+
+		elif 'megahfilmeshd.net' in urlVideo :
+				okID = urlVideo.split('=')[1]
+				urlVideo = 'https://openload.co/embed/%s' % okID
 
 		elif 'video.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
