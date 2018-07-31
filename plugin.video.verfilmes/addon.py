@@ -12,6 +12,7 @@
 # Atualizado (1.0.5) - 01/07/2018
 # Atualizado (1.0.6) - 05/07/2018
 # Atualizado (1.0.7) - 05/07/2018
+# Atualizado (1.0.8) - 01/08/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -34,7 +35,7 @@ base         = base64.b64decode('aHR0cDovL3d3dy52ZXJmaWxtZXMuYml6Lw==')
 
 def menuPrincipal():
 		addDir('Categorias'                , base									,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + 'categoria/lancamento-de-2017/'	,	20, artfolder + 'lancamentos.png')
+		addDir('Lançamentos'               , base + 'categoria/lancamento-de-2018/'	,	20, artfolder + 'lancamentos.png')
 		addDir('Filmes Dublados'           , base + 'search.php?s=dublado'		 	,	20, artfolder + 'pesquisa.png')
 		addDir('Series'		               , base + 'categoria/series/'				,   25, artfolder + 'legendados.png')
 		addDir('Pesquisa Series'           , '--'                           		,   30, artfolder + 'pesquisa.png')
@@ -113,7 +114,7 @@ def getSeries(url):
 				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except :
 				pass
-		setViewFilmes()
+		xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
 def getTemporadas(url):
 		link  = openURL(url)
@@ -136,6 +137,8 @@ def getTemporadas(url):
 			titF = str(i) + "ª Temporada"
 			xbmc.log('[plugin.video.verfilmes] L125 ' + str(imgF), xbmc.LOGNOTICE)
 			addDir(titF, urlF, 27, imgF, False, totF)
+
+		xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
 		xbmc.log('[plugin.video.verfilmesBiz] L130 - ' + str(url), xbmc.LOGNOTICE)
@@ -193,13 +196,13 @@ def getEpisodios(name, url):
 		imgF = img.img['src']
 		imgF = imgF.split('src=')[1]
 		imgF = imgF.split('&h=')[0]
-		
+
 		total = len(episodios)
 
 		for titF, urlF in episodios:
 				addDirF(titF, urlF, 110, imgF, False, totF)
 
-		setViewFilmes()
+		xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
 
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -216,7 +219,7 @@ def pesquisa():
 				soup     = BeautifulSoup(link)
 
 				conteudo = soup("div", {"id": "postagem"})
-				filmes = conteudo[0]("div",{"class":"capa"})
+				filmes = conteudo[0]("div", {"class":"capa"})
 				urls = conteudo[0]("a")
 				totF = len(filmes)
 
@@ -261,7 +264,7 @@ def player(name,url,iconimage):
 
 		link = openURL(url)
 		soup  = BeautifulSoup(link)
-		conteudo = soup("div", {"class":"opcoes-r"})
+		conteudo = soup("div", {"class":"opcoes"})
 		srvsdub = conteudo[0]('a')
 		totD = len(srvsdub)
 		titsT = []
@@ -543,7 +546,7 @@ def playTrailer(name, url,iconimage):
 		link = openURL(url)
 		ytID = re.findall('<a href="https://www.youtube.com/embed/(.+?)?autoplay=1" rel="nofollow" class="trailer" target="\_blank" title=".+?"><img src="img/trailer.png" /></a>', link)[0]
 		ytID = ytID.replace('?','')
-		
+
 		if not ytID :
 			addon = xbmcaddon.Addon()
 			addonname = addon.getAddonInfo('name')
