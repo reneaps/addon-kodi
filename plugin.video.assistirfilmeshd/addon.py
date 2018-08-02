@@ -17,15 +17,17 @@
 # Atualizado (1.1.2) - 20/05/2018
 # Atualizado (1.1.3) - 14/06/2018
 # Atualizado (1.1.4) - 01/07/2018
+# Atualizado (1.1.5) - 02/08/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import urlresolver
+import requests
 
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-versao      = '1.1.4'
+versao      = '1.1.5'
 addon_id    = 'plugin.video.assistirfilmeshd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -118,11 +120,20 @@ def getSeries(url):
 		setViewFilmes()
 		
 def getTemporadas(url):	
+		xbmc.log('[plugin.video.assistirfilmeshd] L121 - ' + str(url), xbmc.LOGNOTICE)
 		link  = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')						
 		soup = BeautifulSoup(link)
-		conteudo = soup.find("ul", {"class": "itens"}) 
-		temporadas = conteudo("li")
+		try:
+			conteudo = soup.find("ul", {"class": "itens"}) 
+			temporadas = conteudo("li")
+		except:
+			pass
+		try:
+			conteudo = soup('div', attrs={'class':'list-temporadas'})
+			temporadas = conteudo[0]('a')
+		except:
+			pass
 		totF = len(temporadas)
 		img = soup.find("div", {"id": "postimg"})
 		imgF = img.img['src']
@@ -139,6 +150,7 @@ def getTemporadas(url):
 			i = i + 1
 		
 def getEpisodios(name, url):
+		xbmc.log('[plugin.video.assistirfilmeshd] L151 - ' + str(url), xbmc.LOGNOTICE)
 		n = name.replace('ª Temporada', '')	
 		n = int(n)
 		#n = (n-1)
@@ -149,9 +161,22 @@ def getEpisodios(name, url):
 		link = unicode(link, 'utf-8', 'ignore')		
 
 		soup = BeautifulSoup(link)
-		conteudo = soup("div", {"class": "videos"})
-		arquivo = conteudo[0]("li", {"class": "video" + str(n) + "-code"})
-			
+		try:
+			conteudo = soup("div", {"class": "videos"})
+			arquivo = conteudo[0]("li", {"class": "video" + str(n) + "-code"})
+		except:
+			pass
+
+		try:
+			n = (n-1)
+			conteudo = soup("div", {"id":"series"})
+			arquivo = conteudo[0]("div", {"class":"lista-temporadas"})
+			temporada = arquivo[n]("div", {"class":"lista-temp"})
+			tipo = temporada[0]("div", {"class":"separartemporadas"})
+			#xbmc.log('[plugin.video.assistirfilmeshd] L175 - ' + str(tipo), xbmc.LOGNOTICE)
+		except:
+			pass
+						
 		try:
 			temporadas = arquivo[0]('table')
 			filmes = temporadas[0]('a')		
@@ -160,13 +185,13 @@ def getEpisodios(name, url):
 			totF = len(filmes)
 
 			for filme in filmes:
-							titF = filme.text.encode('utf-8', 'ignore')
-							titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Dublado"
-							titF = str(n) + "T " + titF
-							urlF = filme.get("href").encode('utf-8', 'ignore')
-							urlF = base + "/" + urlF
-							temp = (titF, urlF)
-							episodios.append(temp)
+					titF = filme.text.encode('utf-8', 'ignore')
+					titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Dublado"
+					titF = str(n) + "T " + titF
+					urlF = filme.get("href").encode('utf-8', 'ignore')
+					urlF = base + "/" + urlF
+					temp = (titF, urlF)
+					episodios.append(temp)
 		except:
 			pass
 			
@@ -178,16 +203,48 @@ def getEpisodios(name, url):
 			totF = len(filmes)
 
 			for filme in filmes:
-							titF = filme.text.encode('utf-8', 'ignore')
-							titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Legendado"
-							titF = str(n) + "T " + titF
-							urlF = filme.get("href").encode('utf-8', 'ignore')
-							urlF = base + "/" + urlF
-							temp = (titF, urlF)
-							episodios.append(temp)
+					titF = filme.text.encode('utf-8', 'ignore')
+					titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Legendado"
+					titF = str(n) + "T " + titF
+					urlF = filme.get("href").encode('utf-8', 'ignore')
+					urlF = base + "/" + urlF
+					temp = (titF, urlF)
+					episodios.append(temp)
 		except:
 			pass
 		
+		try:
+			audio = tipo[0]("div", {"class":"testclass"})
+			audio = audio[0].text.encode('utf-8')
+			episodes = tipo[0]("a")
+			totF = len(episodes)
+			for episode in episodes:
+					titF = episode.text.encode('utf-8', 'ignore')
+					titF = audio.strip() + " - " + titF.strip()
+					#titF = str(n) + "T " + titF
+					urlF = episode.get("href").encode('utf-8', 'ignore')
+					urlF = base + "/" + urlF
+					temp = (titF, urlF)
+					episodios.append(temp)
+		except:
+			pass
+		
+		try:
+			audio = tipo[1]("div", {"class":"testclass"})
+			audio = audio[0].text.encode('utf-8', 'ignore')
+			episodes = tipo[1]("a")
+			totF = len(episodes)
+			for episode in episodes:
+					titF = episode.text.encode('utf-8')
+					titF = audio.strip() + " - " + titF.strip()
+					#titF = str(n) + "T " + titF
+					urlF = episode.get("href").encode('utf-8', 'ignore')
+					urlF = base + "/" + urlF
+					temp = (titF, urlF)
+					episodios.append(temp)
+		except:
+			pass
+			
 		audio = []
 		imgF = []
 		img = soup.find("div", {"id": "postimg"})
@@ -290,7 +347,11 @@ def player(name,url,iconimage):
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[0]['src'])
-		
+
+		if 'openlink.biz' in urlVideo:
+				r = requests.get(urlVideo)
+				urlVideo = r.url
+						
 		xbmc.log('[plugin.video.assistirfilmeshd] L283 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
@@ -421,6 +482,10 @@ def player_series(name,url,iconimage):
 
 		urlVideo = str(conteudo[0]['src'])
 
+		if 'openlink.biz' in urlVideo:
+				r = requests.get(urlVideo)
+				urlVideo = r.url
+				
 		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L412] ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
