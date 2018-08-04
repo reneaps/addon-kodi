@@ -13,6 +13,7 @@
 # Atualizado (1.7.0) - 06/07/2018
 # Atualizado (1.8.0) - 10/07/2018
 # Atualizado (1.9.0) - 22/07/2018
+# Atualizado (2.0.0) - 03/08/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -186,8 +187,8 @@ def pega(idname):
 	idtime = int(round(time() * 1000))
 	idtime = str(idtime)
 	data = urllib.urlencode({'action':'downloadPage','id':idname,'_':idtime})
-	url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
-	#req.add_header('Referer', 'http://www.megahfilmeshd.net/series/game-of-thrones-todas-as-temporadas/')
+	url = 'https://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+	#req.add_header('Referer', 'https://www.megahfilmeshd.net/series/game-of-thrones-todas-as-temporadas/')
 	r = urllib2.urlopen(url+'?'+data)
 	html = r.read()
 	#xbmc.log('[plugin.video.megahfilmeshd] L180 ' + str(html), xbmc.LOGNOTICE)
@@ -202,7 +203,7 @@ def pega(idname):
 	return urlF
 	'''
 	data = urllib.urlencode({'action':'players','id':idname})
-	url = 'http://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+	url = 'https://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
 	req = urllib2.Request(url=url,data=data)
 	req.add_header('Referer',url)
 	req.add_header('Upgrade-Insecure-Requests',1)
