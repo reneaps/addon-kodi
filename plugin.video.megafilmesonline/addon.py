@@ -14,6 +14,7 @@
 # Atualizado (1.8.0) - 10/07/2018
 # Atualizado (1.9.0) - 22/07/2018
 # Atualizado (2.0.0) - 03/08/2018
+# Atualizado (2.0.1) - 04/08/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -32,19 +33,19 @@ selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder	= addonfolder + '/resources/img/'
 fanart		= addonfolder + '/fanart.png'
-base		= base64.b64decode('aHR0cDovL3d3dy5tZWdhaGZpbG1lc2hkLm5ldC8=')
+base		= base64.b64decode('aHR0cHM6Ly93d3cubWVnYWhmaWxtZXNoZC5uZXQv')
 
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'					, base + 'filme/'						,	10, artfolder + 'categorias.png')
-		addDir('Lançamentos'				, base + 'filmes-category/lancamentos/'	,	20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'			, base + '?s=dublado'					,	20, artfolder + 'pesquisa.png')
-		addDir('Seriados'					, base + 'series/'						,	25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'			, '--'									,	30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'			, '--'									,	35, artfolder + 'pesquisa.png')
-		addDir('Configurações'				, base									,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo'	, base									, 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'					, base + 'filme/'							,	10, artfolder + 'categorias.png')
+		addDir('Lançamentos'				, base + 'categoria-filmes/lancamentos/'	,	20, artfolder + 'lancamentos.png')
+		addDir('Filmes Dublados'			, base + '?s=dublado'						,	20, artfolder + 'pesquisa.png')
+		addDir('Seriados'					, base + 'series/'							,	25, artfolder + 'legendados.png')
+		addDir('Pesquisa Series'			, '--'										,	30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'			, '--'										,	35, artfolder + 'pesquisa.png')
+		addDir('Configurações'				, base										,  999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo'	, base										, 1000, artfolder + 'config.png', 1, False)
 
 		setViewMenu()
 
