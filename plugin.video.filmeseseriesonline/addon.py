@@ -27,6 +27,7 @@
 # Atualizado (1.2.0) - 01/05/2018
 # Atualizado (1.2.1) - 03/06/2018
 # Atualizado (1.2.2) - 28/07/2018
+# Atualizado (1.2.3) - 10/03/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -381,7 +382,7 @@ def player(name,url,iconimage):
 
 		elif 'stream=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'https://estream.to/embed-%s.html' % fxID
+				urlVideo = 'https://vcstream.to/embed/%s' % fxID
 				
 		elif 'mailru=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
@@ -393,7 +394,7 @@ def player(name,url,iconimage):
 
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://thevid.net/e/%s' % fxID
+				urlVideo = 'http://thevid.net/e/%s/' % fxID
 				'''
 				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
@@ -403,7 +404,6 @@ def player(name,url,iconimage):
 				if not url2Play : url2Play = re.findall('var tfilea="(.*?)"', sUnpacked)
 				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = str(url2Play[0])
-
 				OK = False'''
 
 		xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(urlVideo), xbmc.LOGNOTICE)
@@ -554,7 +554,7 @@ def player_series(name,url,iconimage):
 
 		elif 'stream=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://estream.to/embed-%s.html' % fxID
+				urlVideo = 'https://vcstream.to/embed/%s' % fxID
 
 		elif 'streamango=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
