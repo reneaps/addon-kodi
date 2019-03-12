@@ -16,6 +16,7 @@
 # Atualizado (2.0.0) - 03/08/2018
 # Atualizado (2.0.1) - 04/08/2018
 # Atualizado (2.0.2) - 12/03/2019
+# Atualizado (2.0.3) - 12/03/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -284,7 +285,7 @@ def player(name,url,iconimage):
 		matriz = []
 
 		link  = openURL(url)
-		xbmc.log('[plugin.video.megahfilmeshd] L241 ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L287 ' + str(url), xbmc.LOGNOTICE)
 		soup	 = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "fullplayer"})
 		article = conteudo[0]("div",{'class':"playerList playerListSmall"})
@@ -309,7 +310,7 @@ def player(name,url,iconimage):
 						urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
 					else:
 						urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
-						xbmc.log('[plugin.video.megahfilmeshd] L303 ' + str(urlVideo), xbmc.LOGNOTICE)
+						xbmc.log('[plugin.video.megahfilmeshd] L312 ' + str(urlVideo), xbmc.LOGNOTICE)
 						#urlVideo = links[1]['src']
 						#opID =	urlVideo.split('?')[1]
 						#opID = opID.split('=')[1]
@@ -330,9 +331,14 @@ def player(name,url,iconimage):
 		if 'javascript' in urlVideo :
 				html = openURL(urlVideo)
 				soup = BeautifulSoup(html)
-				xbmc.log('[plugin.video.megahfilmeshd] L309 ' + str(urlVideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.megahfilmeshd] L333 ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = soup.iframe["src"]
-
+		if 'action' in urlVideo :
+				html = openURL(urlVideo)
+				soup = BeautifulSoup(html)
+				urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(html))[0]
+				xbmc.log('[plugin.video.megahfilmeshd] L339 ' + str(urlVideo), xbmc.LOGNOTICE)
+				
 		t = requests.get(urlVideo)
 		urlVideo = t.url
 
@@ -346,7 +352,7 @@ def player(name,url,iconimage):
 		#urlVideo = okID
 
 
-		xbmc.log('[plugin.video.megahfilmeshd] L325 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L354 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -416,21 +422,21 @@ def player_series(name,url,iconimage):
 		t = requests.get(url)
 		urlVideo = t.url
 
-		xbmc.log('[plugin.video.megahfilmeshd] L420 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L424 ' + str(urlVideo), xbmc.LOGNOTICE)
 		if 'javascript' in urlVideo :
 				html = openURL(urlVideo)
 				soup = BeautifulSoup(html)
-				xbmc.log('[plugin.video.megahfilmeshd] L424 ' + str(urlVideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.megahfilmeshd] L428 ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = soup.iframe["src"]
 		if 'action' in urlVideo :
 				html = openURL(urlVideo)
 				soup = BeautifulSoup(html)
 				urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(html))[0]
-				xbmc.log('[plugin.video.megahfilmeshd] L430 ' + str(urlVideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.megahfilmeshd] L434 ' + str(urlVideo), xbmc.LOGNOTICE)
 				
 		t = requests.get(urlVideo)
 		urlVideo = t.url
-		xbmc.log('[plugin.video.megahfilmeshd] L434 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L438 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
