@@ -15,6 +15,7 @@
 # Atualizado (1.9.0) - 22/07/2018
 # Atualizado (2.0.0) - 03/08/2018
 # Atualizado (2.0.1) - 04/08/2018
+# Atualizado (2.0.2) - 12/03/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -298,12 +299,15 @@ def player(name,url,iconimage):
 					#urlVideo = soup.iframe['src']
 					links = soup.findAll('iframe')
 					if len(links) == 1 :
-						urlVideo = links[0]['src']
+						#urlVideo = links[0]['src']
+						urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
 					else:
-						urlVideo = links[1]['src']
-						opID =	urlVideo.split('?')[1]
-						opID = opID.split('=')[1]
-						urlVideo = "http://openload.co/embed/" + opID
+						urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
+						xbmc.log('[plugin.video.megahfilmeshd] L303 ' + str(urlVideo), xbmc.LOGNOTICE)
+						#urlVideo = links[1]['src']
+						#opID =	urlVideo.split('?')[1]
+						#opID = opID.split('=')[1]
+						#urlVideo = "http://openload.co/embed/" + opID
 				srv = srvsdub[i].text
 				titsT.append(srv)
 				url2.append(urlVideo)
