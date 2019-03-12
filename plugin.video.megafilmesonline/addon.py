@@ -125,8 +125,8 @@ def getTemporadas(url):
 		totD = len(seasons)
 
 		imgF = ""
-		img = soup.find("meta", {"property": "og:image"})
-		imgF = re.findall(r'content=[\'"]?([^\'" >]+)', str(img))
+		img = soup.find("div", {"class": "downloadImage"})
+		imgF = re.findall(r'href=[\'"]?([^\'" >]+)', str(img))
 		imgF = imgF[0]
 
 		i = 1
@@ -163,12 +163,18 @@ def getEpisodios(name, url):
 		response.close()
 		d = json.loads(content)
 		b = d['episodes']
-		#xbmc.log('[plugin.video.megahfilmeshd] L87 ' + str(b), xbmc.LOGNOTICE)
+		#xbmc.log('[plugin.video.megahfilmeshd] L166 ' + str(b), xbmc.LOGNOTICE)
+		'''
 		imgF = ""
 		img = soup.find("meta", {"property": "og:image"})
 		imgF = re.findall(r'content=[\'"]?([^\'" >]+)', str(img))
 		img = imgF[0]
-
+		'''
+		imgF = ""
+		img = soup.find("div", {"class": "downloadImage"})
+		imgF = re.findall(r'href=[\'"]?([^\'" >]+)', str(img))
+		img = imgF[0]
+		
 		for i in range(0, len(b)):
 				titF = b[str(i)]['name'].encode('utf-8')
 				idname = b[str(i)]['id']
@@ -410,68 +416,21 @@ def player_series(name,url,iconimage):
 		t = requests.get(url)
 		urlVideo = t.url
 
-		xbmc.log('[plugin.video.megahfilmeshd] L369 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L420 ' + str(urlVideo), xbmc.LOGNOTICE)
 		if 'javascript' in urlVideo :
 				html = openURL(urlVideo)
 				soup = BeautifulSoup(html)
-				xbmc.log('[plugin.video.megahfilmeshd] L309 ' + str(urlVideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.megahfilmeshd] L424 ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = soup.iframe["src"]
-
+		if 'action' in urlVideo :
+				html = openURL(urlVideo)
+				soup = BeautifulSoup(html)
+				urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(html))[0]
+				xbmc.log('[plugin.video.megahfilmeshd] L430 ' + str(urlVideo), xbmc.LOGNOTICE)
+				
 		t = requests.get(urlVideo)
 		urlVideo = t.url
-		
-		'''
-		try :
-				conteudo = soup('iframe')
-				srvsdub	 = conteudo[0]("src")
-				totD = len(srvsdub)
-				tipo = "Server"
-
-				for i in range(totD) :
-						titS = srvsdub[i].text + " (%s)" % tipo
-						idS = srvsdub[i]["id"]
-						titsT.append(titS)
-						idsT.append(idS)
-		except :
-				pass
-
-		try :
-				conteudo = soup('iframe'})
-				srvsleg	 = conteudo[0]("src")
-				totL = len(srvsleg)
-				tipo = "Servidor"
-
-				for i in range(totL) :
-						titS = srvsdub[i].text + " (%s)" % tipo
-						idS = srvsleg[i]["id"]
-						titsT.append(titS)
-						idsT.append(idS)
-		except :
-				pass
-
-		if not titsT : return
-
-		index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-
-		if index == -1 : return
-
-		ind = idsT[index]
-
-		conteudo = soup("div", {"class": "geral"})
-		links = conteudo[0]("a")
-
-		if len(links) == 0 : links = conteudo[0]("a")
-		ind = int(ind)
-		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[ind-1]
-
-		link = openURL(urlVideo)
-		soup  = BeautifulSoup(link)
-		conteudo = soup("iframe")
-		urlVideo = str(conteudo[0]['src'])
-		okID = urlVideo.split('embed/?v=')[1]
-		urlVideo = okID
-		'''
-		xbmc.log('[plugin.video.megahfilmeshd] L423 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.megahfilmeshd] L434 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
