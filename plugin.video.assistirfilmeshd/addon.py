@@ -18,6 +18,7 @@
 # Atualizado (1.1.3) - 14/06/2018
 # Atualizado (1.1.4) - 01/07/2018
 # Atualizado (1.1.5) - 02/08/2018
+# Atualizado (1.1.6) - 21/03/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -27,25 +28,25 @@ import requests
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-versao      = '1.1.5'
-addon_id    = 'plugin.video.assistirfilmeshd'
-selfAddon   = xbmcaddon.Addon(id=addon_id)
-addonfolder = selfAddon.getAddonInfo('path')
-artfolder   = addonfolder + '/resources/img/'
-fanart      = addonfolder + '/fanart.png'
-base        = base64.b64decode('aHR0cDovL3d3dy5hc3Npc3RpcmZpbG1lc2hkLm9yZw==')
+versao		= '1.1.6'
+addon_id	= 'plugin.video.assistirfilmeshd'
+selfAddon	= xbmcaddon.Addon(id=addon_id)
+addonfolder	= selfAddon.getAddonInfo('path')
+artfolder	= addonfolder + '/resources/img/'
+fanart		= addonfolder + '/fanart.png'
+base		= base64.b64decode('aHR0cDovL3d3dy5hc3Npc3RpcmZpbG1lc2hkLm9yZw==')
 
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base + '/categoria/'						,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + '/categoria/lancamento-de-2017/' 	,	20, artfolder + 'new.png')
-		addDir('Filmes Dublados'           , base + '/search.php?s=dublado&btn-busca=' 	,	20, artfolder + 'filmes.png')
-		addDir('Series'		               , base + '/categoria/series/'				,   25, artfolder + 'series.png')
-		addDir('Pesquisa Series'           , '--'										,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'           , '--'										,   35, artfolder + 'pesquisa.png')
-		addDir('Configurações'             , base										,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo', base										, 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'					, base + '/categoria/'							,	10, artfolder + 'categorias.png')
+		addDir('Lançamentos'				, base + '/categoria/lancamento-de-2017/' 		,	20, artfolder + 'new.png')
+		addDir('Filmes Dublados'			, base + '/search.php?s=dublado&btn-busca='		,	20, artfolder + 'filmes.png')
+		addDir('Series'						, base + '/categoria/series/'					,	25, artfolder + 'series.png')
+		addDir('Pesquisa Series'			, '--'											,	30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'			, '--'											,	35, artfolder + 'pesquisa.png')
+		addDir('Configurações'				, base											,  999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo'	, base											, 1000, artfolder + 'config.png', 1, False)
 			
 		setViewMenu()		
 		
@@ -61,12 +62,12 @@ def getCategorias(url):
 				titC = titC.replace('&ccedil;','c').replace('&atilde;','a').replace('&eacute;','e')
 				titC = titC.replace('&ecirc;','i').replace('&aacute;','a').replace('&eacute;','e')
 				if not 'Lançamento' in titC :
-							urlC = categoria.a["href"]
-							imgC = categoria.a.div["style"]
-							imgC = re.findall(r' url(.*?);', imgC)[0]
-							imgC = imgC.replace("(","").replace(")","")
-							#imgC = artfolder + limpa(titC) + '.png'
-							addDir(titC,urlC,20,imgC)
+						urlC = categoria.a["href"]
+						imgC = categoria.a.div["style"]
+						imgC = re.findall(r' url(.*?);', imgC)[0]
+						imgC = imgC.replace("(","").replace(")","")
+						#imgC = artfolder + limpa(titC) + '.png'
+						addDir(titC,urlC,20,imgC)
 			
 		setViewFilmes()
 		
@@ -76,7 +77,7 @@ def getFilmes(url):
 		#xbmc.log('[plugin.video.assistirfilmeshd] L70 - ' + str(url), xbmc.LOGNOTICE)
 		soup     = BeautifulSoup(link)
 		conteudo = soup("div", {"id": "wrap"})
-		filmes   = conteudo[0]("div", {"class": "box-filme"})
+		filmes   = conteudo[0]("div", {"class": "poster"})
 		totF = len(filmes)
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8','replace')
@@ -379,25 +380,34 @@ def player(name,url,iconimage):
 		elif 'openload2' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'https://openload.co/embed/%s' % okID
-				
-		elif 'thevid.net' in urlVideo :
+					
+		elif 'sts.opensv' in urlVideo :
+				okID = urlVideo.split('z/')[1]
+				okID = okID.replace('.html', '')
+				urlVideo = 'https://streamango.com/embed/%s' % okID
+					
+		elif 'rv.opensv' in urlVideo :
 				okID = urlVideo.split('e/')[1]
-				urlVideo = 'http://thevid.net/v/%s' % okID
-				xbmc.log('[plugin.video.assistirfilmeshd] L310 - ' + str(urlVideo), xbmc.LOGNOTICE)
-				'''
-				linkTV  = openURL(urlVideo)		
-				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+				urlVideo = 'https://www.rapidvideo.com/e/%s' % okID
+							
+		elif 'thevid' in urlVideo :
+				okID = urlVideo.split('e/')[1]
+				urlVideo = 'http://thevid.net/e/%s' % okID
+				#xbmc.log('[plugin.video.assistirfilmeshd] L394 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				linkTV  = openURL(urlVideo)
+				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)\s*<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])				
-	
+				#xbmc.log('[plugin.video.verfilmesBiz - player_series -L399] ' + str(sUnpacked), xbmc.LOGNOTICE)
+				url2Play = re.findall('var ldaa="(.*?)"', sUnpacked)
+				url = str(url2Play[0])
+				url2Play = 'http:%s' % url if url.startswith("//") else url
+
 				OK = False
-				'''
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 		
-		xbmc.log('[plugin.video.assistirfilmeshd] L335 - ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd] L409 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		if not url2Play : return
 		
@@ -515,20 +525,20 @@ def player_series(name,url,iconimage):
 				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
 
 		elif 'thevid.net' in urlVideo :
-				fxID = urlVideo.split('e/')[1]
-				urlVideo = 'http://thevid.net/v/%s' % fxID
-				'''
-				linkTV  = openURL(urlVideo)		
-				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+				okID = urlVideo.split('e/')[1]
+				urlVideo = 'http://thevid.net/e/%s' % okID
+				#xbmc.log('[plugin.video.assistirfilmeshd] L394 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				linkTV  = openURL(urlVideo)
+				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)\s*<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
-				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
-				xbmc.log('[plugin.video.assistirfilmeshd] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-				url2Play = str(url2Play[0])				
-	
-				OK = False'''
-						
+				#xbmc.log('[plugin.video.verfilmesBiz - player_series -L399] ' + str(sUnpacked), xbmc.LOGNOTICE)
+				url2Play = re.findall('var ldaa="(.*?)"', sUnpacked)
+				url = str(url2Play[0])
+				url2Play = 'http:%s' % url if url.startswith("//") else url
+
+				OK = False
+							
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
 		xbmc.log('[plugin.video.assistirfilmeshd] L465 - ' + str(url2Play), xbmc.LOGNOTICE)
