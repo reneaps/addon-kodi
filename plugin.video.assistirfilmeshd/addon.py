@@ -342,18 +342,22 @@ def player(name,url,iconimage):
 		
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 		
-		xbmc.log('[plugin.video.assistirfilmeshd] L276 - ' + str(urlVideo), xbmc.LOGNOTICE)
-
+		xbmc.log('[plugin.video.assistirfilmeshd] L345 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		'''
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup("iframe")
 		urlVideo = str(conteudo[0]['src'])
-
+		'''
 		if 'openlink.biz' in urlVideo:
 				r = requests.get(urlVideo)
 				urlVideo = r.url
+		
+		elif 'opensv.biz' in urlVideo :
+				r = requests.get(urlVideo)
+				urlVideo = r.url.split('=')[1]
 						
-		xbmc.log('[plugin.video.assistirfilmeshd] L283 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd] L360 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -376,11 +380,7 @@ def player(name,url,iconimage):
 		elif 'vdoza' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
-				
-		elif 'openload2' in urlVideo :
-				okID = urlVideo.split('/')[4]
-				urlVideo = 'https://openload.co/embed/%s' % okID
-					
+	
 		elif 'sts.opensv' in urlVideo :
 				okID = urlVideo.split('z/')[1]
 				okID = okID.replace('.html', '')
@@ -389,7 +389,12 @@ def player(name,url,iconimage):
 		elif 'rv.opensv' in urlVideo :
 				okID = urlVideo.split('e/')[1]
 				urlVideo = 'https://www.rapidvideo.com/e/%s' % okID
-							
+					
+		elif 'opensv.biz/op' in urlVideo :
+				okID = urlVideo.split('op/')[1]
+				okID = okID.replace('.html%0D', '')
+				urlVideo = 'https://openload.co/embed/%s' % okID
+											
 		elif 'thevid' in urlVideo :
 				okID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % okID
@@ -405,7 +410,7 @@ def player(name,url,iconimage):
 						
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 		
-		xbmc.log('[plugin.video.assistirfilmeshd] L409 - ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd] L413 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		if not url2Play : return
 		
@@ -482,7 +487,7 @@ def player_series(name,url,iconimage):
 		
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 		
-		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L401] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L485] ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
@@ -494,7 +499,7 @@ def player_series(name,url,iconimage):
 				r = requests.get(urlVideo)
 				urlVideo = r.url
 				
-		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L412] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.assistirfilmeshd - player_series -L497] ' + str(urlVideo), xbmc.LOGNOTICE)
 		
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 				
@@ -530,7 +535,11 @@ def player_series(name,url,iconimage):
 		elif 'rv.opensv' in urlVideo :
 				okID = urlVideo.split('e/')[1]
 				urlVideo = 'https://www.rapidvideo.com/e/%s' % okID
-				
+					
+		elif 'opensv.biz/op' in urlVideo :
+				okID = urlVideo.split('op/')[1]
+				urlVideo = 'https://openload.co/embed/%s' % okID
+								
 		elif 'thevid.net' in urlVideo :
 				okID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % okID
