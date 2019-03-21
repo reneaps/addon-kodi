@@ -13,6 +13,7 @@
 # Atualizado (1.0.6) - 05/07/2018
 # Atualizado (1.0.7) - 05/07/2018
 # Atualizado (1.0.8) - 01/08/2018
+# Atualizado (1.0.9) - 21/03/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -25,23 +26,23 @@ from resources.lib               import jsunpack
 addon_id  = 'plugin.video.verfilmes'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
-addonfolder  = selfAddon.getAddonInfo('path')
-artfolder    = addonfolder + '/resources/img/'
-fanart       = addonfolder + '/fanart.png'
-addon_handle = int(sys.argv[1])
-base         = base64.b64decode('aHR0cDovL3d3dy52ZXJmaWxtZXMuYml6Lw==')
+addonfolder		= selfAddon.getAddonInfo('path')
+artfolder		= addonfolder + '/resources/img/'
+fanart			= addonfolder + '/fanart.png'
+addon_handle	= int(sys.argv[1])
+base			= base64.b64decode('aHR0cDovL3d3dy52ZXJmaWxtZXMuYml6Lw==')
 
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'                , base									,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'               , base + 'categoria/lancamento-de-2018/'	,	20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'           , base + 'search.php?s=dublado'		 	,	20, artfolder + 'pesquisa.png')
-		addDir('Series'		               , base + 'categoria/series/'				,   25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'           , '--'                           		,   30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'           , '--'                           		,   35, artfolder + 'pesquisa.png')
-		addDir('Configurações'             , base                           		,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo', base                           		, 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'					, base										,	10, artfolder + 'categorias.png')
+		addDir('Lançamentos'				, base + 'categoria/lancamento-de-2019/'	,	20, artfolder + 'lancamentos.png')
+		addDir('Filmes Dublados'			, base + 'search.php?s=dublado'				,	20, artfolder + 'pesquisa.png')
+		addDir('Series'						, base + 'categoria/series/'				,	25, artfolder + 'legendados.png')
+		addDir('Pesquisa Series'			, '--'										,	30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'			, '--'										,	35, artfolder + 'pesquisa.png')
+		addDir('Configurações'				, base										,  999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo'	, base										, 1000, artfolder + 'config.png', 1, False)
 
 		setViewMenu()
 
@@ -135,13 +136,13 @@ def getTemporadas(url):
 		for i in range(totF):
 			i = i + 1
 			titF = str(i) + "ª Temporada"
-			xbmc.log('[plugin.video.verfilmes] L125 ' + str(imgF), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.verfilmes] L138 ' + str(imgF), xbmc.LOGNOTICE)
 			addDir(titF, urlF, 27, imgF, False, totF)
 
 		xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
-		xbmc.log('[plugin.video.verfilmesBiz] L130 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmesBiz] L144 - ' + str(url), xbmc.LOGNOTICE)
 		n = name.replace('ª Temporada', '')
 		n = int(n)
 		temp = []
@@ -245,7 +246,7 @@ def doPesquisaSeries():
 
 def doPesquisaFilmes():
 		a = pesquisa()
-		xbmc.log('[plugin.video.verfilmes] L229 - ' + str(a), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmes] L248 - ' + str(a), xbmc.LOGNOTICE)
 		if a is None:
 			xbmcgui.Dialog().ok('VerFilmes', 'Conteudo temporariamente indisponivel,desculpe o transtorno.')
 			return
@@ -294,7 +295,7 @@ def player(name,url,iconimage):
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
-		xbmc.log('[plugin.video.verfilmes] L280 ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmes] L297 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if 'openload2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
@@ -304,15 +305,17 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 
-		elif 'thevid2' in urlVideo :
-				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://thevid.net/e/%s' % fxID
+		elif 'thevid' in urlVideo :
+				fxID = urlVideo.split('e/')[1]
+				urlVideo = 'https://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
+				#xbmc.log('[plugin.video.verfilmesBiz - player_series -L313] ' + str(linkTV), xbmc.LOGNOTICE)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])
+				url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
+				url = str(url2Play[0])
+				url2Play = 'http:%s' % url if url.startswith("//") else url
 
 				OK = False
 
@@ -369,7 +372,7 @@ def player_series(name,url,iconimage):
 		links = []
 		hosts = []
 		matriz = []
-		xbmc.log('[plugin.video.verfilmes] L359 ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmes] L374 ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		soup  = BeautifulSoup(link)
 		conteudo = soup("div", {"class":"itens"})
@@ -401,13 +404,13 @@ def player_series(name,url,iconimage):
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup.findAll("iframe")
-		xbmc.log('[plugin.video.verfilmesBiz - player_series -L387] ' + str(conteudo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmesBiz - player_series -L406] ' + str(conteudo), xbmc.LOGNOTICE)
 		urlVideo = conteudo[0].get('src')
 		if 'openlink' in urlVideo:
 				t = requests.get(urlVideo)
 				urlVideo = t.url
 
-		xbmc.log('[plugin.video.verfilmesBiz - player_series -L390] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmesBiz - player_series -L412] ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -427,15 +430,17 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('-')[1]
 				urlVideo = 'http://vidzi.tv/%s.html' % fxID
 
-		elif 'thevid2' in urlVideo :
-				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://thevid.net/e/%s' % fxID
+		elif 'thevid' in urlVideo :
+				fxID = urlVideo.split('e/')[1]
+				urlVideo = 'https://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
+				#xbmc.log('[plugin.video.verfilmesBiz - player_series -L438] ' + str(linkTV), xbmc.LOGNOTICE)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])
+				url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
+				url = str(url2Play[0])
+				url2Play = 'http:%s' % url if url.startswith("//") else url
 
 				OK = False
 
@@ -499,7 +504,9 @@ def openConfigEI():
 
 def openURL(url):
 		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64; Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		req.add_header('Referer', url)
+		req.add_header('Upgrade-Insecure-Requests', '1')
+		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36')
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
