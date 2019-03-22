@@ -274,7 +274,7 @@ def pesquisa():
 		
 				soup	 = BeautifulSoup(link)
 				conteudo = soup("div", {"id": "wrap"})
-				filmes	 = conteudo[0]("div", {"class": "box-filme"})
+				filmes	 = conteudo[0]("div", {"class": "poster"})
 				totF = len(filmes)
 				hosts = []
 				for filme in filmes:

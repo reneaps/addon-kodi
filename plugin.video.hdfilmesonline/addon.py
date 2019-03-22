@@ -15,6 +15,7 @@
 # Atualizado (1.0.8) - 05/05/2018
 # Atualizado (1.0.9) - 29/05/2018
 # Atualizado (1.1.0) - 12/03/2019
+# Atualizado (1.1.1) - 22/03/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -24,7 +25,7 @@ from urlparse import urlparse
 from resources.lib.BeautifulSoup		import BeautifulSoup
 from resources.lib						import jsunpack
 
-version   = '1.0.3'
+version   = '1.1.1'
 addon_id  = 'plugin.video.hdfilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -103,7 +104,7 @@ def getFilmes(url):
 				if sinopse :
 					sinop = sinopse[0]("span", {"class":"ttx"})
 					pltF = sinopse[0].text.encode('utf-8','replace')
-					xbmc.log('[plugin.video.hdfilmesonline] L100 ' + str(sinop), xbmc.LOGNOTICE)
+					#xbmc.log('[plugin.video.hdfilmesonline] L100 ' + str(sinop), xbmc.LOGNOTICE)
 				else:
 					pltF = ""
 				addDirF(titF, urlF, 100, imgF, False, totF, pltF)
@@ -325,7 +326,7 @@ def player(name,url,iconimage):
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				xbmc.log('[plugin.video.hdfilmesonline] L318 ' + str(sUnpacked), xbmc.LOGNOTICE)
+				#xbmc.log('[plugin.video.hdfilmesonline] L318 ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
 				url2Play = "http:" + str(url2Play[0])
 				xbmc.log('[plugin.video.hdfilmesonline] L331 ' + str(url2Play), xbmc.LOGNOTICE)
@@ -412,8 +413,9 @@ def player_series(name,url,iconimage):
 		#if len(links) > 1 :
 		if "onclick" in str(links):
 			for i in links:
-				xbmc.log('[plugin.video.hdfilmesonline] L404 ' + str(links), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.hdfilmesonline] L415 ' + str(links), xbmc.LOGNOTICE)
 				link =	i["onclick"]
+				xbmc.log('[plugin.video.hdfilmesonline] L417 ' + str(link), xbmc.LOGNOTICE)
 				link2 = link.split("=")[1]
 				link2 = link2.replace("\'","")
 				link = link.split("=")[2]
@@ -433,7 +435,7 @@ def player_series(name,url,iconimage):
 				hosts.append(link2)
 				titsT.append(link2)
 
-		xbmc.log('[plugin.video.hdfilmesonline] L424 ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmesonline] L438 ' + str(urlF), xbmc.LOGNOTICE)
 
 		if not titsT : return
 
@@ -456,7 +458,7 @@ def player_series(name,url,iconimage):
 		#conteudo = soup.findAll("iframe")
 		#urlVideo = conteudo[2].get('src')
 
-		xbmc.log('[plugin.video.hdfilmesonline] L447 - ' + str(titsT[i]), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.hdfilmesonline] L461 - ' + str(titsT[i]), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -464,17 +466,25 @@ def player_series(name,url,iconimage):
 				fxID = urlF[i]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
 
-		elif 'ok2' in urlVideo :
-				fxID = urlF[i]
-				urlVideo = 'http://ok.ru/videoembed%s' % fxID
-
 		elif 'vidto' in titsT[i].lower() :
 				fxID = urlF[i]
 				urlVideo = 'http://vidto.me/embed-%s-850x550.html' % fxID
 
+		elif 'principal' in titsT[i].lower() :
+				fxID = urlF[i]
+				urlVideo = 'https://vidlox.tv/%s.html' % fxID
+
 		elif 'vidzi' in titsT[i].lower() :
 				fxID = urlF[i]
 				urlVideo = 'http://vidzi.tv/%s.html' % fxID
+
+		elif 'netu' in titsT[i].lower() :
+				fxID = urlF[i]
+				urlVideo = 'https://ahdfilmesonline.com/play/ep-dublado.php?netu=%s' % fxID
+				
+		elif 'streamango' in titsT[i].lower() :
+				fxID = urlF[i]
+				urlVideo = 'http://streamango.com/embed/%s' % fxID
 
 		elif 'thevid' in titsT[i].lower() :
 				fxID = urlF[i]
@@ -483,10 +493,10 @@ def player_series(name,url,iconimage):
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				xbmc.log('[plugin.video.hdfilmesonline] L460 ' + str(sUnpacked), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.hdfilmesonline] L492 ' + str(sUnpacked), xbmc.LOGNOTICE)
 				url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
-				url2Play = "http:" + str(url2Play[0])
-				url2Play = str(url2Play[0])
+				url = str(url2Play[0])
+				url2Play = 'http:%s' % url if url.startswith("//") else url
 
 				OK = False
 
