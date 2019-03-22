@@ -14,6 +14,7 @@
 # Atualizado (1.0.7) - 05/07/2018
 # Atualizado (1.0.8) - 01/08/2018
 # Atualizado (1.0.9) - 21/03/2019
+# Atualizado (1.1.0) - 22/03/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -409,8 +410,14 @@ def player_series(name,url,iconimage):
 		if 'openlink' in urlVideo:
 				t = requests.get(urlVideo)
 				urlVideo = t.url
-
-		xbmc.log('[plugin.video.verfilmesBiz - player_series -L412] ' + str(urlVideo), xbmc.LOGNOTICE)
+		
+		elif 'opensv.biz' in urlVideo :
+				r = requests.get(urlVideo)
+				xbmc.log('[plugin.video.verfilmesBiz - player_series - L415] ' + str(r.url), xbmc.LOGNOTICE)
+				#urlVideo = r.url.split('=')[1]
+				urlVideo = r.url
+						
+		xbmc.log('[plugin.video.verfilmesBiz - player_series - L412] ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
