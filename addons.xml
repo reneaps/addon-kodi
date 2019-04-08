@@ -257,6 +257,7 @@
     <import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
+		<import addon="script.module.requests" version="2.19ZZ.1"/>
   </requires>
 
   <extension point="xbmc.python.pluginsource" library="addon.py">
