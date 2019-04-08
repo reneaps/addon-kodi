@@ -28,6 +28,7 @@
 # Atualizado (1.2.1) - 03/06/2018
 # Atualizado (1.2.2) - 28/07/2018
 # Atualizado (1.2.3) - 10/03/2019
+# Atualizado (1.2.4) - 07/04/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -177,10 +178,26 @@ def getEpisodios(name, url):
 
 		soup = BeautifulSoup(link)
 		conteudo = soup('div',{'class':'tab_content'})
-		arquivo = conteudo[n]('ul')
+		texto = str(conteudo)
+		texto1 = texto.replace('<div class="tab_content"></div>','')
+		texto2 = BeautifulSoup(texto1)
+		conteudo = texto2('div',{'class':'tab_content'})
+		#arquivo = conteudo[n]('ul')
+		arquivo = conteudo[n]('div',{'class':'um_terco'})
+		'''
 		if not arquivo :
 			n = n + 1
-			arquivo = conteudo[n]('ul')
+			arquivo = conteudo[n]('div',{'class':'um_terco'})
+		else:
+			arquivo = conteudo[n]('div',{'class':'um_terco'})
+		'''
+		try:
+			b = arquivo[0]('li')
+		except:
+			n = n + 1
+			arquivo = conteudo[n]('div',{'class':'um_terco'})
+			print n
+			pass
 
 		imgF = ""
 		#img = soup.find("div", {"class": "capa-single"})
@@ -190,10 +207,11 @@ def getEpisodios(name, url):
 		img = imgF[0]
 
 		try:
+			au = arquivo[0].p.text.encode('utf-8')
 			dublados = arquivo[0]('li')
-			au = arquivo[0].text.encode('utf-8')
-			result= re.split(r'Epi', au)
-			audio = result[0]
+			#au = arquivo[0].text.encode('utf-8')
+			result = re.split(r'Epi', au)
+			audio  = result[0]
 			if (au.find('Dublado')) == -1 :
 				if (au.find('Dublada')) == -1 :
 					audio = name + ' Legendado'
@@ -209,10 +227,11 @@ def getEpisodios(name, url):
 		except:
 			pass
 		try:
+			au = arquivo[1].p.text.encode('utf-8')
 			legendados = arquivo[1]('li')
-			au = arquivo[1].text.encode('utf-8')
-			result= re.split(r'Epi', au)
-			audio = result[0]
+			#au = arquivo[1].text.encode('utf-8')
+			result = re.split(r'Epi', au)
+			audio  = result[0]
 			if (au.find('Dublado')) == -1 :
 				if (au.find('Dublada')) == -1 :
 					audio = name + ' Legendado'
@@ -352,7 +371,7 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
 
-		elif 'ok' in urlVideo :
+		elif 'ok=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 
@@ -380,7 +399,7 @@ def player(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidlox.tv/embed-%s' % fxID
 
-		elif 'stream=' in urlVideo :
+		elif 'vcstream=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://vcstream.to/embed/%s' % fxID
 				
@@ -394,17 +413,18 @@ def player(name,url,iconimage):
 
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://thevid.net/e/%s/' % fxID
-				'''
+				urlVideo = 'https://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
+				#xbmc.log('[plugin.video.verfilmesBiz - player_series -L438] ' + str(linkTV), xbmc.LOGNOTICE)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
-				if not url2Play : url2Play = re.findall('var tfilea="(.*?)"', sUnpacked)
-				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-				url2Play = str(url2Play[0])
-				OK = False'''
+				url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
+				url = str(url2Play[0])
+				url2Play = 'http:%s' % url if url.startswith("//") else url
+
+				OK = False
+
 
 		xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
@@ -504,7 +524,7 @@ def player_series(name,url,iconimage):
 		i = int(index)
 
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
-		xbmc.log('[plugin.video.filmeseseriesonline] L495 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmeseseriesonline] L507 - ' + str(urlVideo), xbmc.LOGNOTICE)
 		#urlVideo = 'http://www.pirataplay.com/embed/' + urlVideo
 
 		#link = openURL(urlVideo)
@@ -512,7 +532,7 @@ def player_series(name,url,iconimage):
 		#conteudo = soup("iframe")
 		#urlVideo = str(conteudo[0]['src'])
 
-		xbmc.log('[plugin.video.filmeseseriesonline] L503 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmeseseriesonline] L515 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -540,9 +560,14 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidzi.tv/embed-%s.html' % fxID
 
-		elif 'ok' in urlVideo :
+		elif 'ok=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
+				urlVideo = 'http://ok.ru/video/%s' % fxID
+
+		elif 'videoplayer' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				url2Play = 'https://filmesonline.vc/v/%s' % fxID
+				OK = False
 
 		elif 'vidoza' in urlVideo :
 				fxID = urlVideo.split('=')[1]
@@ -552,7 +577,7 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'http://vidlox.tv/embed-%s' % fxID
 
-		elif 'stream=' in urlVideo :
+		elif 'vcstream=' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://vcstream.to/embed/%s' % fxID
 
@@ -562,18 +587,19 @@ def player_series(name,url,iconimage):
 
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('=')[1]
-				urlVideo = 'http://thevid.net/e/%s' % fxID
-				'''
+				urlVideo = 'https://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
+				#xbmc.log('[plugin.video.verfilmesBiz - player_series -L438] ' + str(linkTV), xbmc.LOGNOTICE)
 				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
-				if not url2Play : url2Play = re.findall('var tfilea\s*=\s*"(.*?)"', sUnpacked)
-				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-				url2Play = str(url2Play[0])
+				url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
+				url = str(url2Play[0])
+				url2Play = 'http:%s' % url if url.startswith("//") else url
 
-				OK = False'''
+				OK = False
+
+		xbmc.log('[plugin.video.filmeseseriesonline] L581 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
