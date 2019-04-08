@@ -15,6 +15,7 @@
 # Atualizado (1.0.8) - 01/08/2018
 # Atualizado (1.0.9) - 21/03/2019
 # Atualizado (1.1.0) - 22/03/2019
+# Atualizado (1.1.1) - 08/04/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -303,7 +304,7 @@ def player(name,url,iconimage):
 				urlVideo = 'https://openload.co/embed/%s' % fxID
 
 		elif 'ok' in urlVideo :
-				fxID = urlVideo.split('=')[1]
+				fxID = urlVideo.split('ed/')[1]
 				urlVideo = 'http://ok.ru/videoembed/%s' % fxID
 
 		elif 'thevid' in urlVideo :
@@ -405,7 +406,7 @@ def player_series(name,url,iconimage):
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup.findAll("iframe")
-		xbmc.log('[plugin.video.verfilmesBiz - player_series -L406] ' + str(conteudo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmesBiz - player_series -L408] ' + str(conteudo), xbmc.LOGNOTICE)
 		urlVideo = conteudo[0].get('src')
 		if 'openlink' in urlVideo:
 				t = requests.get(urlVideo)
@@ -413,17 +414,22 @@ def player_series(name,url,iconimage):
 		
 		elif 'opensv.biz' in urlVideo :
 				r = requests.get(urlVideo)
-				xbmc.log('[plugin.video.verfilmesBiz - player_series - L415] ' + str(r.url), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.verfilmesBiz - player_series - L416] ' + str(r.url), xbmc.LOGNOTICE)
 				#urlVideo = r.url.split('=')[1]
-				urlVideo = r.url
+				urlVideo = str(r.url)
 						
-		xbmc.log('[plugin.video.verfilmesBiz - player_series - L412] ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.verfilmesBiz - player_series - L420] ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
 		if 'openload2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
+
+		elif 'oload.fun' in urlVideo :
+				fxID = urlVideo.split('/')[4]
+				xbmc.log('[plugin.video.verfilmesBiz - player_series - L432] ' + str(fxID), xbmc.LOGNOTICE)
+				urlVideo = 'https://oload.fun/embed/%s' % fxID
 
 		elif 'ok2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
@@ -437,9 +443,19 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('-')[1]
 				urlVideo = 'http://vidzi.tv/%s.html' % fxID
 
+		elif 'rv.opensv.biz' in urlVideo :
+				fxID = urlVideo.split('biz/')[1]
+				fxID = fxID.replace('html','')
+				urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
+
+		elif 'vcstream.to2' in urlVideo :
+				fxID = urlVideo.split('embed/')[1]
+				urlVideo = 'https://vidcloud.co/v/%s' % fxID
+
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('e/')[1]
 				urlVideo = 'https://thevid.net/e/%s' % fxID
+				'''
 				linkTV  = openURL(urlVideo)
 				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 				aMatches = re.compile(sPattern).findall(linkTV)
@@ -450,6 +466,7 @@ def player_series(name,url,iconimage):
 				url2Play = 'http:%s' % url if url.startswith("//") else url
 
 				OK = False
+				'''
 
 		if OK :
 			try:
@@ -512,6 +529,7 @@ def openConfigEI():
 def openURL(url):
 		req = urllib2.Request(url)
 		req.add_header('Referer', url)
+		req.add_header('Method', 'GET')
 		req.add_header('Upgrade-Insecure-Requests', '1')
 		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36')
 		response = urllib2.urlopen(req)
