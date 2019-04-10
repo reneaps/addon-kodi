@@ -6,6 +6,7 @@
     <import addon="script.module.metahandler" optional="true"/>
     <import addon="script.module.simplejson" optional="true"/>
     <import addon="script.module.parsedom" optional="true"/>
+    <import addon="script.module.beautifulsoup4" optional="true"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>

@@ -59,7 +59,7 @@ def listar_filmes(url):
 	print url
 	addDir("[B][COLOR red]PESQUISAR FILMES[/B][/COLOR]",'-',11,url_base2+'kUn2Hk')
 	html = abrir_url(url)
-	soup = BeautifulSoup(html)
+	soup = BeautifulSoup(html, "html5lib")
 	arquivo = soup("ul",{"id":"category-thumbs"})[0]
 	filmes = arquivo("li")
 	total = len(filmes)
@@ -80,7 +80,7 @@ def listar_filmes_p(url):
 	print url
 	addDir("[B][COLOR red]PESQUISAR FILMES[/B][/COLOR]",'-',11,url_base2+'kUn2Hk')
 	html = abrir_url(url)
-	soup = BeautifulSoup(html)
+	soup = BeautifulSoup(html, "html5lib")
 	filmes = soup("div",{"class":"filme"})
 	total = len(filmes)
 	for filme in filmes:
@@ -265,7 +265,7 @@ def gethtml(url):
 	link = response.read()
 	response.close()
 	del response
-	soup = BeautifulSoup(link)
+	soup = BeautifulSoup(link, "html5lib")
 	return soup
 
 #def addDir(name,url,mode,iconimage,pasta=True,total=1,plot=''):
