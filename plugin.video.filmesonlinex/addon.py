@@ -16,7 +16,7 @@ except:
 	import simplejson as json
 h = HTMLParser.HTMLParser()
 
-versao = '0.0.6'
+versao = '0.0.8'
 addon_id = 'plugin.video.filmesonlinex'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -162,7 +162,7 @@ def player(name,url,iconimage):
 	imgF = False
 	html = abrir_url(url)
 	imgF = re.compile(r'<div class="poster"><img width=".+?" height=".+?" src="(.*?)" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" />').findall(html)[0]
-	xbmc.log('[plugin.video.filmesonlinex] L164 - ' + str(imgF), xbmc.LOGNOTICE)
+	xbmc.log('[plugin.video.filmesonlinex] L165 - ' + str(url), xbmc.LOGNOTICE)
 	link_houst = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[1]
 	if not link_houst:
 		link_houst = re.compile(r'<div class=\'mob\'><a class=\'video\' rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[1]
@@ -173,27 +173,40 @@ def player(name,url,iconimage):
 		imgF = re.compile(r'image: \'(.+?)\'').findall(html)[0]
 	except:
 		pass
-	xbmc.log('[plugin.video.filmesonlinex] L175 - ' + str(link_houst), xbmc.LOGNOTICE)
+	xbmc.log('[plugin.video.filmesonlinex] L176 - ' + str(link_houst), xbmc.LOGNOTICE)
 	addDir('[B]Adicionar aos Favoritos[/B]',name+','+iconimage+','+url,17,url_base2+'jNC8q5',False)
 	#link_video = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'(.+?)\'>(.+?)</a></div>').findall(html)[1]
 	#sfile = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'.+?\'>(.+?)</a></div>').findall(html)[1]
 	#link_video = re.compile(r'\{\"file\":"(.*?)",\"type\":".+?",\"label\":"(.*?)"',re.DOTALL).findall(html)[1]
-	#xbmc.log('[plugin.video.filmesonlinex] L176 - ' + str(link_video), xbmc.LOGNOTICE)
+	#xbmc.log('[plugin.video.filmesonlinex] L181 - ' + str(link_video), xbmc.LOGNOTICE)
+	urlVideo = link_houst
+	idVD = urlVideo.split('/')[4]
+	if 'playflixhd.ml' in link_houst:
+		link_video = 'https://playflixhd.ml/api/source/%s/' % idVD
+		html = post_url(link_video)
+		xbmc.log('[plugin.video.filmesonlinex] L187 - ' + str(link_video), xbmc.LOGNOTICE)
+	elif 'playflixhd.co' in link_houst:
+		link_video = 'https://playflixhd.co/api/source/%s/' % idVD
+		html = post_url(link_video)
+		xbmc.log('[plugin.video.filmesonlinex] L191 - ' + str(link_video), xbmc.LOGNOTICE)
+	else:
+		urlVideo = link_houst 
 	try:
-		link_video = re.compile(r'\{\"file\":"(.*?)",\"type\":".+?",\"label\":"(.*?)"',re.DOTALL).findall(html)
-		sfile = re.compile(r'\{\"file\":".*?",\"type\":".+?",\"label\":"(.*?)"',re.DOTALL).findall(html)
+		link_video = re.compile(r'\{\"file\":"(.*?)",\"label\":"(.*?)",\"type\":".+?"',	re.DOTALL).findall(html)
+		sfile = re.compile(r'\{\"file\":".*?",\"label\":"(.*?)",\"type\":".+?"',re.DOTALL).findall(html)
+		xbmc.log('[plugin.video.filmesonlinex] L197 - ' + str(link_video), xbmc.LOGNOTICE)
 		for urlF, qual in link_video:
 			urlF = urlF.replace("\\", "")
 			addLink(name.replace('Assistir Agora: ','') +' Full HD '+ str(qual),urlF,imgF,sfile)
 	except:
 		pass
-	#xbmc.log('[plugin.video.filmesonlinex] L186 - ' + str(link_video), xbmc.LOGNOTICE)
+	xbmc.log('[plugin.video.filmesonlinex] L203 - ' + str(link_video), xbmc.LOGNOTICE)
 	if not link_video:
 		try:
 			link_video = urlresolver.resolve(link_houst)
 			urlF = link_video #.split("|")[0]
 			sfile = ['720p']
-			xbmc.log('[plugin.video.filmesonlinex] L194 - ' + str(sfile), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.filmesonlinex] L209 - ' + str(sfile), xbmc.LOGNOTICE)
 			#for urlF in link_video:
 			addLink(name.replace('Assistir Agora: ','') + ' ' + str(sfile),urlF,imgF,sfile)
 		except:
@@ -202,7 +215,7 @@ def player(name,url,iconimage):
 			
 def player2(name,url,iconimage):
 	print url
-	xbmc.log('[plugin.video.filmesonlinex] L172 - ' + str(url), xbmc.LOGNOTICE)
+	xbmc.log('[plugin.video.filmesonlinex] L217 - ' + str(url), xbmc.LOGNOTICE)
 	status = xbmcgui.DialogProgress()
 	status.create('FILMESONLINEX', 'Resolvendo link...','Por favor aguarde...') 
 	playlist = xbmc.PlayList(1)
@@ -228,6 +241,17 @@ def player2(name,url,iconimage):
 def abrir_url(url):
 	req = urllib2.Request(url)
 	req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+	req.get_method = lambda: 'GET'
+	response = urllib2.urlopen(req)
+	link=response.read()
+	response.close()
+	del response
+	return link
+
+def post_url(url):
+	req = urllib2.Request(url)
+	req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+	req.get_method = lambda: 'POST'
 	response = urllib2.urlopen(req)
 	link=response.read()
 	response.close()
