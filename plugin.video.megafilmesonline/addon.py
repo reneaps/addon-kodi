@@ -18,6 +18,7 @@
 # Atualizado (2.0.2) - 12/03/2019
 # Atualizado (2.0.3) - 12/03/2019
 # Atualizado (2.0.4) - 14/03/2019
+# Atualizado (2.0.5) - 11/04/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -362,6 +363,8 @@ def player(name,url,iconimage):
 
 		elif 'megahfilmeshd.net' in urlVideo :
 				okID = urlVideo.split('=')[1]
+				okID = base64.b64decode(okID)
+				okID = okID.replace('id=','').replace('&type=o','')
 				urlVideo = 'https://openload.co/embed/%s' % okID
 
 		elif 'thevid.net' in urlVideo :
@@ -489,6 +492,8 @@ def player_series(name,url,iconimage):
 
 		elif 'megahfilmeshd.net' in urlVideo :
 				okID = urlVideo.split('=')[1]
+				okID = base64.b64decode(okID)
+				okID = okID.replace('id=','').replace('&type=o','')
 				urlVideo = 'https://openload.co/embed/%s' % okID
 
 		elif 'video.php' in urlVideo :

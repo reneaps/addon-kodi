@@ -1,28 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.megafilmesonlinehd" name="Megafilmesonlinehd" version="1.1.0" provider-name="AddonReneSilva">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.urlresolver" version="2.10.8"/>
-    <import addon="script.extendedinfo" version="3.0.0"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Mega Filmes OnlineHD</summary>
-    <description lang="en">
-        No addon Megafilmesonlinehd você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-        Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-        Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
-        </description>
-  </extension>
-</addon>
-
 <addon id="plugin.video.assistirfilmeshd" name="AssistirFilmesHD" version="1.1.6" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -40,7 +17,7 @@
     <platform>all</platform>
     <summary lang="en">Filmes e Series Online</summary>
     <description lang="en">
-			No addon AssistirFilmesHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.	Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C"). Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+			No addon AssistirFilmesHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.	VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C"). Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
 		</description>
   </extension>
 </addon>
@@ -65,7 +42,7 @@
     <description lang="en">
             No addon BestFilmes voce assiste filmes separados por categorias, lancamentos,filmes HD, etc.
             Voce tambem pode ver as informacoes ou assistir ao trailer do filme no submenu do addon (Botao direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
         </description>
   </extension>
 </addon>
@@ -86,9 +63,9 @@
         <platform>all</platform>
         <summary lang="en">FilmeseSeriesOnline</summary>
         <description lang="en">
-            No addon FilmeseSeriesOnline você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+            No addon FilmeseSeriesOnline vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
         </description>
   </extension>
 </addon>
@@ -110,9 +87,9 @@
     <platform>all</platform>
     <summary lang="en">Filmes e Series Online</summary>
     <description lang="en">
-			No addon FilmesOnlineHD11 você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-			Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+			No addon FilmesOnlineHD11 vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+			VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+			Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
 		</description>
   </extension>
 </addon>
@@ -160,7 +137,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.megafilmesonline" name="MegaFilmesHD" version="2.0.4" provider-name="AddonReneSilva">
+<addon id="plugin.video.megafilmesonline" name="MegaFilmesHD" version="2.0.5" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.urlresolver" version="2.10.8"/>
@@ -177,10 +154,33 @@
     <platform>all</platform>
     <summary lang="en">Filmes e Series Online</summary>
     <description lang="en">
-			No addon MegaFilmesHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-			Vocêtambém pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+			No addon MegaFilmesHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+			VocÃªtambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+			Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
 		</description>
+  </extension>
+</addon>
+
+<addon id="plugin.video.megafilmesonlinehd" name="Megafilmesonlinehd" version="1.1.0" provider-name="AddonReneSilva">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.urlresolver" version="2.10.8"/>
+    <import addon="script.extendedinfo" version="3.0.0"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">Mega Filmes OnlineHD</summary>
+    <description lang="en">
+        No addon Megafilmesonlinehd vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+        VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+        </description>
   </extension>
 </addon>
 
@@ -201,9 +201,9 @@
         <platform>all</platform>
         <summary lang="en">MidiaFlixHD</summary>
         <description lang="en">
-            No addon MidiaFlixHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+            No addon MidiaFlixHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
         </description>
   </extension>
 </addon>
@@ -245,9 +245,9 @@
     <platform>all</platform>
     <summary lang="en">Filmes e Series Online</summary>
     <description lang="en">
-            No addon TeuTorrent você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior e o plugin de video PULSAR 0.6.1 ou superior.
+            No addon TeuTorrent vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior e o plugin de video PULSAR 0.6.1 ou superior.
         </description>
         <website>http://teutorrent.com/</website>
   </extension>
@@ -272,7 +272,7 @@
     <description lang="en">
 			No addon VerFilmes.biz voce assiste filmes separados por categorias, lancamentos,filmes HD, etc.
 			Voce tambem pode ver as informacoes ou assistir ao trailer do filme no submenu do addon (Botao direito do mouse ou tecla "C").
-			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+			Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
 		</description>
   </extension>
 </addon>
@@ -293,7 +293,7 @@
     <platform>all</platform>
     <summary lang="en">Filmes e Series Online</summary>
     <description lang="en">
-			No addon Weekseries você assiste filmes separados por categorias, lançamentos,filmes HD, etc.	Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C"). Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+			No addon Weekseries vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.	VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C"). Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
 		</description>
   </extension>
 </addon>
@@ -305,8 +305,8 @@
 		<datadir zip="true">https://github.com/reneaps/addon-kodi/raw/master/repo/</datadir>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary>Repositório AddonReneSilva</summary>
-		<description>Repositório de addons brasileiros AddonReneSilva</description>
+		<summary>RepositÃ³rio AddonReneSilva</summary>
+		<description>RepositÃ³rio de addons brasileiros AddonReneSilva</description>
 		<disclaimer></disclaimer>
 		<platform>all</platform>
 	</extension>

@@ -162,8 +162,8 @@ def player(name,url,iconimage):
 	imgF = False
 	html = abrir_url(url)
 	imgF = re.compile(r'<div class="poster"><img width=".+?" height=".+?" src="(.*?)" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" />').findall(html)[0]
-	xbmc.log('[plugin.video.filmesonlinex] L165 - ' + str(url), xbmc.LOGNOTICE)
 	link_houst = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[1]
+	xbmc.log('[plugin.video.filmesonlinex] L166 - ' + str(link_houst), xbmc.LOGNOTICE)
 	if not link_houst:
 		link_houst = re.compile(r'<div class=\'mob\'><a class=\'video\' rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[1]
 	print link_houst
