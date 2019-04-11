@@ -228,7 +228,7 @@ def pega(idname):
 	s = BeautifulSoup(ef)
 	#urlF = s.iframe['src']
 	urlF = data
-	xbmc.log('[plugin.video.megahfilmeshd] L230 ' + str(urlF), xbmc.LOGNOTICE)
+	#xbmc.log('[plugin.video.megahfilmeshd] L230 ' + str(urlF), xbmc.LOGNOTICE)
 	return urlF
 
 
@@ -298,11 +298,13 @@ def player(name,url,iconimage):
 				urlF = srvsdub[i]['data-player-content']
 				iframe = BeautifulSoup(urlF)
 				urlD = iframe.iframe['src']
+				xbmc.log('[plugin.video.megahfilmeshd] L301 ' + str(urlD), xbmc.LOGNOTICE)
+				'''
 				if totD == 1 :
 					urlVideo = urlD
 				else:
 					link  = openURL(urlD)
-					link  = unicode(link, 'utf-8', 'ignore')
+					#link  = unicode(link, 'utf-8', 'ignore')
 					soup	 = BeautifulSoup(link)
 					#urlVideo = soup.iframe['src']
 					links = soup.findAll('iframe')
@@ -310,15 +312,19 @@ def player(name,url,iconimage):
 						#urlVideo = links[0]['src']
 						urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
 					else:
-						urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
-						xbmc.log('[plugin.video.megahfilmeshd] L313 ' + str(urlVideo), xbmc.LOGNOTICE)
+						xbmc.log('[plugin.video.megahfilmeshd] L314 ' + str(link), xbmc.LOGNOTICE)
+						#urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
+						token = re.findall(r'<a href="http://acessoaoface.info/redir.php\?token=(.+?)" target="_blank" class="big-icon-link">', str(link))[0]
+						urlVideo = base64.b64decode(token)
+						xbmc.log('[plugin.video.megahfilmeshd] L316 ' + str(urlVideo), xbmc.LOGNOTICE)
 						#urlVideo = links[1]['src']
 						#opID =	urlVideo.split('?')[1]
 						#opID = opID.split('=')[1]
 						#urlVideo = "http://openload.co/embed/" + opID
+				'''
 				srv = srvsdub[i].text
 				titsT.append(srv)
-				url2.append(urlVideo)
+				url2.append(urlD)
 
 		if not titsT : return
 
@@ -334,15 +340,16 @@ def player(name,url,iconimage):
 				soup = BeautifulSoup(html)
 				xbmc.log('[plugin.video.megahfilmeshd] L334 ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = soup.iframe["src"]
-		if 'action' in urlVideo :
+		elif 'action' in urlVideo :
 				html = openURL(urlVideo)
 				soup = BeautifulSoup(html)
 				urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(html))[0]
 				xbmc.log('[plugin.video.megahfilmeshd] L340 ' + str(urlVideo), xbmc.LOGNOTICE)
-				
+		'''
 		t = requests.get(urlVideo)
 		urlVideo = t.url
-
+		'''
+		
 		#conteudo = soup("div", {"class": "player-video"})
 		#links = conteudo[i]("iframe")
 
@@ -362,10 +369,14 @@ def player(name,url,iconimage):
 				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
 
 		elif 'megahfilmeshd.net' in urlVideo :
-				okID = urlVideo.split('=')[1]
+				okID = urlVideo.split('url=')[1]
 				okID = base64.b64decode(okID)
-				okID = okID.replace('id=','').replace('&type=o','')
-				urlVideo = 'https://openload.co/embed/%s' % okID
+				if 'type=o' in okID:
+					okID = okID.replace('id=','').replace('&type=o','')
+					urlVideo = 'https://openload.co/embed/%s' % okID
+				elif 'type=t' in okID:
+					okID = okID.replace('id=','').replace('&type=t','')
+					urlVideo = 'https://thevid.net/e/%s' % okID
 
 		elif 'thevid.net' in urlVideo :
 				okID = urlVideo.split('e/')[1]
@@ -491,10 +502,14 @@ def player_series(name,url,iconimage):
 				urlVideo = 'https://openload.co/embed/%s' % nowID
 
 		elif 'megahfilmeshd.net' in urlVideo :
-				okID = urlVideo.split('=')[1]
+				okID = urlVideo.split('url=')[1]
 				okID = base64.b64decode(okID)
-				okID = okID.replace('id=','').replace('&type=o','')
-				urlVideo = 'https://openload.co/embed/%s' % okID
+				if 'type=o' in okID:
+					okID = okID.replace('id=','').replace('&type=o','')
+					urlVideo = 'https://openload.co/embed/%s' % okID
+				elif 'type=t' in okID:
+					okID = okID.replace('id=','').replace('&type=o','')
+					urlVideo = 'http://thevid.net/e/%s' % okID
 
 		elif 'video.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
