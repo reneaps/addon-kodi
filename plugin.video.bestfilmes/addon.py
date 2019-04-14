@@ -7,15 +7,15 @@
 # Atualizado (1.0.0) - 03/07/2018
 # Atualizado (1.0.1) - 09/07/2018
 # Atualizado (1.0.2) - 22/07/2018
+# Atualizado (1.0.3) - 14/04/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import urlresolver
 import requests
 
-from bs4 			import BeautifulSoup
+from bs4 		import BeautifulSoup
 from urlparse 		import urlparse
-#from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib	import jsunpack
 
 addon_id  = 'plugin.video.bestfilmes'
@@ -116,8 +116,7 @@ def getTemporadas(url):
 		links = soup("iframe")
 		for i in links:
 			if "playtop" in str(i) : urlF = i["src"]
-		img = soup('div', {'id':'dt_galery'})
-		#xbmc.log('[plugin.video.bestfilmes] L116 - ' + str(soup), xbmc.LOGNOTICE)
+		img = soup('div', {'class':'poster'})
 		imgF = img[0].img['src']
 		link  = openURL(urlF)
 		link = unicode(link, 'utf-8', 'ignore')
@@ -143,7 +142,7 @@ def getEpisodios(name, url, iconimage):
 		soup = BeautifulSoup(link, "html.parser")
 		links = soup.findAll('a',{'class':'video'})
 		links2 = re.findall(r'addiframe\(\'(.+?)\'\);', link)
-		epis = re.findall(r'<a class="video" href="javascript: InitPlayer\(\'(.+?)\', \'(.+?)\',\'(.+?)\'\);">(.+?)<\/a>', str(links))
+		epis = re.findall(r'<a class="video" href="javascript: InitPlayer\(\'(.+?)\', \'(.+?)\',\'(.+?)\'\);" onclick=".+?" style="">(.+?)</a>', str(links))
 		totF = len(links2)
 		temp = []
 		episodios = []
@@ -173,7 +172,6 @@ def doPesquisaSeries(url):
 				
 				link = openURL(url)
 				link = unicode(link, 'utf-8', 'ignore')
-				xbmc.log('[plugin.video.bestfilmes] L171 - ' + str(url), xbmc.LOGNOTICE)
 				soup     = BeautifulSoup(link, "html.parser")
 				conteudo = soup("div", {"class": "search-page"})
 				filmes   = conteudo[0]("div", {"class": "thumbnail animation-2"})
