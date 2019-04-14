@@ -19,6 +19,7 @@
 # Atualizado (2.0.3) - 12/03/2019
 # Atualizado (2.0.4) - 14/03/2019
 # Atualizado (2.0.5) - 11/04/2019
+# Atualizado (2.0.6) - 14/04/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -122,6 +123,9 @@ def getTemporadas(url):
 		soup = BeautifulSoup(link)
 		filmes = soup('div', {'id':'seasons'})
 		seasons = filmes[0]('div',{'class':'item get_episodes'})
+		info = soup('div', {'class':'infos'})
+		sname = info[0].h2.text.encode('utf-8')
+		xbmc.log('[plugin.video.megahfilmeshd] L127 ' + str(sname), xbmc.LOGNOTICE)
 		urlF = url
 		totD = len(seasons)
 
@@ -143,6 +147,7 @@ def getEpisodios(name, url):
 		n = name.replace('ª Temporada', '')
 		n = int(n)
 		n = (n-1)
+		s = n
 		temp = []
 		episodios = []
 
@@ -151,6 +156,8 @@ def getEpisodios(name, url):
 
 		soup = BeautifulSoup(link)
 		filmes = soup.findAll('div', {'id':'seasons'})
+		info = soup('div', {'class':'infos'})
+		sname = info[0].h2.text.encode('utf-8')
 		seasons = filmes[0]('div',{'class':'item get_episodes'})
 		idseasons = seasons[n]['data-row-id']
 		data = urllib.urlencode({'action':'episodes','season':idseasons})
@@ -164,7 +171,7 @@ def getEpisodios(name, url):
 		response.close()
 		d = json.loads(content)
 		b = d['episodes']
-		#xbmc.log('[plugin.video.megahfilmeshd] L166 ' + str(b), xbmc.LOGNOTICE)
+		#xbmc.log('[plugin.video.megahfilmeshd] L173 ' + str(b), xbmc.LOGNOTICE)
 		'''
 		imgF = ""
 		img = soup.find("meta", {"property": "og:image"})
@@ -177,7 +184,7 @@ def getEpisodios(name, url):
 		img = imgF[0]
 		
 		for i in range(0, len(b)):
-				titF = b[str(i)]['name'].encode('utf-8')
+				titF = b[str(i)]['ep'].encode('utf-8')
 				idname = b[str(i)]['id']
 				urlF = pega(idname)
 				if urlF == "" : titF = titF + ">>Indisponivel"
@@ -188,7 +195,28 @@ def getEpisodios(name, url):
 		total = len(episodios)
 
 		for url, titulo in episodios:
-				titulo = titulo.replace('ª e',' - E')
+				t = str(n+1)
+				e = int(titulo)
+				if len(t) == 1 :
+
+					if e < 10:
+
+						titulo = sname+' - S'+'0'+t+'E'+'0'+str(e)
+
+					else:
+
+						titulo = sname+' - S'+'0'+t+'E'+str(e)
+
+				else:
+
+					if e < 10:
+
+						titulo = sname+' - S'+t+'E'+'0'+str(e)
+
+					else:
+
+						titulo = sname+' - S'+t+'E'+str(e)
+				#titulo = sname + " - " + "T " + str(n+1) + " - E " +titulo #+titulo.replace('ª e','ª E')
 				#xbmc.log('[plugin.video.megahfilmeshd] L192 ' + str(url), xbmc.LOGNOTICE)
 				addDirF(titulo, url, 110, img, False, total)
 
