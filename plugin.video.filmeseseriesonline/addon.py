@@ -150,11 +150,12 @@ def getTemporadas(url):
         totF = len(temporadas)
         img = soup.find("div", {"class": "capa-thumb"})
         urlF = url
+        pltF = sinopse(urlF)
         i = 1
         while i <= totF:
             titF = str(i) + "ª Temporada"
             try:
-                addDirF(titF, urlF, 27, iconimage)
+                addDirF(titF, urlF, 27, iconimage, True, totF, pltF)
             except:
                 pass
             i = i + 1
@@ -264,7 +265,9 @@ def doPesquisaSeries():
         total = len(a)
         for url2, titulo, img in a:
             addDir(titulo, url2, 26, img, False, total)
-
+            
+        xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
+        
 def doPesquisaFilmes():
         a = pesquisa()
         total = len(a)
