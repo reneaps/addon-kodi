@@ -16,6 +16,7 @@
 # Atualizado (1.0.9) - 21/03/2019
 # Atualizado (1.1.0) - 22/03/2019
 # Atualizado (1.1.1) - 08/04/2019
+# Atualizado (1.1.2) - 23/04/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -156,6 +157,11 @@ def getEpisodios(name, url):
 		soup = BeautifulSoup(link)
 		conteudo = soup("div", {"class": "videos"})
 		arquivo = conteudo[0]("li", {"class": "video" + str(n) + "-code"})
+		perfil = soup('div',{'id':'perfil_conteudo'})
+
+		sname = perfil[0].h1.text.encode('utf-8')
+
+		sname = sname.split('-')[0].strip()
 
 		try:
 			temporadas = arquivo[0]('table')
@@ -167,7 +173,7 @@ def getEpisodios(name, url):
 			for filme in filmes:
 					titF = filme.text.decode('unicode-escape').encode('utf-8')
 					titF = titF.replace('Assistir ','').replace('Filme ','').replace('Episdio', 'Episodio') + " " +audio #" Dublado"
-					titF = str(n) + "T " + titF
+					titF = sname + " "+str(n) + "T " + titF
 					urlF = filme.get("href").encode('utf-8', 'ignore')
 					urlF = base + urlF
 					temp = (titF, urlF)
@@ -183,9 +189,9 @@ def getEpisodios(name, url):
 			totF = len(filmes)
 
 			for filme in filmes:
-					titF = filme.text .decode('unicode-escape').encode('utf-8')
-					titF = titF.replace('Assistir ','').replace('Filme ','') + " " +audio #" Legendado"
-					titF = str(n) + "T " + titF
+					titF = filme.text.decode('unicode-escape').encode('utf-8')
+					titF = titF.replace('Assistir ','').replace('Filme ','').replace('Episdio', 'Episodio') + " " +audio #" Legendado"
+					titF = sname + " "+str(n) + "T " + titF
 					urlF = filme.get("href").encode('utf-8', 'ignore')
 					urlF = base + urlF
 					temp = (titF, urlF)
@@ -261,6 +267,7 @@ def player(name,url,iconimage):
 		mensagemprogresso = xbmcgui.DialogProgress()
 		mensagemprogresso.create('VerFilmes', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
 		mensagemprogresso.update(0)
+		xbmc.log('[plugin.video.verfilmes] L264 ' + str(url), xbmc.LOGNOTICE)
 
 		titsT = []
 		matriz = []
