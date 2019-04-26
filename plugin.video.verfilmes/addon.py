@@ -17,6 +17,7 @@
 # Atualizado (1.1.0) - 22/03/2019
 # Atualizado (1.1.1) - 08/04/2019
 # Atualizado (1.1.2) - 23/04/2019
+# Atualizado (1.1.3) - 26/04/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -372,6 +373,7 @@ def player(name,url,iconimage):
 				xbmcPlayer.setSubtitles(legendas)
 
 def player_series(name,url,iconimage):
+		xbmc.log('[plugin.video.verfilmes] L375 ' + str(url), xbmc.LOGNOTICE)
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
 		mensagemprogresso.create('VerFilmes', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -381,7 +383,6 @@ def player_series(name,url,iconimage):
 		links = []
 		hosts = []
 		matriz = []
-		xbmc.log('[plugin.video.verfilmes] L374 ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		soup  = BeautifulSoup(link)
 		conteudo = soup("div", {"class":"itens"})
@@ -410,10 +411,11 @@ def player_series(name,url,iconimage):
 
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 
+		'''
 		link = openURL(urlVideo)
 		soup  = BeautifulSoup(link)
 		conteudo = soup.findAll("iframe")
-		xbmc.log('[plugin.video.verfilmesBiz - player_series -L408] ' + str(conteudo), xbmc.LOGNOTICE)
+		#xbmc.log('[plugin.video.verfilmesBiz - player_series -L408] ' + str(conteudo), xbmc.LOGNOTICE)
 		urlVideo = conteudo[0].get('src')
 		if 'openlink' in urlVideo:
 				t = requests.get(urlVideo)
@@ -423,15 +425,20 @@ def player_series(name,url,iconimage):
 				r = requests.get(urlVideo)
 				xbmc.log('[plugin.video.verfilmesBiz - player_series - L416] ' + str(r.url), xbmc.LOGNOTICE)
 				#urlVideo = r.url.split('=')[1]
-				urlVideo = str(r.url)
-						
+				urlVideo = str(r.url)'''
+				
 		xbmc.log('[plugin.video.verfilmesBiz - player_series - L420] ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
-		if 'openload2' in urlVideo :
+		if 'opload2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
+				fxID = fxID.split('/')[0]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
+
+		elif 'mango2=' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				urlVideo = 'http://streamango.com/embed/%s' % fxID
 
 		elif 'oload.fun' in urlVideo :
 				fxID = urlVideo.split('/')[4]
@@ -451,7 +458,19 @@ def player_series(name,url,iconimage):
 				urlVideo = 'http://vidzi.tv/%s.html' % fxID
 
 		elif 'rv.opensv.biz' in urlVideo :
-				fxID = urlVideo.split('biz/')[1]
+				fxID = urlVideo.split('e/')[1]
+				fxID = fxID.replace('html','')
+				urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
+
+		elif 'tvid=' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				fxID = fxID.split('&')[0]
+				fxID = fxID.replace('html','')
+				urlVideo = 'https://thevid.net/e/%s' % fxID
+
+		elif 'rvid2=' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				fxID = fxID.split('&')[0]
 				fxID = fxID.replace('html','')
 				urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
 
