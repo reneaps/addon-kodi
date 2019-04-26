@@ -16,7 +16,7 @@ except:
 	import simplejson as json
 h = HTMLParser.HTMLParser()
 
-versao = '0.0.8'
+versao = '0.0.9'
 addon_id = 'plugin.video.filmesonlinex'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -162,10 +162,10 @@ def player(name,url,iconimage):
 	imgF = False
 	html = abrir_url(url)
 	imgF = re.compile(r'<div class="poster"><img width=".+?" height=".+?" src="(.*?)" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" />').findall(html)[0]
-	link_houst = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[1]
-	xbmc.log('[plugin.video.filmesonlinex] L166 - ' + str(link_houst), xbmc.LOGNOTICE)
+	xbmc.log('[plugin.video.filmesonlinex] L165 - ' + str(url), xbmc.LOGNOTICE)
+	link_houst = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[0]
 	if not link_houst:
-		link_houst = re.compile(r'<div class=\'mob\'><a class=\'video\' rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[1]
+		link_houst = re.compile(r'<div class=\'mob\'><a class=\'video\' rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[0]
 	print link_houst
 	if not "openload" in link_houst: html = abrir_url(link_houst)
 	if "INDISPONÍVEL" in html: return
