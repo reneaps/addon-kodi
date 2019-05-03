@@ -30,6 +30,7 @@
 # Atualizado (1.2.3) - 10/03/2019
 # Atualizado (1.2.4) - 07/04/2019
 # Atualizado (1.2.5) - 16/04/2019
+# Atualizado (1.2.6) - 02/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -343,11 +344,15 @@ def player(name,url,iconimage):
 
         elif 'ok=' in urlVideo :
                 fxID = urlVideo.split('=')[1]
-                urlVideo = 'http://ok.ru/videoembed/%s' % fxID
+                urlVideo = 'http://ok.ru/video/%s' % fxID
 
         elif 'raptu' in urlVideo :
                 fxID = urlVideo.split('=')[1]
                 urlVideo = 'https://www.raptu.com/?v=%s' % fxID
+
+        elif 'videoplayer=' in urlVideo :
+                fxID = urlVideo.split('=')[1]
+                urlVideo = 'https://www.fembed.com/v/%s' % fxID
 
         elif 'megavid' in urlVideo :
                 fxID = urlVideo.split('=')[1]
@@ -525,10 +530,9 @@ def player_series(name,url,iconimage):
                 fxID = urlVideo.split('=')[1]
                 urlVideo = 'http://ok.ru/video/%s' % fxID
 
-        elif 'videoplayer' in urlVideo :
+        elif 'videoplayer=' in urlVideo :
                 fxID = urlVideo.split('=')[1]
-                url2Play = 'https://filmesonline.vc/v/%s' % fxID
-                OK = False
+                urlVideo = 'https://www.fembed.com/v/%s' % fxID
 
         elif 'vidoza' in urlVideo :
                 fxID = urlVideo.split('=')[1]
@@ -710,9 +714,13 @@ def sinopse(urlF):
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html5lib")
         #conteudo = soup("div", {"class": "content clearfix"})
-        p = soup('p', limit=5)[1]
-        #print conteudo
-        plot = p.text.replace('kk-star-ratings','')
+        try:
+            p = soup('p', limit=5)[1]
+            #print conteudo
+            plot = p.text.replace('kk-star-ratings','')
+        except:
+            plot = 'Sem Sinopse'
+            pass
         return plot
 
 ############################################################################################################
