@@ -5,6 +5,7 @@
 # By AddonBrasil - 11/12/2015
 # Atualizado (1.0.0) - 29/06/2018
 # Atualizado (1.0.1) - 22/07/2018
+# Atualizado (1.0.2) - 23/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -16,7 +17,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib				 import jsunpack
 from time						 import time
 
-version	  = '1.0.1'
+version	  = '1.0.2'
 addon_id  = 'plugin.video.midiaflixhd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -28,14 +29,14 @@ base		= base64.b64decode('aHR0cDovL3d3dy5taWRpYWZsaXhoZC5uZXQv')
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias'				, base + ''								,	10, artfolder + 'categorias.png')
-		addDir('Lançamentos'			, base + 'filmes/'						,	20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'		, base + '?s=dublado'					,	20, artfolder + 'pesquisa.png')
-		addDir('Seriados'				, base + 'series/'						,	25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'		, '--'									,	30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'		, '--'									,	35, artfolder + 'pesquisa.png')
-		addDir('Configurações'			, base									,  999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo' , base								, 1000, artfolder + 'config.png', 1, False)
+		addDir('Categorias'				, base + ''								,		10, artfolder + 'categorias.png')
+		addDir('Lançamentos'			, base + 'categoria/filmes-online-lancamentos/',20, artfolder + 'lancamentos.png')
+		addDir('Filmes Dublados'		, base + '?s=dublado'					,		20, artfolder + 'pesquisa.png')
+		addDir('Seriados'				, base + 'series/'						,		25, artfolder + 'legendados.png')
+		addDir('Pesquisa Series'		, '--'									,		30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'		, '--'									,		35, artfolder + 'pesquisa.png')
+		addDir('Configurações'			, base									,	   999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo' , base								,	  1000, artfolder + 'config.png', 1, False)
 
 		setViewMenu()
 
@@ -292,23 +293,33 @@ def player(name,url,iconimage):
 		url2 = []
 		matriz = []
 
-		link  = openURL(url)
-		xbmc.log('[plugin.video.midiaflixhd] L295 - ' + str(url), xbmc.LOGNOTICE)
+		link = openURL(url)
 		soup = BeautifulSoup(link)
+		dooplay = re.findall(r'<li id="player-option-1" class="dooplay_player_option jump" data-type="(.+?)" data-post="(.+?)" data-nume="(.+?)">', link)
 		try:
-			urlF = soup.iframe["data-lazy-src"]
+			for dtype, dpost, dnume in dooplay:
+				print dtype, dpost, dnume
+			headers = {'Referer': url, 
+					   'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+					   'Host': 'www.midiaflixhd.net',
+					   'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+			}
+			urlF = 'https://www.midiaflixhd.net/wp-admin/admin-ajax.php'
+			data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
+			xbmc.log('[plugin.video.midiaflixhd] L305 - ' + str(data), xbmc.LOGNOTICE)
+			r = requests.post(url=urlF, data=data, headers=headers)
+			html = r.content
+			soup = BeautifulSoup(html)
+			urlF = soup.iframe['src']
+			xbmc.log('[plugin.video.midiaflixhd] L308 - ' + str(html), xbmc.LOGNOTICE)
 		except:
 			pass
-		try:
-			urlF = soup.iframe["src"]
-		except:
-			pass
-		xbmc.log('[plugin.video.midiaflixhd] L305 - ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.midiaflixhd] L312 - ' + str(urlF), xbmc.LOGNOTICE)
 		html = openURL(urlF)
 		urlVideo = urlF
 		try:
 			urlVideo = re.findall(r'var JWp = \{\'mp4file\': \'(.+?)\',', html)[0]
-			xbmc.log('[plugin.video.midiaflixhd] L310 - ' + str(html), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.midiaflixhd] L315 - ' + str(html), xbmc.LOGNOTICE)
 			url2Play = urlVideo
 			OK = False
 			print urlVideo
@@ -321,7 +332,7 @@ def player(name,url,iconimage):
 			r = urllib2.urlopen(url2Play)
 			url2Play = r.geturl()
 			OK = False
-			xbmc.log('[plugin.video.midiaflixhd] L325 - ' + str(url2Play), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.midiaflixhd] L329 - ' + str(url2Play), xbmc.LOGNOTICE)
 		except:
 			pass
 		try:
@@ -329,11 +340,11 @@ def player(name,url,iconimage):
 			url2Play = urlVideo
 			OK = False
 			OK = False
-			xbmc.log('[plugin.video.midiaflixhd] L333 - ' + str(url2Play), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.midiaflixhd] L337 - ' + str(url2Play), xbmc.LOGNOTICE)
 		except:
 			pass			
 
-		xbmc.log('[plugin.video.midiaflixhd] L337 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.midiaflixhd] L341 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 		
@@ -358,11 +369,51 @@ def player(name,url,iconimage):
 				urlF = soup.source["src"]
 				url2Play = urlF
 				xbmc.log('[plugin.video.midiaflixhd] L353 - ' + str(urlVideo), xbmc.LOGNOTICE)
-				OK = False				
+				OK = False	
+			
+		elif 'play.midiaflixhd.com' in urlVideo:
+				r = requests.get(urlVideo)
+				html = r.content
+				soup = BeautifulSoup(html)
+				#xbmc.log('[plugin.video.midiaflixhd] L378 - ' + str(html), xbmc.LOGNOTICE)
+				match = re.findall('\tidS:\s*"(.+?)"\r', html)
+				for x in match:
+					idsT.append(x)
+				match = re.findall('\t<button id="Servidores" class="button-xlarge pure-button" svid=".+?">(.+?)</button>\r', html)
+				for x in match:
+					titsT.append(x)
+
+				if not titsT : return
+
+				index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
+
+				if index == -1 : return
+
+				i = int(index)
+				idS = idsT[i]
+
+				headers = {'Referer': url, 
+						   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+						   'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+						   'Host': 'play.midiaflixhd.com',
+						   'Connection': 'keep-alive',
+						   'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+				}
+				urlF ='https://play.midiaflixhd.com/CallPlayer'
+				data = urllib.urlencode({'id': idS})
+				r = requests.post(url=urlF, data=data, headers=headers)
+				html = r.content
+				soup = BeautifulSoup(html)
+				_html = str(html)
+				b = json.loads(_html.decode('hex'))
+				urlF = b['url']
+				urlVideo = urlF
+				xbmc.log('[plugin.video.midiaflixhd] L398 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				#OK = False	
 				
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
-		xbmc.log('[plugin.video.midiaflixhd] L358 - ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.midiaflixhd] L403 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		if not url2Play : return
 
@@ -485,6 +536,20 @@ def openURL(url):
 		req.add_header('Referer',url)
 		req.add_header('Upgrade-Insecure-Requests',1)
 		req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
+		response = urllib2.urlopen(req)
+		link=response.read()
+		response.close()
+		return link
+
+def postURL(url):
+		headers = {'Referer': base, 
+				   'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+				   'Host': 'www.midiaflixhd.net',
+				   'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+		}
+
+		req = urllib2.Request(url, "",headers)
+		req.get_method = lambda: 'POST'
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
