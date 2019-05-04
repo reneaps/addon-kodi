@@ -12,6 +12,7 @@
 # Atualizado (1.0.7) - 16/06/2018
 # Atualizado (1.0.8) - 09/07/2018
 # Atualizado (1.0.9) - 18/04/2018
+# Atualizado (1.1.0) - 04/05/2018
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -36,7 +37,7 @@ base        = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNvbmxpbmVoZDExLmNj')
 def menuPrincipal():
 		addDir('Categorias'					, base							,   10, artfolder + 'categorias.png')
 		addDir('Lançamentos'				, base + '/lancamentos/'		,   20, artfolder + 'new.png')
-		addDir('Filmes Dublados'			, base + '/?s=dublado&submit=' 	,   20, artfolder + 'pesquisa.png')
+		addDir('Filmes Dublados'			, base + '/search?q=dublado' 	,   20, artfolder + 'pesquisa.png')
 		addDir('Seriados'					, base + '/series/'				,   25, artfolder + 'series.png')
 		addDir('Pesquisa Series'			, '--'							,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'			, '--'							,   35, artfolder + 'pesquisa.png')
@@ -64,20 +65,21 @@ def getCategorias(url):
 		setViewMenu()
 
 def getFilmes(url):
-		#xbmc.log('[plugin.video.filmesonlinehd11] L66 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L66 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
-		conteudo = soup.findAll("div", {"class": "ui main inverted segment"})
+		conteudo = soup("div", {"class": "ui inverted raised segment"})
 		if not conteudo :
-			conteudo = soup.findAll("div", {"class": "ui five special doubling cards"})
+			conteudo = soup("div", {"class": "ui five special doubling cards"})
 		filmes   = conteudo[0]("a", {"class": "ui card"})
 		
 		totF = len(filmes)
 		
 		for filme in filmes:
 				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
-				if not 'Temporada' in titF :
+				titF = cap_name(titF)
+				if not 'temporada' in titF.lower() :
 					urlF = filme["href"].encode('utf-8')
 					imgF = filme.img["data-src"].encode('utf-8')
 					addDirF(titF, urlF, 100, imgF, False, totF)
@@ -101,7 +103,7 @@ def getSeries(url):
 		totF = len(filmes)
 		
 		for filme in filmes:
-				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
+				titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '').capitalize()
 				urlF = filme["href"].encode('utf-8')
 				imgF = filme.img["data-src"]
 				#imgF = "http:" + imgF
@@ -153,7 +155,7 @@ def getTemporadas(url):
 			totF = len(srvsdub)
 
 			for i in range(totF):
-					titF = srvsdub[i]["Nome"].encode('utf-8')
+					titF = srvsdub[i]["Nome"].encode('utf-8').capitalize()
 					#titF = titF.replace('\u00aa','ª')
 					urlF = srvsdub[i]["Url"]
 					addDir(titF, urlF, 28, imgF, False, totF)
@@ -165,7 +167,7 @@ def getTemporadas(url):
 			seasons = seasons.split(",")
 			totF = len(seasons)
 			for i in seasons:
-					titF = i.encode('utf-8')
+					titF = i.encode('utf-8').capitalize()
 					titF = titF + "a Temporada"
 					addDir(titF, url, 28, imgF, False, totF)
 		except:
@@ -199,7 +201,7 @@ def getEpisodios(name, url, iconimage):
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
 		conteudo = soup.findAll("div", {"class":"ui embed dimmable"})
-
+		xbmc.log('[plugin.video.filmesonlinehd11] L204 - ' + str(soup), xbmc.LOGNOTICE)
 		urlF  = conteudo[0]["data-url"]
 		xbmc.log('[plugin.video.filmesonlinehd11] L204 - ' + str(urlF), xbmc.LOGNOTICE)
 
@@ -253,16 +255,17 @@ def pesquisa():
 				link  = openURL(url)
 				link = unicode(link, 'utf-8', 'ignore')
 				soup     = BeautifulSoup(link)
-				conteudo = soup.findAll("div", {"class": "ui main inverted segment"})
-				if not conteudo :
-					conteudo = soup.findAll("div", {"class": "ui six special doubling cards"})
+				conteudo = soup("div", {"class": "ui five special doubling cards"})
 				filmes   = conteudo[0]("a", {"class": "ui card"})
+
 				totF = len(filmes)
+
 				for filme in filmes:
 						titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
-						urlF = "http:" + filme["href"].encode('utf-8')
-						imgF = filme.img["src"].encode('utf-8')
-						temp = (urlF,titF)
+						urlF = filme["href"]
+						imgF = filme.img["data-src"]
+						xbmc.log('[plugin.video.filmesonlinehd11] L266 - ' + str(filme), xbmc.LOGNOTICE)
+						temp = (urlF,titF,imgF)
 						hosts.append(temp)
 
 				a = []
@@ -348,7 +351,7 @@ def player(name,url,iconimage):
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://openload.co/embed/%s' % okID
 
-		elif 'actelecup.com' in urlVideo :
+		elif '2actelecup.com' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'http://actelecup.com/video/%s/iframe' % okID
 				xbmc.log('[plugin.video.filmesonlinehd11] L354 - ' + str(urlVideo), xbmc.LOGNOTICE)
@@ -396,6 +399,22 @@ def player(name,url,iconimage):
 
 				OK = False
 				xbmc.log('[plugin.video.filmesonlinehd11] L357 - ' + str(url2Play), xbmc.LOGNOTICE)
+
+		elif 'actelecup.com' in urlVideo :
+				okID = urlVideo.split('/')[4]
+				urlVideo = 'http://actelecup.com/video/%s/iframe' % okID
+				xbmc.log('[plugin.video.filmesonlinehd11] L290 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				urlVideo = moonwalk.get_playlist(urlVideo)
+				urlVideo = urlVideo[0]
+				qual = []
+				for i in urlVideo:
+						qual.append(str(i))
+				index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
+				if index == -1 : return
+				i = int(qual[index])
+				url2Play = urlVideo[i]
+				OK = False
+				#xbmc.log('[plugin.video.filmesonlinehd11] L293 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		elif 'thevid' in urlVideo :
 				okID = urlVideo.split('e/')[1]
@@ -674,6 +693,15 @@ def limpa(texto):
 		texto = texto.lower()
 
 		return texto
+
+def cap_name(name):
+		items = []
+		p = ['da', 'de', 'di', 'do', 'du', 'para']
+		for item in name.split():
+		    if not item in p:
+		        item = item.capitalize()
+		    items.append(item)
+		return ' '.join(items)
 
 ############################################################################################################
 
