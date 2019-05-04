@@ -4,6 +4,7 @@
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.urlresolver" version="1.0.0"/>
         <import addon="script.extendedinfo" />
+		<import addon="script.module.videohosts" version="1.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
         <import addon="script.module.requests" version="2.9.1"/>
   </requires>
