@@ -33,8 +33,6 @@ sbase        = 'http://vseries.me/'
 def menuPrincipal():
 		addDir('Categorias'                 , base                              ,   10, artfolder + 'categorias.png')
 		addDir('Lançamentos'                , base + '/filmes/lancamentos/'     ,   20, artfolder + 'ultimos.png')
-		addDir('Filmes em HD'               , base + '/filmes/filmes-hd/'       ,   20, artfolder + 'filmes.png')
-		addDir('Filmes Dublados'            , base + '/?s=dublado&tipo=video'   ,   20, artfolder + 'filmes.png')
 		addDir('Series'                     , sbase + '/series-hd/'             ,   25, artfolder + 'series.png')
 		addDir('Pesquisa Series'            , '--'                              ,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'            , '--'                              ,   35, artfolder + 'pesquisa.png')
@@ -46,21 +44,20 @@ def menuPrincipal():
 def getCategorias(url):
 		link = openURL(url)
 		soup = BeautifulSoup(link, "html5lib")
-		conteudo = soup("div", {"class": "container"})
-		arquivo = conteudo[4]("div", {"class": "lista-amigos"})
-		categorias = arquivo[0]("a")
-
+		conteudo = soup("div", {"class": "bgct"})
+		arquivo = conteudo[0]("ul")
+		categorias = arquivo[0]("li")
 		totC = len(categorias)
 
 		for categoria in categorias:
-				titC = categoria.span.text.encode('utf-8','replace')
+				titC = categoria.a['title'].encode('utf-8','replace')
 				titC = titC.replace('Assistir Filmes ', '').replace('Online ', '')
 				titC = titC.replace('de ', '').replace('Assistir ', '')
 
-				if not 'Lançamento' in titC :
-					if not 'Séries' in titC:
+				if not 'Lançamentos' in titC :
+					if not 'series online' in titC:
 						if not 'Filmes' in titC:
-							urlC = categoria["href"]
+							urlC = base + categoria.a['href']
 							imgC = "" #categoria.img["src"]
 							addDir(titC,urlC,20,imgC)
 
@@ -76,10 +73,10 @@ def getFilmes(url):
 		print totF
 
 		for filme in filmes:
-			titF = filme.a['title'].encode('utf-8')
+			titF = filme.a['title'].encode('utf-8').replace('Assistir ','')
 			urlF = filme.a['href']
 			imgF = filme.img['src']
-			xbmc.log('[plugin.video.gofilmes] L82 - ' + str(urlF), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.gofilmes] L79 - ' + str(urlF), xbmc.LOGNOTICE)
 			pltF = ''
 			addDirF(titF, urlF, 100, imgF, False, totF, pltF)
 
@@ -108,7 +105,7 @@ def getSeries(url):
 			titF = filme('div',{'class':'tt'})[0].text.encode('utf-8')
 			urlF = sbase + filme.a['href']
 			imgF = filme.img['src']
-			xbmc.log('[plugin.video.gofilmes] L111 - ' + str(urlF), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.gofilmes] L108 - ' + str(urlF), xbmc.LOGNOTICE)
 			addDir(titF, urlF, 26, imgF)
 
 		try :
@@ -146,61 +143,47 @@ def getTemporadas(url):
 		xbmcplugin.setContent(int(sys.argv[1]), 'seasons')
 
 def getEpisodios(name, url):
+		xbmc.log('[plugin.video.gofilmes] L146 - ' + str(url), xbmc.LOGNOTICE)
 		n = name[0] #.replace('ª Temporada', '')
 		n = int(n)
-		n = (n-1)
 		temp = []
 		episodios = []
 
 		html  = openURL(url)
 		link = unicode(html, 'utf-8', 'ignore')
 
-		name = re.findall(r'<div class="p2"><h1><b>Assistir </b>(.+?)<b>.+?</b></h1>', str(html))[0]
-		soup = BeautifulSoup(link, "html5lib")
+		name = re.findall(r'<div class="p2">\n<h1><b>.+?</b>(.+?)<b>.+?</b></h1>\n', str(html))[0]
+		soup = BeautifulSoup(html, "html5lib")
+		img = soup.find("div", {"class": "p1"}).img['src']
 		conteudo = soup('div',{'class':'eps'})
-		texto = str(conteudo)
-		texto1 = texto.replace('<div class="tab_content"></div>','')
-		texto2 = BeautifulSoup(texto1, "html5lib")
-		conteudo = texto2('div',{'class':'tab_content'})
-		arquivo = conteudo[n]('div',{'class':'temp1-view'})
-		xbmc.log('[plugin.video.gofilmes] L166 - ' + str(url), xbmc.LOGNOTICE)
-
-		imgF = ""
-		img = soup.find("div", {"class": "capa-post"})
-		imgF = img.img['src']
-		img = imgF
+		xbmc.log('[plugin.video.gofilmes] L159 - ' + str(n), xbmc.LOGNOTICE)
+		arquivo = conteudo[0]('div',{'class':'temp'+str(n)+'-view'})
+		series = arquivo[0]('ul')
 
 		try:
-			dublados = arquivo[0]('li')
-			au = arquivo[0].text
-			result= re.split(r'Epi', au)
-			audio = result[0].encode('utf-8', 'ignore')
-			audio = audio.replace('\\xaa','ª')
-
-			for link in dublados:
-				if link.a.text != "" :
-					url = link.a["href"].encode('utf-8', 'ignore')
-					titulo = link.a.text.encode('utf-8', 'ignore').replace('\\xf3','ó')
-					titulo = name+" "+audio+" "+titulo
-					temp = (url, titulo)
-					episodios.append(temp)
+			dubs = series[0]('li')
+			audio = series[0].h3.text[0]
+			totF = len(dubs)
+			for dub in dubs:
+				titF = name + ' - ' + dub.span.text + dub.a.text + ' ('+ audio + ')'
+				titF = titF.encode('utf-8', 'ignore')
+				urlF = sbase + dub.a['href']
+				temp = (urlF, titF)
+				episodios.append(temp)
 
 		except:
 			pass
-		try:
-			legendados = arquivo[1]('li')
-			au = arquivo[1].text
-			result= re.split(r'Epi', au)
-			audio = result[0].encode('utf-8')
-			audio = audio.replace('\\xaa','ª')
 
-			for link in legendados:
-				if link.a.text != "" :
-					url = link.a["href"].encode('utf-8', 'ignore')
-					titulo = link.a.text.encode('utf-8', 'ignore').replace('\\xf3','ó')
-					titulo = name +" "+audio+" "+titulo
-					temp = (url, titulo)
-					episodios.append(temp)
+		try:
+			legs = series[1]('li')
+			audio = series[1].h3.text[0]
+			totF = len(legs)
+			for leg in legs:
+				titF = name + ' - ' + leg.span.text + leg.a.text + ' ('+ audio + ')'
+				titF = titF.encode('utf-8', 'ignore')
+				urlF = sbase + leg.a['href']
+				temp = (urlF, titF)
+				episodios.append(temp)
 
 		except:
 			pass
@@ -219,40 +202,61 @@ def pesquisa():
 		if (keyb.isConfirmed()):
 				texto    = keyb.getText()
 				pesquisa = urllib.quote(texto)
-				url      = base + '?s=%s&tipo=video' % str(pesquisa)
-
-				link  = openURL(url)
-				link = unicode(link, 'utf-8', 'ignore')
-
-				soup     = BeautifulSoup(link, "html5lib")
-				conteudo = soup("div", {"class": "filmes"})
-				filmes   = conteudo[0]("div", {"class": "item"})
-				totF = len(filmes)
-				hosts = []
-				for filme in filmes:
-					titF = filme.a.text.encode('utf-8','replace')
-					titF = titF.replace('Assistir ','').replace('Filme ','')
-					urlF = filme.a["href"].encode('utf-8', 'ignore')
-					imgF = filme.img["src"].encode('utf-8', 'ignore')
-					temp = [urlF, titF, imgF]
-					hosts.append(temp)
-
-				a = []
-				for url, titulo, img in hosts:
-					temp = [url, titulo, img]
-					a.append(temp);
-				return a
+				texto = str(pesquisa)
+		return texto
 
 def doPesquisaSeries():
-		a = pesquisa()
+		texto = pesquisa()
+		url = sbase + 'search?q=%s' % str(texto)
+		link  = openURL(url)
+		link = unicode(link, 'utf-8', 'ignore')
+
+		soup = BeautifulSoup(link, "html5lib")
+		conteudo = soup('div',{'class':'main'})
+		filmes = conteudo[0]('div',{'class':'serie'})
+		totF = len(filmes)
+
+		hosts = []
+		for filme in filmes:
+			titF = filme('div',{'class':'tt'})[0].text.encode('utf-8')
+			urlF = sbase + filme.a['href']
+			imgF = filme.img['src']
+			temp = [urlF, titF, imgF]
+			hosts.append(temp)
+
+		a = []
+		for url, titulo, img in hosts:
+			temp = [url, titulo, img]
+			a.append(temp);
 		total = len(a)
+
 		for url2, titulo, img in a:
 			addDir(titulo, url2, 26, img, False, total)
 			
 		xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
 		
 def doPesquisaFilmes():
-		a = pesquisa()
+		texto = pesquisa()
+		url = base + '/search.php?s=%s' % str(texto)
+		html = openURL(url)
+		soup = BeautifulSoup(html, 'html5lib')
+		conteudo = soup('div',{'class':'main'})
+		filmes = conteudo[0]('div',{'class':'poster'})
+		totF = len(filmes)
+
+		hosts = []
+		for filme in filmes:
+			titF = filme.a['title'].encode('utf-8')
+			urlF = filme.a['href']
+			imgF = filme.img['src']
+			temp = [urlF, titF, imgF]
+			hosts.append(temp)
+
+		a = []
+		for url, titulo, img in hosts:
+			temp = [url, titulo, img]
+			a.append(temp);
+
 		total = len(a)
 		for url2, titulo, img in a:
 			addDirF(titulo, url2, 100, img, False, total)
@@ -260,7 +264,7 @@ def doPesquisaFilmes():
 		setViewFilmes()
 
 def player(name,url,iconimage):
-		xbmc.log('[plugin.video.gofilmes] L263 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.gofilmes] L267 - ' + str(url), xbmc.LOGNOTICE)
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
 		mensagemprogresso.create('FilmesESeriesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -298,7 +302,7 @@ def player(name,url,iconimage):
 		i = int(index)
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 
-		xbmc.log('[plugin.video.gofilmes] L301 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.gofilmes] L305 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -313,10 +317,6 @@ def player(name,url,iconimage):
 		elif 'raptu' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://www.raptu.com/?v=%s' % fxID
-
-		elif 'ruvid.nl2' in urlVideo :
-				fxID = urlVideo.split('v/')[1]
-				urlVideo = 'https://www.fembed.com/v/%s' % fxID
 
 		elif 'vidoza' in urlVideo :
 				fxID = urlVideo.split('=')[1]
@@ -350,6 +350,10 @@ def player(name,url,iconimage):
 				url2Play = 'http:%s' % url if url.startswith("//") else url
 				OK = False
 
+		elif 'ruvid.nl' in urlVideo :
+				fxID = urlVideo.split('v/')[-1]
+				urlVideo = 'https://www.fembed.com/v/%s' % fxID
+
 		elif 'alforenao.com/' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'http://alforenao.com//video/%s/iframe' % okID
@@ -365,7 +369,7 @@ def player(name,url,iconimage):
 				url2Play = urlVideo[i]
 				OK = False
 
-		xbmc.log('[plugin.video.gofilmes] L368 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.gofilmes] L372 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if OK :
 			try:
@@ -411,6 +415,7 @@ def player(name,url,iconimage):
 				xbmcPlayer.setSubtitles(legendas)
 
 def player_series(name,url,iconimage):
+		xbmc.log('[plugin.video.gofilmes] L418 - ' + str(url), xbmc.LOGNOTICE)
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
 		mensagemprogresso.create('FilmesESeriesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -426,24 +431,12 @@ def player_series(name,url,iconimage):
 		soup  = BeautifulSoup(link, "html5lib")
 
 		try :
-				conteudo = soup("div", {"class": "geral"})
+				conteudo = soup("div", {"class": "alinha"})
 				srvsdub  = conteudo[0]("a")
 				totD = len(srvsdub)
 				for i in range(totD) :
 						titS = srvsdub[i].text
-						idS = srvsdub[i]["id"]
-						titsT.append(titS)
-						idsT.append(idS)
-		except :
-				pass
-
-		try :
-				conteudo = soup("div", {"class": "geral'"})
-				srvsleg  = conteudo[0]("a")
-				totL = len(srvsleg)
-				for i in range(totL) :
-						titS = srvsdub[i].text
-						idS = srvsleg[i]["id"]
+						idS = srvsdub[i]["href"]
 						titsT.append(titS)
 						idsT.append(idS)
 		except :
@@ -455,7 +448,7 @@ def player_series(name,url,iconimage):
 
 		if index == -1 : return
 
-		conteudo = soup("div", {"class": "geral"})
+		conteudo = soup("div", {"class": "alinha"})
 		links = conteudo[0]("a")
 
 		if len(links) == 0 : links = conteudo[0]("a")
@@ -464,10 +457,10 @@ def player_series(name,url,iconimage):
 
 		urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 		
-		xbmc.log('[plugin.video.gofilmes] L467 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.gofilmes] L460 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-
+		'''
 		if 'openload' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://openload.co/embed/%s' % fxID
@@ -516,7 +509,7 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://fruitstreams.com/embed/%s' % fxID
 
-		elif 'thevid' in urlVideo :
+		elif 'thevid2' in urlVideo :
 				fxID = urlVideo.split('=')[1]
 				urlVideo = 'https://thevid.net/e/%s' % fxID
 				linkTV  = openURL(urlVideo)
@@ -531,7 +524,7 @@ def player_series(name,url,iconimage):
 		elif 'alforenao.com/' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'http://alforenao.com//video/%s/iframe' % okID
-				xbmc.log('[plugin.video.gofilmes] L534 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.gofilmes] L527 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = moonwalk.get_playlist(urlVideo)
 				urlVideo = urlVideo[0]
 				qual = []
@@ -542,8 +535,8 @@ def player_series(name,url,iconimage):
 				i = int(qual[index])
 				url2Play = urlVideo[i]
 				OK = False
-
-		xbmc.log('[plugin.video.gofilmes] L546 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		'''
+		xbmc.log('[plugin.video.gofilmes] L539 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
