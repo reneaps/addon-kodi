@@ -5,13 +5,15 @@
 # By AddonBrasil - 11/12/2015
 # Atualizado (1.0.0) - 29/06/2018
 # Atualizado (1.0.1) - 22/07/2018
-# Atualizado (1.0.2) - 23/05/2019
+# Atualizado (1.0.2) - 23/04/2019
+# Atualizado (1.0.2) - 05/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import json
 import urlresolver
 import requests
+import resources.lib.moonwalk as moonwalk
 
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib				 import jsunpack
@@ -283,6 +285,7 @@ def doPesquisaFilmes():
 		setViewFilmes()
 
 def player(name,url,iconimage):
+		xbmc.log('[plugin.video.midiaflixhd] L286 - ' + str(url), xbmc.LOGNOTICE)
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
 		mensagemprogresso.create('MegaFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -295,7 +298,8 @@ def player(name,url,iconimage):
 
 		link = openURL(url)
 		soup = BeautifulSoup(link)
-		dooplay = re.findall(r'<li id="player-option-1" class="dooplay_player_option jump" data-type="(.+?)" data-post="(.+?)" data-nume="(.+?)">', link)
+		dooplay = re.findall(r'<li id="player-option-1" class="dooplay_player_option.+?" data-type="(.+?)" data-post="(.+?)" data-nume="(.+?)">', link)
+
 		try:
 			for dtype, dpost, dnume in dooplay:
 				print dtype, dpost, dnume
@@ -338,7 +342,6 @@ def player(name,url,iconimage):
 		try:
 			urlVideo = re.findall(r'file: "(.+?)",', html)[2]
 			url2Play = urlVideo
-			OK = False
 			OK = False
 			xbmc.log('[plugin.video.midiaflixhd] L337 - ' + str(url2Play), xbmc.LOGNOTICE)
 		except:
@@ -408,12 +411,43 @@ def player(name,url,iconimage):
 				b = json.loads(_html.decode('hex'))
 				urlF = b['url']
 				urlVideo = urlF
-				xbmc.log('[plugin.video.midiaflixhd] L398 - ' + str(urlVideo), xbmc.LOGNOTICE)
-				#OK = False	
-				
-		if OK : url2Play = urlresolver.resolve(urlVideo)
 
-		xbmc.log('[plugin.video.midiaflixhd] L403 - ' + str(url2Play), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.midiaflixhd] L398 - ' + str(urlVideo), xbmc.LOGNOTICE)
+
+				if 'letsupload.co' in urlVideo:
+						nowID = urlVideo.split("=")[1]
+						urlVideo = "https://letsupload.co/plugins/mediaplayer/site/_embed.php?u=%s" % nowID
+						OK = True
+
+				elif 'video.php' in urlVideo :
+						fxID = urlVideo.split('=')[1]
+						urlVideo = base64.b64decode(fxID)
+						xbmc.log('[plugin.video.midiaflixhd] L423 - ' + str(urlVideo), xbmc.LOGNOTICE)
+						OK = True
+
+						if 'alfastream.cc' in urlVideo:
+								xbmc.log('[plugin.video.midiaflixhd] L427 - ' + str(urlVideo), xbmc.LOGNOTICE)
+								urlVideo = moonwalk.get_playlist(urlVideo)
+								urlVideo = urlVideo[0]
+								qual = []
+								for i in urlVideo:
+										qual.append(str(i))
+								index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
+								if index == -1 : return
+								i = int(qual[index])
+								url2Play = urlVideo[i]
+								OK = False
+
+		if OK :
+			try:
+				url2Play = urlresolver.resolve(urlVideo)
+			except:
+				dialog = xbmcgui.Dialog()
+				dialog.ok(" Erro:", " Video removido! ")
+				url2Play = []
+				pass
+
+		xbmc.log('[plugin.video.midiaflixhd] L421 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		if not url2Play : return
 
@@ -477,7 +511,6 @@ def player_series(name,url,iconimage):
 		if 'open.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'https://openload.co/embed/%s' % nowID
-
 
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 

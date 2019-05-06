@@ -1,9 +1,10 @@
 <?xml version="0.0.1" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.midiaflixhd" name="MidiaFlixHD" version="1.0.2" provider-name="AddonReneSilva">
+<addon id="plugin.video.midiaflixhd" name="MidiaFlixHD" version="1.0.3" provider-name="AddonReneSilva">
   <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.urlresolver" version="1.0.0"/>
-	<import addon="script.module.requests" version="2.9.1"/>
+		<import addon="script.module.videohosts" version="1.0.0"/>
+		<import addon="script.module.requests" version="2.9.1"/>
         <import addon="script.extendedinfo" />
   </requires>
     
