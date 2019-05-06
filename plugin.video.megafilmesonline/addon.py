@@ -36,10 +36,10 @@ version   = '2.0.7'
 addon_id  = 'plugin.video.megafilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
-addonfolder    = selfAddon.getAddonInfo('path')
+addonfolder  = selfAddon.getAddonInfo('path')
 artfolder    = addonfolder + '/resources/img/'
-fanart        = addonfolder + '/fanart.png'
-base        = base64.b64decode('aHR0cHM6Ly9tZWdhaGRmaWxtZXMuY29tLw==')
+fanart       = addonfolder + '/fanart.png'
+base         = base64.b64decode('aHR0cHM6Ly9tZWdhaGRmaWxtZXMuY29tLw==')
 
 ############################################################################################################
 
@@ -96,7 +96,7 @@ def getSeries(url):
         link = unicode(link, 'utf-8', 'ignore')
 
         soup = BeautifulSoup(link)
-        conteudo = soup.findAll('div',{'id':'series-list'})
+        conteudo = soup.findAll('div', {'id':'series-list'})
         filmes = conteudo[0]('a')
         totF = len(filmes)
 
@@ -104,7 +104,7 @@ def getSeries(url):
                 urlF = filme["href"].encode('utf-8')
                 imgF = filme.img["data-original"].encode('utf-8')
                 titF = filme.find('div',{'class':'title'}).text.encode('utf-8')
-                titF = urlF.replace('https://www.megahfilmeshd.net/series/','')
+                titF = urlF.split('/')[4]
                 titF = titF.replace('/','').replace('-',' ').replace('assistir','')
                 titF = titF.replace(' as','').replace('todas','').replace('temporadas','')
                 titF = titF.strip()
@@ -612,8 +612,12 @@ def openConfigEI():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        req = urllib2.Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        headers = {
+        "Referer": url,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"
+    }
+        req = urllib2.Request(url, "",headers)
+        req.get_method = lambda: 'GET'
         response = urllib2.urlopen(req)
         link=response.read()
         response.close()

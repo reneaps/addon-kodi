@@ -9,6 +9,8 @@
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import urlresolver
+import requests
+import json
 import resources.lib.moonwalk as moonwalk
 
 from bs4 import BeautifulSoup
@@ -74,8 +76,8 @@ def getFilmes(url):
 
 		for filme in filmes:
 			titF = filme.a['title'].encode('utf-8').replace('Assistir ','')
-			urlF = filme.a['href']
-			imgF = filme.img['src']
+			urlF = filme.a['href'].encode('utf-8')
+			imgF = filme.img['src'].encode('utf-8')
 			xbmc.log('[plugin.video.gofilmes] L79 - ' + str(urlF), xbmc.LOGNOTICE)
 			pltF = ''
 			addDirF(titF, urlF, 100, imgF, False, totF, pltF)
@@ -103,8 +105,8 @@ def getSeries(url):
 
 		for filme in filmes:
 			titF = filme('div',{'class':'tt'})[0].text.encode('utf-8')
-			urlF = sbase + filme.a['href']
-			imgF = filme.img['src']
+			urlF = sbase + filme.a['href'].encode('utf-8')
+			imgF = filme.img['src'].encode('utf-8')
 			xbmc.log('[plugin.video.gofilmes] L108 - ' + str(urlF), xbmc.LOGNOTICE)
 			addDir(titF, urlF, 26, imgF)
 
@@ -350,9 +352,18 @@ def player(name,url,iconimage):
 				url2Play = 'http:%s' % url if url.startswith("//") else url
 				OK = False
 
+		elif '2gofilmes.me/play' in urlVideo:
+				r = requests.get(urlVideo)
+				html = r.content
+				js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
+				b = json.loads(js)
+				url2Play = b['g']
+				xbmc.log('[plugin.video.gofilmes] L359 - ' + str(url2Play), xbmc.LOGNOTICE)
+				OK = False
+
 		elif 'ruvid.nl' in urlVideo :
 				fxID = urlVideo.split('v/')[-1]
-				urlVideo = 'https://www.fembed.com/v/%s' % fxID
+				urlVideo = 'https://www.ruvid.nl/v/%s' % fxID
 
 		elif 'alforenao.com/' in urlVideo :
 				okID = urlVideo.split('/')[4]
@@ -369,7 +380,7 @@ def player(name,url,iconimage):
 				url2Play = urlVideo[i]
 				OK = False
 
-		xbmc.log('[plugin.video.gofilmes] L372 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.gofilmes] L381 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if OK :
 			try:
