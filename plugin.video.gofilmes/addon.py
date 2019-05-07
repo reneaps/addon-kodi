@@ -25,7 +25,7 @@ addon_id     = 'plugin.video.gofilmes'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
 artfolder    = addonfolder + '/resources/media/'
-fanart       = addonfolder + '/resources/fanart.png'
+fanart       = addonfolder + '/resources/media/fanart.png'
 addon_handle = int(sys.argv[1])
 base         = base64.b64decode('aHR0cDovL2dvZmlsbWVzLm1lLw==')
 sbase        = 'http://vseries.me/'
@@ -167,7 +167,7 @@ def getEpisodios(name, url):
 			audio = series[0].h3.text[0]
 			totF = len(dubs)
 			for dub in dubs:
-				titF = name + ' - ' + dub.span.text + dub.a.text + ' ('+ audio + ')'
+				titF = name + ' - '+str(n) +'x'+ dub.span.text + dub.a.text + ' ('+ audio + ')'
 				titF = titF.encode('utf-8', 'ignore')
 				urlF = sbase + dub.a['href']
 				temp = (urlF, titF)
@@ -181,7 +181,7 @@ def getEpisodios(name, url):
 			audio = series[1].h3.text[0]
 			totF = len(legs)
 			for leg in legs:
-				titF = name + ' - ' + leg.span.text + leg.a.text + ' ('+ audio + ')'
+				titF = name + ' - ' +str(n) +'x'+ leg.span.text + leg.a.text + ' ('+ audio + ')'
 				titF = titF.encode('utf-8', 'ignore')
 				urlF = sbase + leg.a['href']
 				temp = (urlF, titF)
