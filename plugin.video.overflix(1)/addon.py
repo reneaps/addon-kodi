@@ -80,7 +80,7 @@ def getFilmes(url):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.overflix] L83 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.overflix] L341 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')        
         soup = BeautifulSoup(link, 'html.parser')
@@ -92,7 +92,7 @@ def getSeries(url):
                 urlF = filme.a["href"].encode('utf-8')
                 image_news = filme('div', {'class':'vb_image_container'})[0]
                 imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0]
-                xbmc.log('[plugin.video.overflix] L95 - ' + str(titF), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.overflix] L109 - ' + str(titF), xbmc.LOGNOTICE)
                 addDir(titF, urlF, 26, imgF)
 
         try :
@@ -128,7 +128,7 @@ def getTemporadas(name,url,iconimage):
 		xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
-        xbmc.log('[plugin.video.overflix] L131 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.overflix] L129 ' + str(url), xbmc.LOGNOTICE)
         n = name.replace('ª Temporada', '')
         link = openURL(url)
         soup = BeautifulSoup(link,'html.parser')
@@ -202,191 +202,20 @@ def doPesquisaFilmes():
         setViewFilmes()
 
 def player(name,url,iconimage):
+        xbmc.log('[plugin.video.overflix] L205 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
-        mensagemprogresso.create('OverFlix', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+        mensagemprogresso.create('MegaFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
         mensagemprogresso.update(0)
 
         titsT = []
         idsT = []
-        
-        urlF = url+'?&area=online'
-        xbmc.log('[plugin.video.overflix] L214 - ' + str(urlF), xbmc.LOGNOTICE)
-        link = openURL(urlF)
+
+        link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
-        #data = soup('div', {'class':'ipsColumns ipsColumns_collapsePhone'})
-        #btn = data[0]('a',{'class':'btnn iconized assistir'})[0]['href']
-        data = soup.iframe
-        btn = data['src']
-        xbmc.log('[plugin.video.overflix] L221 - ' + str(btn), xbmc.LOGNOTICE)
-        try:
-            ss = btn.split('/?')[1].split('&')
-            for s in ss:
-                hname = s.split('=')[0]
-                if 'down' not in hname:
-                    hkey = s.split('=')[1]
-                    titsT.append(hname)
-                    idsT.append(hkey)
-
-            if not titsT : return
-
-            index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-
-            if index == -1 : return
-
-            i = int(index)
-            urlVideo = titsT[i]
-
-            if 'verystream' in urlVideo:
-                fxID = str(idsT[i])
-                urlVideo = 'https://verystream.com/e/%s' % fxID
-
-            elif 'streamango' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://streamango.com/embed/%s' % fxID
-                
-            elif 'rapidvideo' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
-                 
-            elif 'mystream' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://mstream.cloud/%s' % fxID
-                r = requests.get(urlVideo)
-                data = r.content
-                srv = re.findall('<meta name="og:image" content="([^"]+)">', data)[0]
-                url2Play = srv.replace('/img','').replace('jpg','mp4')
-                OK = False
-                
-            elif 'thevid' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://thevid.net/e/%s' % fxID
-                 
-            elif 'openload' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://openload.co/embed/%s' % fxID
- 
-            elif 'vidoza' in urlVideo :
-                    fxID = str(idsT[i])
-                    urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
-                                       
-            elif 'jetload' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://jetload.net/e/%s' % fxID
-                xbmc.log('[plugin.video.overflix] L276 - ' + str(urlVideo), xbmc.LOGNOTICE)
-                data = openURL(urlVideo)
-                srv = re.findall('id="srv" value="([^"]+)"', data)[0]
-                file_name = re.findall('file_name" value="([^"]+)"', data)[0]
-                try:
-                    id_srv = re.findall('id="srv_id" value="([^"]+)"', data)[0]
-                except:
-                    id_srv = ''
-                    pass
-                if id_srv == '20' : 
-                    url = 'https://jetload.net/api/download'
-                    data = urllib.urlencode({"file_name":file_name,"srv":id_srv})
-                    headers = {'Referer': urlVideo, 
-                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                           'Connection': 'keep-alive',
-                           'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-                }
-                    r = requests.post(url=url, data=data, headers=headers)
-                    tipo = r.text
-                    ext = tipo.split('?')[0]
-                    ext2 = tipo.split('?')[1]
-                    head = {'Referer': urlVideo,
-                            'Content-Type': 'video/mp4',
-                            'Connection': 'keep-alive',
-                            'Origin': 'https://jetload.net',
-                            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-                }
-                    head2 = urllib.urlencode(head)
-                    url2Play = ext+'.mp4?'+ext2+'|'+head2
-                    urlVideo =[]
-                else:
-                    head = {'Referer': urlVideo,
-                            'Content-Type': 'application/vnd.apple.mpegurl',
-                            'Connection': 'keep-alive',
-                            'Origin': 'https://jetload.net',
-                            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-                }
-                    head2 = urllib.urlencode(head)
-                    url2Play = srv + "/v2/schema/%s/master.m3u8" % file_name #+ head2
-                
-                OK = False
-                
-            elif 'principal' in urlVideo :
-                fxID = str(idsT[i+1])
-                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
-                
-            xbmc.log('[plugin.video.overflix] L323 - ' + str(urlVideo), xbmc.LOGNOTICE)
-        except:
-            pass
-        
-        try:
-            value = re.findall(r'<a style=".+?" href="(.+?)" class="btn iconized download" rel="nofollow" target="_blank"><i class="icon fa fa-download"></i> Baixar</a>', link)
-            urlVideo = value[0]
-        except:
-            pass
-
-        if OK :
-            try:
-                url2Play = urlresolver.resolve(urlVideo)
-            except:
-                dialog = xbmcgui.Dialog()
-                dialog.ok(" Erro:", " Video removido! ")
-                url2Play = []
-                pass
-
-        if not url2Play : return
-
-        xbmc.log('[plugin.video.overflix] L344 - ' + str(url2Play), xbmc.LOGNOTICE)
-
-        legendas = '-'
-
-        mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
-
-        playlist = xbmc.PlayList(1)
-        playlist.clear()
-
-        listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
-        listitem.setPath(url2Play)
-        listitem.setProperty('mimetype','video/mp4')
-        listitem.setProperty('IsPlayable', 'true')
-        playlist.add(url2Play,listitem)
-
-        xbmcPlayer = xbmc.Player()
-        xbmc.sleep(20000)
-        xbmcPlayer.play(playlist)
-
-        mensagemprogresso.update(100)
-        mensagemprogresso.close()
-
-        if legendas != '-':
-            if 'timedtext' in legendas:
-                    import os.path
-                    sfile = os.path.join(xbmc.translatePath("special://temp"),'sub.srt')
-                    sfile_xml = os.path.join(xbmc.translatePath("special://temp"),'sub.xml')#timedtext
-                    sub_file_xml = open(sfile_xml,'w')
-                    sub_file_xml.write(urllib2.urlopen(legendas).read())
-                    sub_file_xml.close()
-                    xmltosrt.main(sfile_xml)
-                    xbmcPlayer.setSubtitles(sfile)
-            else:
-                xbmcPlayer.setSubtitles(legendas)
-
-def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.overflix] L380 - ' + str(url), xbmc.LOGNOTICE)
-        OK = True
-        mensagemprogresso = xbmcgui.DialogProgress()
-        mensagemprogresso.create('OverFlix', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
-        mensagemprogresso.update(0)
-        titsT = []
-        idsT = []
-
-        btn = url
-        xbmc.log('[plugin.video.overflix] L389 - ' + str(btn), xbmc.LOGNOTICE)
+        data = soup('div', {'class':'ipsColumns ipsColumns_collapsePhone'})
+        btn = data[0]('a',{'class':'btnn iconized assistir'})[0]['href']
+        xbmc.log('[plugin.video.overflix] L217 - ' + str(btn), xbmc.LOGNOTICE)
         try:
             ss = btn.split('/?')[1].split('&')
             for s in ss:
@@ -462,7 +291,7 @@ def player_series(name,url,iconimage):
                     head2 = urllib.urlencode(head)
                     url2Play = ext+'.mp4?'+ext2+'|'+head2
                     urlVideo =[]
-                    xbmc.log('[plugin.video.overflix] L465 - ' + str(url2Play), xbmc.LOGNOTICE)
+                    xbmc.log('[plugin.video.overflix] L292 - ' + str(url2Play), xbmc.LOGNOTICE)
                 else:
                     url2Play = srv + "/v2/schema/%s/master.m3u8" %file_name
                 OK = False
@@ -471,7 +300,158 @@ def player_series(name,url,iconimage):
                 fxID = str(idsT[i+1])
                 urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
                 
-            xbmc.log('[plugin.video.overflix] L474 - ' + str(urlVideo), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.overflix] L301 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                
+        except:
+            pass
+        try:
+            value = re.findall(r'<a style=".+?" href="(.+?)" class="btn iconized download" rel="nofollow" target="_blank"><i class="icon fa fa-download"></i> Baixar</a>', link)
+            urlVideo = value[0]
+        except:
+            pass
+
+        if OK :
+            try:
+                url2Play = urlresolver.resolve(urlVideo)
+            except:
+                dialog = xbmcgui.Dialog()
+                dialog.ok(" Erro:", " Video removido! ")
+                url2Play = []
+                pass
+
+        if not url2Play : return
+
+        xbmc.log('[plugin.video.overflix] L322 - ' + str(url2Play), xbmc.LOGNOTICE)
+
+        legendas = '-'
+
+        mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
+
+        playlist = xbmc.PlayList(1)
+        playlist.clear()
+
+        listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
+        listitem.setPath(url2Play)
+        listitem.setProperty('mimetype','video/mp4')
+        listitem.setProperty('IsPlayable', 'true')
+        playlist.add(url2Play,listitem)
+
+        xbmcPlayer = xbmc.Player()
+        xbmc.sleep(20000)
+        xbmcPlayer.play(playlist)
+
+        mensagemprogresso.update(100)
+        mensagemprogresso.close()
+
+        if legendas != '-':
+            if 'timedtext' in legendas:
+                    import os.path
+                    sfile = os.path.join(xbmc.translatePath("special://temp"),'sub.srt')
+                    sfile_xml = os.path.join(xbmc.translatePath("special://temp"),'sub.xml')#timedtext
+                    sub_file_xml = open(sfile_xml,'w')
+                    sub_file_xml.write(urllib2.urlopen(legendas).read())
+                    sub_file_xml.close()
+                    xmltosrt.main(sfile_xml)
+                    xbmcPlayer.setSubtitles(sfile)
+            else:
+                xbmcPlayer.setSubtitles(legendas)
+
+def player_series(name,url,iconimage):
+        xbmc.log('[plugin.video.overflix] L354 - ' + str(url), xbmc.LOGNOTICE)
+        OK = True
+        mensagemprogresso = xbmcgui.DialogProgress()
+        mensagemprogresso.create('MegaFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+        mensagemprogresso.update(0)
+        titsT = []
+        idsT = []
+
+        btn = url
+        xbmc.log('[plugin.video.overflix] L217 - ' + str(btn), xbmc.LOGNOTICE)
+        try:
+            ss = btn.split('/?')[1].split('&')
+            for s in ss:
+                hname = s.split('=')[0]
+                if 'down' not in hname:
+                    hkey = s.split('=')[1]
+                    titsT.append(hname)
+                    idsT.append(hkey)
+
+            if not titsT : return
+
+            index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
+
+            if index == -1 : return
+
+            i = int(index)
+            urlVideo = titsT[i]
+
+            if 'verystream' in urlVideo:
+                fxID = str(idsT[i])
+                urlVideo = 'https://verystream.com/e/%s' % fxID
+
+            elif 'streamango' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://streamango.com/embed/%s' % fxID
+                
+            elif 'rapidvideo' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
+                 
+            elif 'mystream' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://mystream.to/external/%s' % fxID
+                
+            elif 'thevid' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://thevid.net/e/%s' % fxID
+                 
+            elif 'openload' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://openload.co/embed/%s' % fxID
+ 
+            elif 'vidoza' in urlVideo :
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
+                                       
+            elif 'jetload' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://jetload.net/e/%s' % fxID
+                data = openURL(urlVideo)
+                srv = re.findall('id="srv" value="([^"]+)"', data)[0]
+                file_name = re.findall('file_name" value="([^"]+)"', data)[0]
+                id_srv = re.findall('id="srv_id" value="([^"]+)"', data)[0]
+                if id_srv == '20' : 
+                    url = 'https://jetload.net/api/download'
+                    data = urllib.urlencode({"file_name":file_name,"srv":id_srv})
+                    headers = {'Referer': urlVideo, 
+                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                           'Connection': 'keep-alive',
+                           'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                }
+                    r = requests.post(url=url, data=data, headers=headers)
+                    tipo = r.text
+                    ext = tipo.split('?')[0]
+                    ext2 = tipo.split('?')[1]
+                    head = {'Referer': urlVideo,
+                            'Content-Type': 'video/mp4',
+                            'Connection': 'keep-alive',
+                            'Origin': 'https://jetload.net',
+                            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                }
+                    head2 = urllib.urlencode(head)
+                    url2Play = ext+'.mp4?'+ext2+'|'+head2
+                    urlVideo =[]
+                    xbmc.log('[plugin.video.overflix] L292 - ' + str(url2Play), xbmc.LOGNOTICE)
+                else:
+                    url2Play = srv + "/v2/schema/%s/master.m3u8" %file_name
+                OK = False
+                
+            elif 'principal' in urlVideo :
+                fxID = str(idsT[i+1])
+                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
+                
+            xbmc.log('[plugin.video.overflix] L301 - ' + str(urlVideo), xbmc.LOGNOTICE)
                 
         except:
             pass
@@ -487,7 +467,7 @@ def player_series(name,url,iconimage):
 
         if not url2Play : return
 
-        xbmc.log('[plugin.video.overflix] L490 - ' + str(url2Play), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.overflix] L469 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         legendas = '-'
 
