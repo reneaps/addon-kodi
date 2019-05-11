@@ -3,7 +3,8 @@
 #####################################################################
 # Addon : OverFlix
 # By AddonBrasil - 08/05/2019
-# Atualizado (1.0.3) - 08/05/2019
+# Atualizado (1.0.0) - 08/05/2019
+# Atualizado (1.0.1) - 10/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -16,27 +17,30 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version      = '1.0.0'
+version   = '1.0.1'
 addon_id  = 'plugin.video.overflix'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
 addonfolder = selfAddon.getAddonInfo('path')
-artfolder    = addonfolder + '/resources/media/'
-fanart        = addonfolder + '/resources/fanart.png'
+artfolder   = addonfolder + '/resources/media/'
+fanart      = addonfolder + '/resources/fanart.png'
 base        = base64.b64decode('aHR0cHM6Ly9vdmVyZmxpeC5uZXQv')
-sbase        = 'navegar/series-2/?alphabet=all&sortby=v_started&sortdirection=desc'
+sbase       = 'navegar/series-2/?alphabet=all&sortby=v_started&sortdirection=desc'
+v_views     = 'navegar/filmes-1/?alphabet=all&sortby=v_views&sortdirection=desc'
 
 ############################################################################################################
 
 def menuPrincipal():
-        addDir('Categorias'                , base + ''                                ,        10, artfolder + 'categorias.png')
-        addDir('Lançamentos'            , base + 'categoria/50-lancamentos/'    ,        20, artfolder + 'lancamentos.png')
-        addDir('Filmes Dublados'        , base + '56-filmes-dublados/'            ,        20, artfolder + 'pesquisa.png')
-        addDir('Series'                    , base + sbase                            ,        25, artfolder + 'legendados.png')
-        addDir('Pesquisa Series'        , '--'                                    ,        30, artfolder + 'pesquisa.png')
-        addDir('Pesquisa Filmes'        , '--'                                    ,        35, artfolder + 'pesquisa.png')
-        addDir('Configurações'            , base                                    ,       999, artfolder + 'config.png', 1, False)
-        addDir('Configurações ExtendedInfo' , base                                ,      1000, artfolder + 'config.png', 1, False)
+        addDir('Categorias Filmes'		    , base + 'navegar/filmes-1/'            ,        10, artfolder + 'categorias.png')
+        addDir('Categorias Series'		    , base + sbase                          ,        10, artfolder + 'categorias.png')
+        addDir('Lançamentos'                , base + 'categoria/50-lancamentos/'    ,        20, artfolder + 'lancamentos.png')
+        addDir('Filmes Dublados'            , base + '56-filmes-dublados/'          ,        20, artfolder + 'pesquisa.png')
+        addDir('Filmes Mais Assistidos'     , base + v_views            			,        20, artfolder + 'pesquisa.png')
+        addDir('Series'                     , base + sbase                          ,        25, artfolder + 'legendados.png')
+        addDir('Pesquisa Series'            , '--'                                  ,        30, artfolder + 'pesquisa.png')
+        addDir('Pesquisa Filmes'            , '--'                                  ,        35, artfolder + 'pesquisa.png')
+        addDir('Configurações'              , base                                  ,       999, artfolder + 'config.png', 1, False)
+        addDir('Configurações ExtendedInfo' , base                                  ,      1000, artfolder + 'config.png', 1, False)
 
         setViewMenu()
 
@@ -44,14 +48,20 @@ def getCategorias(url):
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, 'html.parser')
-        conteudo   = soup("ul",{"class":"sub-menu"})
+        if 'filmes' in url :
+        	conteudo   = soup("ul",{"id":"elNavigation_18_menu"})
+    	if 'series' in url :
+    		conteudo   = soup("ul",{"id":"elNavigation_19_menu"})
         categorias = conteudo[0]("li")
 
         for categoria in categorias:
                 titC = categoria.a.text.encode('utf-8','')
                 urlC = categoria.a["href"]
                 imgC = artfolder + limpa(titC) + '.png'
-                addDir(titC,urlC,20,imgC)
+                if 'filmes' in url:
+                	addDir(titC,urlC,20,imgC)
+                elif 'series' in url:
+                	addDir(titC,urlC,25,imgC)
 
         setViewMenu()
 
@@ -65,6 +75,7 @@ def getFilmes(url):
 
         for filme in filmes:
                 titF = filme.a['title'].encode("utf-8")
+                titF = titF.replace('Assistir','').replace('Online','')
                 urlF = filme.a['href'].encode("utf-8")
                 image_news = filme('div', {'class':'vb_image_container'})[0]
                 imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0].encode("utf-8")
@@ -89,6 +100,7 @@ def getSeries(url):
 
         for filme in filmes:
                 titF = filme.a["title"].encode("utf-8")
+                titF = titF.replace('Assistir','').replace('Online','')
                 urlF = filme.a["href"].encode('utf-8')
                 image_news = filme('div', {'class':'vb_image_container'})[0]
                 imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0]
@@ -154,7 +166,7 @@ def getEpisodios(name, url):
 def pesquisa():
         hosts = []
         temp = []
-        keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
+        keyb = xbmc.Keyboard('', 'Pesquisar Filmes/Series')
         keyb.doModal()
 
         if (keyb.isConfirmed()):
@@ -162,7 +174,7 @@ def pesquisa():
                 pesquisa = urllib.quote(texto)
 
                 data = urllib.urlencode({'term':pesquisa})
-                url    = base + 'findContent/' 
+                url = base + 'findContent/' 
 
                 headers = {'Referer': url, 
                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -416,10 +428,15 @@ def player_series(name,url,iconimage):
             elif 'rapidvideo' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
-                 
+
             elif 'mystream' in urlVideo :
                 fxID = str(idsT[i])
-                urlVideo = 'https://mystream.to/external/%s' % fxID
+                urlVideo = 'https://mstream.cloud/%s' % fxID
+                r = requests.get(urlVideo)
+                data = r.content
+                srv = re.findall('<meta name="og:image" content="([^"]+)">', data)[0]
+                url2Play = srv.replace('/img','').replace('jpg','mp4')
+                OK = False
                 
             elif 'thevid' in urlVideo :
                 fxID = str(idsT[i])
@@ -462,16 +479,16 @@ def player_series(name,url,iconimage):
                     head2 = urllib.urlencode(head)
                     url2Play = ext+'.mp4?'+ext2+'|'+head2
                     urlVideo =[]
-                    xbmc.log('[plugin.video.overflix] L465 - ' + str(url2Play), xbmc.LOGNOTICE)
+                    xbmc.log('[plugin.video.overflix] L482 - ' + str(tipo), xbmc.LOGNOTICE)
                 else:
-                    url2Play = srv + "/v2/schema/%s/master.m3u8" %file_name
+                    url2Play = srv + "/v2/schema/%s/master.m3u8" % file_name
                 OK = False
                 
             elif 'principal' in urlVideo :
                 fxID = str(idsT[i+1])
                 urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
                 
-            xbmc.log('[plugin.video.overflix] L474 - ' + str(urlVideo), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.overflix] L491 - ' + str(urlVideo), xbmc.LOGNOTICE)
                 
         except:
             pass
@@ -487,7 +504,7 @@ def player_series(name,url,iconimage):
 
         if not url2Play : return
 
-        xbmc.log('[plugin.video.overflix] L490 - ' + str(url2Play), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.overflix] L507 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         legendas = '-'
 
