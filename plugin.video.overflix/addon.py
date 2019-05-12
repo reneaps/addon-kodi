@@ -158,7 +158,7 @@ def getEpisodios(name, url):
                     titE = epis[i][1]
                     titT = epis[i][2]
                     titF = epis[i][3]
-                    titF = sname.encode('utf-8') + ' T' + n + ' ' +  titT.replace('dub', '(D)').replace('leg', '(L)') + " - " + titF
+                    titF = sname + ' T' + n + ' ' +  titT.replace('dub', '(D)').replace('leg', '(L)') + " - " + titF
                     urlF = links[i]
                     addDirF(titF, urlF, 110, imgF, False, totF)
 
