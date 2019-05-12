@@ -5,6 +5,7 @@
 # By AddonBrasil - 08/05/2019
 # Atualizado (1.0.0) - 08/05/2019
 # Atualizado (1.0.1) - 10/05/2019
+# Atualizado (1.0.1) - 12/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -17,7 +18,7 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version   = '1.0.1'
+version   = '1.0.2'
 addon_id  = 'plugin.video.overflix'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -31,16 +32,16 @@ v_views     = 'navegar/filmes-1/?alphabet=all&sortby=v_views&sortdirection=desc'
 ############################################################################################################
 
 def menuPrincipal():
-        addDir('Categorias Filmes'          , base + 'navegar/filmes-1/'            ,        10, artfolder + 'categorias.png')
-        addDir('Categorias Series'          , base + sbase                          ,        10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + 'categoria/50-lancamentos/'    ,        20, artfolder + 'lancamentos.png')
-        addDir('Filmes Dublados'            , base + '56-filmes-dublados/'          ,        20, artfolder + 'pesquisa.png')
-        addDir('Filmes Mais Assistidos'     , base + v_views                        ,        20, artfolder + 'pesquisa.png')
-        addDir('Series'                     , base + sbase                          ,        25, artfolder + 'legendados.png')
-        addDir('Pesquisa Series'            , '--'                                  ,        30, artfolder + 'pesquisa.png')
-        addDir('Pesquisa Filmes'            , '--'                                  ,        35, artfolder + 'pesquisa.png')
-        addDir('Configurações'              , base                                  ,       999, artfolder + 'config.png', 1, False)
-        addDir('Configurações ExtendedInfo' , base                                  ,      1000, artfolder + 'config.png', 1, False)
+        addDir('Categorias Filmes'          , base + 'navegar/filmes-1/'             ,        10, artfolder + 'categorias.png')
+        addDir('Categorias Series'          , base + sbase                           ,        10, artfolder + 'categorias.png')
+        addDir('Lançamentos'                , base + 'categoria/50-lancamentos/'     ,        20, artfolder + 'lancamentos.png')
+        addDir('Filmes Dublados'            , base + 'categoria/56-filmes-dublados/' ,        20, artfolder + 'pesquisa.png')
+        addDir('Filmes Mais Assistidos'     , base + v_views                         ,        20, artfolder + 'pesquisa.png')
+        addDir('Series'                     , base + sbase                           ,        25, artfolder + 'legendados.png')
+        addDir('Pesquisa Series'            , '--'                                   ,        30, artfolder + 'pesquisa.png')
+        addDir('Pesquisa Filmes'            , '--'                                   ,        35, artfolder + 'pesquisa.png')
+        addDir('Configurações'              , base                                   ,       999, artfolder + 'config.png', 1, False)
+        addDir('Configurações ExtendedInfo' , base                                   ,      1000, artfolder + 'config.png', 1, False)
 
         setViewMenu()
 
@@ -91,7 +92,6 @@ def getFilmes(url):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.overflix] L94 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')        
         soup = BeautifulSoup(link, 'html.parser')
@@ -104,7 +104,6 @@ def getSeries(url):
                 urlF = filme.a["href"].encode('utf-8')
                 image_news = filme('div', {'class':'vb_image_container'})[0]
                 imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0]
-                xbmc.log('[plugin.video.overflix] L107 - ' + str(titF), xbmc.LOGNOTICE)
                 addDir(titF, urlF, 26, imgF)
 
         try :
@@ -119,6 +118,8 @@ def getSeries(url):
 def getTemporadas(name,url,iconimage):
         html = openURL(url)
         soup = BeautifulSoup(html,'html.parser')
+        sname = soup.title.text.replace('-','|').split('|')[0]
+        sname = sname.replace('Assistir','').replace('Online','')
         data = soup('div', {'class':'ipsColumns ipsColumns_collapsePhone'})
         url = data[0]('a',{'class':'btnn iconized assistir'})[0]['href']
         html = openURL(url)
@@ -130,7 +131,7 @@ def getTemporadas(name,url,iconimage):
         urlF = url
         i = 1
         while i <= totF:
-                titF = str(i) + "ª Temporada"
+                titF = str(i) + "ª Temporada " + sname.encode('utf-8')
                 try:
                     addDirF(titF, urlF, 27, imgF, True, totF)
                 except:
@@ -140,17 +141,16 @@ def getTemporadas(name,url,iconimage):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
-        xbmc.log('[plugin.video.overflix] L143 ' + str(url), xbmc.LOGNOTICE)
-        n = name.replace('ª Temporada', '')
+        n = re.findall(r'(.+?)ª Temporada.+', name)[0]
         link = openURL(url)
         soup = BeautifulSoup(link,'html.parser')
-        name = soup.title.text.replace('-','|').split('|')[0]
+        sname = soup.title.text.replace('-','|').split('|')[0]
+        sname = sname.replace('Assistir','').replace('Online','')
+        sname = sname.encode('utf-8')
         links = re.findall(r'addiframe\(\'(.+?)\'\);', link)
         imgF = iconimage
         epis = re.findall(r'<a class="video" href="javascript: InitPlayer\(\'(.+?)\', \'(.+?)\',\'(.+?)\'\);">(.+?)</a>', link)
-        
         totF = len(links)
-            
         for i in range(0, totF):
             if n in str(epis[i][0]) :
                 if not "ximo" in str(epis[i][3]) :
@@ -158,9 +158,10 @@ def getEpisodios(name, url):
                     titE = epis[i][1]
                     titT = epis[i][2]
                     titF = epis[i][3]
-                    titF = name.encode('utf-8') +' '+titT.replace('dub', '(D)').replace('leg', '(L)') + " - " + titF
+                    titF = sname.encode('utf-8') + ' T' + n + ' ' +  titT.replace('dub', '(D)').replace('leg', '(L)') + " - " + titF
                     urlF = links[i]
                     addDirF(titF, urlF, 110, imgF, False, totF)
+
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
         
 def pesquisa():
@@ -212,6 +213,7 @@ def doPesquisaFilmes():
         total = len(a)
         for url2, titulo, img in a:
             addDir(titulo, url2, 100, img, False, total)
+
         setViewFilmes()
 
 def player(name,url,iconimage):
@@ -219,7 +221,6 @@ def player(name,url,iconimage):
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('OverFlix', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
         mensagemprogresso.update(0)
-
         titsT = []
         idsT = []
         
@@ -619,7 +620,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
 
         liz.setProperty('fanart_image', fanart)
-        liz.setInfo(type="Video", infoLabels={"Title": name})
+        liz.setInfo(type="Video", infoLabels={"title": name})
 
         cmItems = []
 
