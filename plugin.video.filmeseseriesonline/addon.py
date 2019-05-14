@@ -601,7 +601,7 @@ def openURL(url):
         req = urllib2.Request(url)
         req.add_header('Referer',url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
-        response = urllib2.urlopen(req, timeout=7.0)
+        response = urllib2.urlopen(req, timeout=3.0)
         link=response.read()
         response.close()
         return link
