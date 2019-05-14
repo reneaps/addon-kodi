@@ -5,25 +5,6 @@
 # Addon : Filmes e Series Online
 # By AddonReneSilva - 01/10/2016
 # Atualizado (1.0.0) - 01/10/2016
-# Atualizado (1.0.1) - 15/12/2016
-# Atualizado (1.0.2) - 18/12/2016
-# Atualizado (1.0.3) - 05/02/2017
-# Atualizado (1.0.4) - 21/05/2017
-# Atualizado (1.0.5) - 25/05/2017
-# Atualizado (1.0.6) - 25/05/2017
-# Atualizado (1.0.7) - 04/06/2017
-# Atualizado (1.0.8) - 15/06/2017
-# Atualizado (1.0.9) - 17/06/2017
-# Atualizado (1.1.0) - 19/06/2017
-# Atualizado (1.1.1) - 28/06/2017
-# Atualizado (1.1.2) - 10/07/2017
-# Atualizado (1.1.3) - 17/07/2017
-# Atualizado (1.1.4) - 13/08/2017
-# Atualizado (1.1.5) - 03/10/2017
-# Atualizado (1.1.6) - 09/11/2017
-# Atualizado (1.1.7) - 01/12/2017
-# Atualizado (1.1.8) - 04/02/2018
-# Atualizado (1.1.9) - 21/02/2018
 # Atualizado (1.2.0) - 01/05/2018
 # Atualizado (1.2.1) - 03/06/2018
 # Atualizado (1.2.2) - 28/07/2018
@@ -32,19 +13,19 @@
 # Atualizado (1.2.5) - 16/04/2019
 # Atualizado (1.2.6) - 02/05/2019
 # Atualizado (1.2.7) - 13/05/2019
+# Atualizado (1.2.8) - 14/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import urlresolver
 
-from bs4 import BeautifulSoup
-#from resources.lib.BeautifulSoup import BeautifulSoup
-from resources.lib               import jsunpack
+from bs4                import BeautifulSoup
+from resources.lib      import jsunpack
 
 import socket
 socket.setdefaulttimeout(60)
 
-version         = '1.2.2'
+version      = '1.2.8'
 addon_id     = 'plugin.video.filmeseseriesonline'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
@@ -56,21 +37,23 @@ base         = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNlc2VyaWVzb25saW5lLm5ldC8
 ############################################################################################################
 
 def menuPrincipal():
-        addDir('Categorias'                    , base                              ,   10, artfolder + 'categorias.png')
+        addDir('Categorias'                 , base                              ,   10, artfolder + 'categorias.png')
         addDir('Lançamentos'                , base + '/filmes/lancamentos/'     ,   20, artfolder + 'ultimos.png')
-        addDir('Filmes em HD'                , base + '/filmes/filmes-hd/'         ,   20, artfolder + 'filmes.png')
-        addDir('Filmes Dublados'            , base + '/?s=dublado&tipo=video'     ,   20, artfolder + 'filmes.png')
-        addDir('Series'                        , base + '/series-hd/'                ,   25, artfolder + 'series.png')
-        addDir('Pesquisa Series'            , '--'                               ,   30, artfolder + 'pesquisa.png')
-        addDir('Pesquisa Filmes'            , '--'                               ,   35, artfolder + 'pesquisa.png')
-        addDir('Configurações'                , base                                ,  999, artfolder + 'config.png', 1, False)
-        addDir('Configurações ExtendedInfo'    , base                               , 1000, artfolder + 'config.png', 1, False)
+        addDir('Filmes em HD'               , base + '/filmes/filmes-hd/'       ,   20, artfolder + 'filmes.png')
+        addDir('Filmes Dublados'            , base + '/?s=dublado&tipo=video'   ,   20, artfolder + 'filmes.png')
+        addDir('Series'                     , base + '/series-hd/'              ,   25, artfolder + 'series.png')
+        addDir('Pesquisa Series'            , '--'                              ,   30, artfolder + 'pesquisa.png')
+        addDir('Pesquisa Filmes'            , '--'                              ,   35, artfolder + 'pesquisa.png')
+        addDir('Configurações'              , base                              ,  999, artfolder + 'config.png', 1, False)
+        addDir('Configurações ExtendedInfo' , base                              , 1000, artfolder + 'config.png', 1, False)
 
         setViewMenu()
 
 def getCategorias(url):
         link = openURL(url)
-        soup = BeautifulSoup(link, "html.parser")
+        link = unicode(link, 'utf-8', 'ignore')
+
+        soup = BeautifulSoup(link, "html5lib")
         conteudo = soup("div", {"class": "container"})
         arquivo = conteudo[4]("div", {"class": "lista-amigos"})
         categorias = arquivo[0]("a")
@@ -92,12 +75,13 @@ def getCategorias(url):
         setViewMenu()
 
 def getFilmes(url):
-        link  = openURL(url)
+        link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
 
-        soup     = BeautifulSoup(link, "html.parser")
+        soup = BeautifulSoup(link, "html5lib")
         conteudo = soup("div", {"class": "filmes"})
-        filmes   = conteudo[0]("div", {"class": "item"})
+        filmes = conteudo[0]("div", {"class": "item"})
+
         totF = len(filmes)
 
         for filme in filmes:
@@ -120,18 +104,17 @@ def getSeries(url):
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
 
-        soup     = BeautifulSoup(link, "html.parser")
+        soup = BeautifulSoup(link, "html5lib")
         conteudo = soup("div", {"class": "filmes"})
-        filmes   = conteudo[0]("div", {"class": "item"})
+        filmes = conteudo[0]("div", {"class": "item"})
+
         totF = len(filmes)
 
         for filme in filmes:
                 titF = filme.a.text.encode('utf-8','replace')
-                #titF = filme.img["alt"].encode('utf-8','replace')
                 titF = titF.replace('Assistir ','').replace('Filme ','')
                 urlF = filme.a["href"].encode('utf-8', 'ignore')
                 imgF = filme.img["src"].encode('utf-8', 'ignore')
-                xbmc.log('[plugin.video.filmeseseriesonline] L131 - ' + str(urlF), xbmc.LOGNOTICE)
                 addDir(titF, urlF, 26, imgF)
 
         try :
@@ -141,12 +124,13 @@ def getSeries(url):
                 pass
 
         xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
-        #setViewFilmes()
 
 def getTemporadas(url):
+        xbmc.log('[plugin.video.filmeseseriesonline] L128 - ' + str(url), xbmc.LOGNOTICE)
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
-        soup     = BeautifulSoup(link, "html.parser")
+
+        soup = BeautifulSoup(link, "html5lib")
         conteudo = soup.find("ul", {"class": "tabs"})
         temporadas = conteudo("li")
         totF = len(temporadas)
@@ -165,9 +149,9 @@ def getTemporadas(url):
         xbmcplugin.setContent(int(sys.argv[1]), 'seasons')
 
 def getEpisodios(name, url):
-        n = name[0] #.replace('ª Temporada', '')
+        n = re.findall(r'(.+?)ª Temporada', name)[0]
         n = int(n)
-        n = (n-1)
+        if n > 0 : n = (n-1)
         temp = []
         episodios = []
 
@@ -175,14 +159,13 @@ def getEpisodios(name, url):
         link = unicode(html, 'utf-8', 'ignore')
 
         name = re.findall(r'<div class="content clearfix"><h2 style="font-family: Open Sans; font-size: 16px;">(.+?)<\/h2>', str(html))[0]
-        soup = BeautifulSoup(link, "html.parser")
+        soup = BeautifulSoup(link, "html5lib")
         conteudo = soup('div',{'class':'tab_content'})
         texto = str(conteudo)
         texto1 = texto.replace('<div class="tab_content"></div>','')
-        texto2 = BeautifulSoup(texto1, "html.parser")
+        texto2 = BeautifulSoup(texto1, "html5lib")
         conteudo = texto2('div',{'class':'tab_content'})
         arquivo = conteudo[n]('div',{'class':'um_terco'})
-        xbmc.log('[plugin.video.filmeseseriesonline] L181 - ' + str(url), xbmc.LOGNOTICE)
 
         imgF = ""
         img = soup.find("div", {"class": "capa-post"})
@@ -243,9 +226,10 @@ def pesquisa():
                 link  = openURL(url)
                 link = unicode(link, 'utf-8', 'ignore')
 
-                soup     = BeautifulSoup(link, "html.parser")
+                soup = BeautifulSoup(link, "html5lib")
                 conteudo = soup("div", {"class": "filmes"})
-                filmes   = conteudo[0]("div", {"class": "item"})
+                filmes = conteudo[0]("div", {"class": "item"})
+
                 totF = len(filmes)
                 hosts = []
                 for filme in filmes:
@@ -287,16 +271,14 @@ def player(name,url,iconimage):
         titsT = []
         idsT = []
 
-        matriz = []
-
         link     = openURL(url)
-        soup     = BeautifulSoup(link, "html.parser")
+        soup     = BeautifulSoup(link, "html5lib")
         conteudo = soup("div", {"class": "embeds-servidores"})
         srvsdub  = conteudo[0]("iframe")
         url = srvsdub[0]['src']
 
         link = openURL(url)
-        soup  = BeautifulSoup(link, "html.parser")
+        soup  = BeautifulSoup(link, "html5lib")
 
         try :
             conteudo = soup("div", {"class": "geral"})
@@ -455,10 +437,9 @@ def player_series(name,url,iconimage):
         idsT = []
         links = []
         hosts = []
-        matriz = []
 
         link = openURL(url)
-        soup  = BeautifulSoup(link, "html.parser")
+        soup  = BeautifulSoup(link, "html5lib")
 
         try :
                 conteudo = soup("div", {"class": "geral"})
@@ -617,13 +598,10 @@ def openConfigEI():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        headers = {
-        "Referer": url,
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"
-    }
-        req = urllib2.Request(url, "",headers)
-        req.get_method = lambda: 'GET'
-        response = urllib2.urlopen(req)
+        req = urllib2.Request(url)
+        req.add_header('Referer',url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
+        response = urllib2.urlopen(req, timeout=7.0)
         link=response.read()
         response.close()
         return link
@@ -712,11 +690,10 @@ def limpa(texto):
 def sinopse(urlF):
         link = openURL(urlF)
         link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link, "html.parser")
+        soup = BeautifulSoup(link, "html5lib")
         #conteudo = soup("div", {"class": "content clearfix"})
         try:
             p = soup('p', limit=5)[1]
-            #print conteudo
             plot = p.text.replace('kk-star-ratings','')
         except:
             plot = 'Sem Sinopse'
