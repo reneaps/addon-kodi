@@ -22,6 +22,7 @@
 # Atualizado (2.0.6) - 14/04/2019
 # Atualizado (2.0.7) - 25/04/2019
 # Atualizado (2.0.8) - 15/05/2019
+# Atualizado (2.0.9) - 15/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -33,7 +34,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 from time                        import time
 
-version   = '2.0.8'
+version   = '2.0.9'
 addon_id  = 'plugin.video.megafilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -163,7 +164,7 @@ def getEpisodios(name, url):
         seasons = filmes[0]('div',{'class':'item get_episodes'})
         idseasons = seasons[n]['data-row-id']
         data = urllib.urlencode({'action':'episodes','season':idseasons})
-        url = 'https://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+        url = 'https://megahdfilmes.com/wp-admin/admin-ajax.php'
         req = urllib2.Request(url=url,data=data)
         req.add_header('Referer',url)
         req.add_header('Upgrade-Insecure-Requests',1)
@@ -243,7 +244,7 @@ def pega(idname):
     return urlF
     '''
     data = urllib.urlencode({'action':'players','id':idname})
-    url = 'https://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+    url = 'https://megahdfilmes.com/wp-admin/admin-ajax.php'
     req = urllib2.Request(url=url,data=data)
     req.add_header('Referer',url)
     req.add_header('Upgrade-Insecure-Requests',1)
@@ -467,7 +468,7 @@ def player_series(name,url,iconimage):
         matriz = []
 
         data = url
-        url = 'https://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
+        url = 'https://megahdfilmes.com/wp-admin/admin-ajax.php'
         req = urllib2.Request(url=url,data=data)
         req.add_header('Referer',url)
         req.add_header('Upgrade-Insecure-Requests',1)
