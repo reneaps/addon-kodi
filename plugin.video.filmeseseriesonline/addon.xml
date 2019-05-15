@@ -1,26 +1,24 @@
-<?xml version="0.0.1" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.megafilmesonline" name="MegaFilmesHD" version="2.0.9" provider-name="AddonReneSilva">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.2.8" provider-name="AddonReneSilva">
   <requires>
-    	<import addon="xbmc.python" version="2.1.0"/>
-		<import addon="script.module.urlresolver" version="2.10.8"/>
-		<import addon="script.extendedinfo" version="3.0.0"/>
-		<import addon="script.module.requests" version="2.9.1"/>
-		<import addon="script.module.beautifulsoup4" version="4.3.2"/>
-		<import addon="script.module.html5lib" />
+      <import addon="xbmc.python" version="2.1.0"/>
+      <import addon="script.module.urlresolver" version="1.0.0"/>
+      <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+      <import addon="script.extendedinfo" />
   </requires>
-	
+    
   <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
+        <provides>video</provides>
   </extension>
-	
+    
   <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Filmes e Series Online</summary>
-    <description lang="en">
-			No addon MegaFilmesHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc. 
-			Vocêtambém pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
-		</description>
+      <language>en</language>
+      <platform>all</platform>
+      <summary lang="en">FilmeseSeriesOnline</summary>
+      <description lang="en">
+            No addon FilmeseSeriesOnline você assiste filmes separados por categorias, lançamentos,filmes HD, etc. 
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+      </description>
   </extension>
 </addon>
