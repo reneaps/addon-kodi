@@ -4,22 +4,8 @@
 # Addon : AssistirFilmesHD
 # By AddonReneSilva - 02/11/2016
 # Atualizado (1.0.0) - 02/11/2016
-# Atualizado (1.0.1) - 06/12/2016
-# Atualizado (1.0.2) - 21/12/2016
-# Atualizado (1.0.4) - 06/02/2017
-# Atualizado (1.0.5) - 21/05/2017
-# Atualizado (1.0.6) - 25/05/2017
-# Atualizado (1.0.7) - 03/07/2017
-# Atualizado (1.0.8) - 05/07/2017
-# Atualizado (1.0.9) - 21/07/2017
 # Atualizado (1.1.0) - 08/08/2017
-# Atualizado (1.1.1) - 29/04/2018
-# Atualizado (1.1.2) - 20/05/2018
-# Atualizado (1.1.3) - 14/06/2018
-# Atualizado (1.1.4) - 01/07/2018
-# Atualizado (1.1.5) - 02/08/2018
-# Atualizado (1.1.6) - 21/03/2019
-# Atualizado (1.1.7) - 15/05/2019
+# Atualizado (1.1.8) - 16/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -29,7 +15,7 @@ import requests
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-versao      = '1.1.7'
+versao      = '1.1.8'
 addon_id    = 'plugin.video.assistirfilmeshd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -99,10 +85,12 @@ def getFilmes(url):
 def getSeries(url):
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
-        soup     = BeautifulSoup(link)
+        soup = BeautifulSoup(link)
         conteudo = soup("div", {"id": "wrap"})
-        filmes   = conteudo[0]("div", {"class": "poster"})
+        filmes = conteudo[0]("div", {"class": "poster"})
+
         totF = len(filmes)
+
         for filme in filmes:
                 titF = filme.img["alt"].encode('utf-8','replace')
                 titF = titF.replace('Assistir ','').replace('Filme ','')
@@ -113,12 +101,13 @@ def getSeries(url):
                 imgF = filme.img["src"].encode('utf-8', 'ignore')
                 imgF = imgF.split('?src=')[1]
                 imgF = imgF.split('&')[0]
-                addDirF(titF, urlF, 26, imgF)
+                addDirF(titF, urlF, 26, imgF, totF)
         try :
                 proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
+
         setViewFilmes()
 
 def getTemporadas(url):
@@ -126,6 +115,7 @@ def getTemporadas(url):
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link)
+
         try:
             conteudo = soup.find("ul", {"class": "itens"})
             temporadas = conteudo("li")
@@ -151,6 +141,8 @@ def getTemporadas(url):
                 pass
             i = i + 1
 
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
+
 def getEpisodios(name, url):
         xbmc.log('[plugin.video.assistirfilmeshd] L151 - ' + str(url), xbmc.LOGNOTICE)
         n = name.replace('ª Temporada', '')
@@ -163,6 +155,7 @@ def getEpisodios(name, url):
         link = unicode(link, 'utf-8', 'ignore')
 
         soup = BeautifulSoup(link)
+
         try:
             conteudo = soup("div", {"class": "videos"})
             arquivo = conteudo[0]("li", {"class": "video" + str(n) + "-code"})
@@ -259,8 +252,8 @@ def getEpisodios(name, url):
         for titF, urlF in episodios:
                 addDirF(titF, urlF, 110, imgF, False, totF)
 
-        xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
-
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
+        
 def pesquisa():
         keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
         keyb.doModal()
@@ -663,7 +656,7 @@ def openURL(url):
         response.close()
         return link
 
-def addDir(name, url, mode, iconimage, total=1, pasta=True):
+def addDir(name, url, mode, iconimage, total=1, pasta=True) :
         u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
         ok = True
 
