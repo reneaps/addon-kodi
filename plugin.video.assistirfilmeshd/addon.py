@@ -5,7 +5,7 @@
 # By AddonReneSilva - 02/11/2016
 # Atualizado (1.0.0) - 02/11/2016
 # Atualizado (1.1.0) - 08/08/2017
-# Atualizado (1.1.8) - 16/05/2019
+# Atualizado (1.1.9) - 18/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -15,7 +15,7 @@ import requests
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
-versao      = '1.1.8'
+versao      = '1.1.9'
 addon_id    = 'plugin.video.assistirfilmeshd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -159,16 +159,22 @@ def getEpisodios(name, url):
         try:
             conteudo = soup("div", {"class": "videos"})
             arquivo = conteudo[0]("li", {"class": "video" + str(n) + "-code"})
+            tname = soup('div', {'id':'postinfo'})
+            sname = tname[0].h1.text
+            sname = sname.split('-')[0]
         except:
             pass
 
         try:
-            n = (n-1)
             conteudo = soup("div", {"id":"series"})
             arquivo = conteudo[0]("div", {"class":"lista-temporadas"})
+            n = (n-1)
             temporada = arquivo[n]("div", {"class":"lista-temp"})
             tipo = temporada[0]("div", {"class":"separartemporadas"})
-            #xbmc.log('[plugin.video.assistirfilmeshd] L175 - ' + str(tipo), xbmc.LOGNOTICE)
+            tname = soup('div', {'id':'postinfo'})
+            sname = tname[0].h1.text
+            sname = sname.split('-')[0]
+            xbmc.log('[plugin.video.assistirfilmeshd] L175 - ' + str(sname), xbmc.LOGNOTICE)
         except:
             pass
 
@@ -182,7 +188,7 @@ def getEpisodios(name, url):
             for filme in filmes:
                     titF = filme.text.encode('utf-8', 'ignore')
                     titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Dublado"
-                    titF = str(n) + "T " + titF
+                    titF = sname + str(n) + "T " + titF
                     urlF = filme.get("href").encode('utf-8', 'ignore')
                     urlF = base + "/" + urlF
                     temp = (titF, urlF)
@@ -200,7 +206,7 @@ def getEpisodios(name, url):
             for filme in filmes:
                     titF = filme.text.encode('utf-8', 'ignore')
                     titF = titF.replace('Assistir ','').replace('Filme ','') + " - " +audio #" Legendado"
-                    titF = str(n) + "T " + titF
+                    titF = aname + str(n) + "T " + titF
                     urlF = filme.get("href").encode('utf-8', 'ignore')
                     urlF = base + "/" + urlF
                     temp = (titF, urlF)
@@ -212,11 +218,12 @@ def getEpisodios(name, url):
             audio = tipo[0]("div", {"class":"testclass"})
             audio = audio[0].span.text.encode('utf-8')
             episodes = tipo[0]("a")
+            n = name.replace('ª Temporada', '')
             totF = len(episodes)
             for episode in episodes:
                     titF = episode.text.encode('utf-8', 'ignore')
-                    titF =  titF.strip() + " - " +audio.strip()
-                    #titF = str(n) + "T " + titF
+                    titF = sname.encode('utf-') + str(n) + 'T' + 'E' + titF[12:].strip()
+                    titF = titF.strip() + " - " + audio[:3].strip()
                     urlF = episode.get("href").encode('utf-8', 'ignore')
                     urlF = base + "/" + urlF
                     temp = (titF, urlF)
@@ -228,11 +235,12 @@ def getEpisodios(name, url):
             audio = tipo[1]("div", {"class":"testclass"})
             audio = audio[0].span.text.encode('utf-8', 'ignore')
             episodes = tipo[1]("a")
+            n = name.replace('ª Temporada', '')
             totF = len(episodes)
             for episode in episodes:
                     titF = episode.text.encode('utf-8')
-                    titF = titF.strip() + " - " +audio.strip()
-                    #titF = str(n) + "T " + titF
+                    titF = sname.encode('utf-') + str(n) + 'T' + 'E' + titF[12:].strip()
+                    titF = titF.strip() + " - " + audio[:3].strip()
                     urlF = episode.get("href").encode('utf-8', 'ignore')
                     urlF = base + "/" + urlF
                     temp = (titF, urlF)
