@@ -5,6 +5,7 @@
 # Addon : Filmes e Series Online
 # By AddonReneSilva - 03/05/2019
 # Atualizado (1.0.0) - 03/05/2019
+# Atualizado (1.0.0) - 26/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -20,7 +21,7 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version      = '1.0.0'
+version      = '1.0.1'
 addon_id     = 'plugin.video.gofilmes'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
@@ -77,8 +78,8 @@ def getFilmes(url):
 		for filme in filmes:
 			titF = filme.a['title'].encode('utf-8').replace('Assistir ','')
 			urlF = filme.a['href'].encode('utf-8')
-			imgF = filme.img['src'].encode('utf-8')
-			xbmc.log('[plugin.video.gofilmes] L79 - ' + str(urlF), xbmc.LOGNOTICE)
+			imgF = filme.img['data-src'].encode('utf-8')
+			#xbmc.log('[plugin.video.gofilmes] L79 - ' + str(imgF), xbmc.LOGNOTICE)
 			pltF = ''
 			addDirF(titF, urlF, 100, imgF, False, totF, pltF)
 
@@ -107,7 +108,7 @@ def getSeries(url):
 			titF = filme('div',{'class':'tt'})[0].text.encode('utf-8')
 			urlF = sbase + filme.a['href'].encode('utf-8')
 			imgF = filme.img['src'].encode('utf-8')
-			xbmc.log('[plugin.video.gofilmes] L108 - ' + str(urlF), xbmc.LOGNOTICE)
+			#xbmc.log('[plugin.video.gofilmes] L108 - ' + str(urlF), xbmc.LOGNOTICE)
 			addDir(titF, urlF, 26, imgF)
 
 		try :
@@ -124,9 +125,9 @@ def getSeries(url):
 		#setViewFilmes()
 
 def getTemporadas(url):
-		link  = openURL(url)
+		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
-		soup     = BeautifulSoup(link, "html5lib")
+		soup = BeautifulSoup(link, "html5lib")
 		conteudo = soup.find("ul", {"class": "temporadas"})
 		temporadas = conteudo("li")
 		totF = len(temporadas)
@@ -146,12 +147,12 @@ def getTemporadas(url):
 
 def getEpisodios(name, url):
 		xbmc.log('[plugin.video.gofilmes] L146 - ' + str(url), xbmc.LOGNOTICE)
-		n = name[0] #.replace('ª Temporada', '')
+		n = name.replace('ª Temporada', '')
 		n = int(n)
 		temp = []
 		episodios = []
 
-		html  = openURL(url)
+		html = openURL(url)
 		link = unicode(html, 'utf-8', 'ignore')
 
 		name = re.findall(r'<div class="p2">\n<h1><b>.+?</b>(.+?)<b>.+?</b></h1>\n', str(html))[0]
@@ -274,8 +275,6 @@ def player(name,url,iconimage):
 
 		titsT = []
 		idsT = []
-
-		matriz = []
 
 		link     = openURL(url)
 		soup     = BeautifulSoup(link, "html5lib")
@@ -436,7 +435,6 @@ def player_series(name,url,iconimage):
 		idsT = []
 		links = []
 		hosts = []
-		matriz = []
 
 		link = openURL(url)
 		soup  = BeautifulSoup(link, "html5lib")
@@ -604,7 +602,6 @@ def openURL(url):
 		"Referer": url,
 		"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"
 	}
-
 		req = urllib2.Request(url, "",headers)
 		req.get_method = lambda: 'GET'
 		response = urllib2.urlopen(req)
@@ -654,7 +651,6 @@ def playTrailer(name, url,iconimage):
 		ytID = re.findall('<iframe width=".*?" height=".*?" src="https://www.youtube.com/embed/(.*?)rel=0&controls=0&showinfo=0" frameborder="0" allowfullscreen>.*?</iframe>', link)[0]
 		ytID = ytID.replace('?','')
 
-		#xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
 		xbmc.executebuiltin('XBMC.RunPlugin("plugin://plugin.video.youtube/play/?video_id=%s")' % ytID)
 
 def setViewMenu() :
@@ -700,7 +696,6 @@ def sinopse(urlF):
 		conteudo = soup("div", {"class": "sinopse"})
 		try:
 			p = conteudo[0]
-			#print conteudo
 			plot = p.text.replace('kk-star-ratings','')
 		except:
 			plot = 'Sem Sinopse'
