@@ -6,6 +6,7 @@
 # Atualizado (1.0.0) - 02/11/2016
 # Atualizado (1.1.0) - 08/08/2017
 # Atualizado (1.1.9) - 18/05/2019
+# Atualizado (1.2.0) - 01/06/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -59,12 +60,14 @@ def getCategorias(url):
         setViewFilmes()
 
 def getFilmes(url):
+        global fanart
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
-        #xbmc.log('[plugin.video.assistirfilmeshd] L70 - ' + str(url), xbmc.LOGNOTICE)
-        soup     = BeautifulSoup(link)
+        soup = BeautifulSoup(link)
         conteudo = soup("div", {"id": "wrap"})
-        filmes   = conteudo[0]("div", {"class": "poster"})
+        filmes = conteudo[0]("div", {"class": "poster"})
+        bg = soup('div', {'class':'fundo'})
+        fanart = bg[0].img['src']
         totF = len(filmes)
         for filme in filmes:
                 titF = filme.img["alt"].encode('utf-8','replace')
@@ -73,6 +76,7 @@ def getFilmes(url):
                 imgF = filme.img["src"].encode('utf-8', 'ignore')
                 imgF = imgF.split('?src=')[1]
                 imgF = imgF.split('&')[0]
+                xbmc.log('[plugin.video.assistirfilmeshd] L75 - ' + str(urlF), xbmc.LOGNOTICE)
                 addDirF(titF, urlF, 100, imgF, False, totF)
         try :
                 proxima = re.findall('<a href="(.*?)">Pr.*?xima</a>', link)[0]
@@ -83,11 +87,14 @@ def getFilmes(url):
         setViewFilmes()
 
 def getSeries(url):
+        global fanart
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link)
         conteudo = soup("div", {"id": "wrap"})
         filmes = conteudo[0]("div", {"class": "poster"})
+        bg = soup('div', {'class':'fundo'})
+        fanart = bg[0].img['src']
 
         totF = len(filmes)
 
@@ -263,20 +270,23 @@ def getEpisodios(name, url):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
         
 def pesquisa():
+        global fanart
         keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
         keyb.doModal()
 
         if (keyb.isConfirmed()):
-                texto    = keyb.getText()
+                texto = keyb.getText()
                 pesquisa = urllib.quote(texto)
-                url      = base + '/search.php?s=%s&btn-busca=' % str(pesquisa)
+                url = base + '/search.php?s=%s&btn-busca=' % str(pesquisa)
 
-                link  = openURL(url)
+                link = openURL(url)
                 link = unicode(link, 'utf-8', 'ignore')
 
-                soup     = BeautifulSoup(link)
+                soup = BeautifulSoup(link)
                 conteudo = soup("div", {"id": "wrap"})
-                filmes   = conteudo[0]("div", {"class": "poster"})
+                filmes = conteudo[0]("div", {"class": "poster"})
+                bg = soup('div', {'class':'fundo'})
+                fanart = bg[0].img['src']
                 totF = len(filmes)
                 hosts = []
                 for filme in filmes:
@@ -327,7 +337,7 @@ def player(name,url,iconimage):
         titsT = []
         for i in range(totD) :
                 titS = srvsdub[i].text
-                if 'Principal' not in titS:
+                if 'Principal HD' not in titS:
                     titsT.append(titS)
 
         if not titsT : return
@@ -341,23 +351,32 @@ def player(name,url,iconimage):
         links  = opcoes[0]('a')
 
         if len(links) == 0 : links = conteudo[0]("a")
+        if 'Principal HD' in str(opcoes) : i = (i + 1)
 
         urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 
         xbmc.log('[plugin.video.assistirfilmeshd] L345 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        if 'campanha.php' in urlVideo :
+        	code = urlVideo.split('auth=')[1]
+        	urlVideo = base64.b64decode(code)
+        	xbmc.log('[plugin.video.assistirfilmeshd] L351 - ' + str(urlVideo), xbmc.LOGNOTICE)
+
         '''
         link = openURL(urlVideo)
         soup  = BeautifulSoup(link)
         conteudo = soup("iframe")
         urlVideo = str(conteudo[0]['src'])
         '''
-        if 'openlink.biz' in urlVideo:
+        if 'openlink.biz' in urlVideo :
                 r = requests.get(urlVideo)
                 urlVideo = r.url
 
         elif 'opensv.biz' in urlVideo :
                 r = requests.get(urlVideo)
                 urlVideo = r.url.split('=')[1]
+
+        if '%0D' in urlVideo :
+        		urlVideo = urlVideo.replace('%0D', '')
 
         xbmc.log('[plugin.video.assistirfilmeshd] L360 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
@@ -681,7 +700,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         u  = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
         ok = True
 
-        liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
+        liz = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
 
         liz.setProperty('fanart_image', fanart)
         liz.setInfo(type="Video", infoLabels={"Title": name})
