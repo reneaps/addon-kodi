@@ -1,92 +1,90 @@
 ﻿#####################################################################
 # -*- coding: utf-8 -*-
 #####################################################################
-# Addon : Hora Da Pipoca
-# By AddonBrasil - 11/12/2015
-# Atualizado (1.0.1) - 15/12/2015
-# Atualizado (1.1.0) - 12/03/2016
-# Atualizado (1.2.0) - 14/06/2017
-# Atualizado (1.3.0) - 18/07/2017
-# Atualizado (1.4.0) - 06/05/2018
-# Atualizado (1.5.0) - 06/06/2018
-# Atualizado (1.6.0) - 27/06/2018
-# Atualizado (1.7.0) - 06/07/2018
-# Atualizado (1.8.0) - 10/07/2018
-# Atualizado (1.9.0) - 22/07/2018
-# Atualizado (2.0.0) - 03/08/2018
-# Atualizado (2.0.1) - 04/08/2018
-# Atualizado (2.0.2) - 12/03/2019
-# Atualizado (2.0.3) - 12/03/2019
-# Atualizado (2.0.4) - 14/03/2019
-# Atualizado (2.0.5) - 11/04/2019
-# Atualizado (2.0.6) - 14/04/2019
-# Atualizado (2.0.7) - 25/04/2019
-# Atualizado (2.0.8) - 15/05/2019
-# Atualizado (2.0.9) - 15/05/2019
+# Addon : OverFlix
+# By AddonBrasil - 08/05/2019
+# Atualizado (1.0.0) - 08/05/2019
+# Atualizado (1.0.1) - 10/05/2019
+# Atualizado (1.0.2) - 12/05/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import json
 import urlresolver
 import requests
+import resources.lib.moonwalk as moonwalk
 
-from resources.lib.BeautifulSoup import BeautifulSoup
-from resources.lib               import jsunpack
-from time                        import time
+from bs4 import BeautifulSoup
+from resources.lib import jsunpack
+from time import time
 
-version   = '2.0.9'
-addon_id  = 'plugin.video.megafilmesonline'
+version   = '1.0.2'
+addon_id  = 'plugin.video.overflix'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
-addonfolder  = selfAddon.getAddonInfo('path')
-artfolder    = addonfolder + '/resources/img/'
-fanart       = addonfolder + '/fanart.png'
-base         = base64.b64decode('aHR0cHM6Ly9tZWdhaGRmaWxtZXMuY29tLw==')
+addonfolder = selfAddon.getAddonInfo('path')
+artfolder   = addonfolder + '/resources/media/'
+fanart      = addonfolder + '/resources/fanart.png'
+base        = base64.b64decode('aHR0cHM6Ly9vdmVyZmxpeC5uZXQv')
+sbase       = 'navegar/series-2/?alphabet=all&sortby=v_started&sortdirection=desc'
+v_views     = 'navegar/filmes-1/?alphabet=all&sortby=v_views&sortdirection=desc'
 
 ############################################################################################################
 
 def menuPrincipal():
-        addDir('Categorias'                    , base + 'filme/'                            ,    10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + 'categoria-filmes/lancamentos/'    ,    20, artfolder + 'lancamentos.png')
-        addDir('Filmes Dublados'            , base + '?s=dublado'                        ,    20, artfolder + 'pesquisa.png')
-        addDir('Seriados'                    , base + 'series/'                            ,    25, artfolder + 'legendados.png')
-        addDir('Pesquisa Series'            , '--'                                        ,    30, artfolder + 'pesquisa.png')
-        addDir('Pesquisa Filmes'            , '--'                                        ,    35, artfolder + 'pesquisa.png')
-        addDir('Configurações'                , base                                        ,  999, artfolder + 'config.png', 1, False)
-        addDir('Configurações ExtendedInfo'    , base                                        , 1000, artfolder + 'config.png', 1, False)
+        addDir('Categorias Filmes'          , base + 'navegar/filmes-1/'             ,        10, artfolder + 'categorias.png')
+        addDir('Categorias Series'          , base + sbase                           ,        10, artfolder + 'categorias.png')
+        addDir('Lançamentos'                , base + 'categoria/50-lancamentos/'     ,        20, artfolder + 'lancamentos.png')
+        addDir('Filmes Dublados'            , base + 'categoria/56-filmes-dublados/' ,        20, artfolder + 'pesquisa.png')
+        addDir('Filmes Mais Assistidos'     , base + v_views                         ,        20, artfolder + 'pesquisa.png')
+        addDir('Series'                     , base + sbase                           ,        25, artfolder + 'legendados.png')
+        addDir('Pesquisa Series'            , '--'                                   ,        30, artfolder + 'pesquisa.png')
+        addDir('Pesquisa Filmes'            , '--'                                   ,        35, artfolder + 'pesquisa.png')
+        addDir('Configurações'              , base                                   ,       999, artfolder + 'config.png', 1, False)
+        addDir('Configurações ExtendedInfo' , base                                   ,      1000, artfolder + 'config.png', 1, False)
 
         setViewMenu()
 
 def getCategorias(url):
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link)
-        conteudo   = soup("div", {"id": "homepage-items"})
-        categorias = conteudo[0].findAll("a")
-        totC = len(categorias)
+        soup = BeautifulSoup(link, 'html.parser')
+        if 'filmes' in url :
+            conteudo   = soup("ul",{"id":"elNavigation_18_menu"})
+        if 'series' in url :
+            conteudo   = soup("ul",{"id":"elNavigation_19_menu"})
+        categorias = conteudo[0]("li")
+
         for categoria in categorias:
-                #xbmc.log('[plugin.video.megahfilmeshd] L50 ' + str(categoria['href']), xbmc.LOGNOTICE)
-                titC = categoria.text.encode('utf-8','replace')
-                urlC = categoria["href"]
+                titC = categoria.a.text.encode('utf-8','')
+                urlC = categoria.a["href"]
                 imgC = artfolder + limpa(titC) + '.png'
-                addDir(titC,urlC,20,imgC)
+                if 'filmes' in url:
+                    addDir(titC,urlC,20,imgC)
+                elif 'series' in url:
+                    addDir(titC,urlC,25,imgC)
 
         setViewMenu()
 
 def getFilmes(url):
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link)
-        filmes = soup.findAll('div',{'class':re.compile('201')})
+        soup = BeautifulSoup(link, 'html.parser')
+        conteudo = soup('div', attrs={'class':'ipsGrid ipsPad_half'})
+        filmes = conteudo[0]('div', attrs={'class':'vbItemImage'})
         totF = len(filmes)
+
         for filme in filmes:
-                titF = filme.h2.text.encode('utf-8')
-                urlF = filme.a["href"].encode('utf-8')
-                imgF = filme.div["data-original"].encode('utf-8')
+                titF = filme.a['title'].encode("utf-8")
+                titF = titF.replace('Assistir','').replace('Online','')
+                urlF = filme.a['href'].encode("utf-8")
+                image_news = filme('div', {'class':'vb_image_container'})[0]
+                imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0].encode("utf-8")
                 addDirF(titF, urlF, 100, imgF, False, totF)
 
         try :
-                proxima = re.findall('<link rel="next" href="(.*?)"', link)[0]
+                next_page = soup('li', attrs={'class':'ipsPagination_next'})[0]
+                proxima = next_page.a['href']
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
                 pass
@@ -95,333 +93,276 @@ def getFilmes(url):
 
 def getSeries(url):
         link = openURL(url)
-        link = unicode(link, 'utf-8', 'ignore')
-
-        soup = BeautifulSoup(link)
-        conteudo = soup.findAll('div', {'id':'series-list'})
-        filmes = conteudo[0]('a')
-        totF = len(filmes)
+        link = unicode(link, 'utf-8', 'ignore')        
+        soup = BeautifulSoup(link, 'html.parser')
+        conteudo = soup('div', attrs={'class':'ipsGrid ipsPad_half'})
+        filmes = conteudo[0]('div', attrs={'class':'vbItemImage'})
 
         for filme in filmes:
-                urlF = filme["href"].encode('utf-8')
-                imgF = filme.img["data-original"].encode('utf-8')
-                titF = filme.find('div',{'class':'title'}).text.encode('utf-8')
-                titF = urlF.split('/')[4]
-                titF = titF.replace('/','').replace('-',' ').replace('assistir','')
-                titF = titF.replace(' as','').replace('todas','').replace('temporadas','')
-                titF = titF.strip()
-                titF = titF.title()
+                titF = filme.a["title"].encode("utf-8")
+                titF = titF.replace('Assistir','').replace('Online','')
+                urlF = filme.a["href"].encode('utf-8')
+                image_news = filme('div', {'class':'vb_image_container'})[0]
+                imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0]
                 addDir(titF, urlF, 26, imgF)
 
         try :
-                proxima = re.findall('<link rel="next" href="(.*?)"', link)[0]
+                next_page = soup('li', attrs={'class':'ipsPagination_next'})[0]
+                proxima = next_page.a['href']
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
 
-        xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
-def getTemporadas(url):
-        link  = openURL(url)
-        soup = BeautifulSoup(link)
-        filmes = soup('div', {'id':'seasons'})
-        seasons = filmes[0]('div',{'class':'item get_episodes'})
-        info = soup('div', {'class':'infos'})
-        sname = info[0].h2.text.encode('utf-8')
-        xbmc.log('[plugin.video.megahfilmeshd] L127 ' + str(sname), xbmc.LOGNOTICE)
+def getTemporadas(name,url,iconimage):
+        html = openURL(url)
+        soup = BeautifulSoup(html,'html.parser')
+        sname = soup.title.text.replace('-','|').split('|')[0]
+        sname = sname.replace('Assistir','').replace('Online','')
+        data = soup('div', {'class':'ipsColumns ipsColumns_collapsePhone'})
+        url = data[0]('a',{'class':'btnn iconized assistir'})[0]['href']
+        html = openURL(url)
+        soup = BeautifulSoup(html, 'html.parser')
+        conteudo = soup('div', attrs={'class':'box'})
+        filmes = conteudo[0]('li')
+        totF = len(filmes)
+        imgF = data[0].img['src']
         urlF = url
-        totD = len(seasons)
-
-        imgF = ""
-        img = soup.find("div", {"class": "downloadImage"})
-        imgF = re.findall(r'href=[\'"]?([^\'" >]+)', str(img))
-        imgF = imgF[0]
-
         i = 1
-        while i <= totD:
-            titF = str(i) + "ª Temporada"
-            try:
-                addDir(titF, urlF, 27, imgF)
-            except:
-                pass
-            i = i + 1
+        while i <= totF:
+                titF = str(i) + "ª Temporada " + sname.encode('utf-8')
+                try:
+                    addDirF(titF, urlF, 27, imgF, True, totF)
+                except:
+                    pass
+                i = i + 1
+                
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
-        n = name.replace('ª Temporada', '')
-        n = int(n)
-        n = (n-1)
-        s = n
-        temp = []
-        episodios = []
+        n = re.findall(r'(.+?)ª Temporada.+', name)[0]
+        link = openURL(url)
+        soup = BeautifulSoup(link,'html.parser')
+        sname = soup.title.text.replace('-','|').split('|')[0]
+        sname = sname.replace('Assistir','').replace('Online','')
+        sname = sname.encode('utf-8')
+        links = re.findall(r'addiframe\(\'(.+?)\'\);', link)
+        imgF = iconimage
+        epis = re.findall(r'<a class="video" href="javascript: InitPlayer\(\'(.+?)\', \'(.+?)\',\'(.+?)\'\);">(.+?)</a>', link)
+        totF = len(links)
+        for i in range(0, totF):
+            if n in str(epis[i][0]) :
+                if not "ximo" in str(epis[i][3]) :
+                    titS = epis[i][0]
+                    titE = epis[i][1]
+                    titT = epis[i][2]
+                    titF = epis[i][3]
+                    titF = sname + ' T' + n + ' ' +  titT.replace('dub', '(D)').replace('leg', '(L)') + " - " + titF
+                    urlF = links[i]
+                    addDirF(titF, urlF, 110, imgF, False, totF)
 
-        link  = openURL(url)
-        link = unicode(link, 'utf-8', 'ignore')
-
-        soup = BeautifulSoup(link)
-        filmes = soup.findAll('div', {'id':'seasons'})
-        info = soup('div', {'class':'infos'})
-        sname = info[0].h2.text.encode('utf-8')
-        seasons = filmes[0]('div',{'class':'item get_episodes'})
-        idseasons = seasons[n]['data-row-id']
-        data = urllib.urlencode({'action':'episodes','season':idseasons})
-        url = 'https://megahdfilmes.com/wp-admin/admin-ajax.php'
-        req = urllib2.Request(url=url,data=data)
-        req.add_header('Referer',url)
-        req.add_header('Upgrade-Insecure-Requests',1)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
-        response = urllib2.urlopen(req)
-        content = response.read()
-        response.close()
-        d = json.loads(content)
-        b = d['episodes']
-        #xbmc.log('[plugin.video.megahfilmeshd] L173 ' + str(b), xbmc.LOGNOTICE)
-        '''
-        imgF = ""
-        img = soup.find("meta", {"property": "og:image"})
-        imgF = re.findall(r'content=[\'"]?([^\'" >]+)', str(img))
-        img = imgF[0]
-        '''
-        imgF = ""
-        img = soup.find("div", {"class": "downloadImage"})
-        imgF = re.findall(r'href=[\'"]?([^\'" >]+)', str(img))
-        img = imgF[0]
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
         
-        for i in range(0, len(b)):
-                titF = b[str(i)]['ep'].encode('utf-8')
-                idname = b[str(i)]['id']
-                urlF = pega(idname)
-                if urlF == "" : titF = titF + ">>Indisponivel"
-                imgF = ''
-                temp = (urlF, titF)
-                episodios.append(temp)
-
-        total = len(episodios)
-
-        for url, titulo in episodios:
-                t = str(n+1)
-                e = int(titulo)
-                if len(t) == 1 :
-
-                    if e < 10:
-
-                        titulo = sname+' - S'+'0'+t+'E'+'0'+str(e)
-
-                    else:
-
-                        titulo = sname+' - S'+'0'+t+'E'+str(e)
-
-                else:
-
-                    if e < 10:
-
-                        titulo = sname+' - S'+t+'E'+'0'+str(e)
-
-                    else:
-
-                        titulo = sname+' - S'+t+'E'+str(e)
-                #titulo = sname + " - " + "T " + str(n+1) + " - E " +titulo #+titulo.replace('ª e','ª E')
-                #xbmc.log('[plugin.video.megahfilmeshd] L192 ' + str(url), xbmc.LOGNOTICE)
-                addDirF(titulo, url, 110, img, False, total)
-
-def pega(idname):
-    '''
-    idtime = int(round(time() * 1000))
-    idtime = str(idtime)
-    data = urllib.urlencode({'action':'downloadPage','id':idname,'_':idtime})
-    url = 'https://www.megahfilmeshd.net/wp-admin/admin-ajax.php'
-    #req.add_header('Referer', 'https://www.megahfilmeshd.net/series/game-of-thrones-todas-as-temporadas/')
-    r = urllib2.urlopen(url+'?'+data)
-    html = r.read()
-    #xbmc.log('[plugin.video.megahfilmeshd] L180 ' + str(html), xbmc.LOGNOTICE)
-    urlF = re.compile(r'<a target="_BLANK" href="(.+?)" class="player">').findall(html)[0]
-    html = openURL(urlF)
-    soup = BeautifulSoup(html)
-    #xbmc.log('[plugin.video.megahfilmeshd] L184 ' + str(html), xbmc.LOGNOTICE)
-    urlF = soup.iframe["src"]
-    html = openURL(urlF)
-    soup = BeautifulSoup(html)
-    #xbmc.log('[plugin.video.megahfilmeshd] L188 ' + str(soup), xbmc.LOGNOTICE)
-    return urlF
-    '''
-    data = urllib.urlencode({'action':'players','id':idname})
-    url = 'https://megahdfilmes.com/wp-admin/admin-ajax.php'
-    req = urllib2.Request(url=url,data=data)
-    req.add_header('Referer',url)
-    req.add_header('Upgrade-Insecure-Requests',1)
-    req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
-    content = urllib2.urlopen(req).read()
-    soup = BeautifulSoup(content)
-    try:
-        ef = soup.div['data-player-content']
-    except TypeError:
-        urlF = ''
-        return urlF
-    s = BeautifulSoup(ef)
-    #urlF = s.iframe['src']
-    urlF = data
-    #xbmc.log('[plugin.video.megahfilmeshd] L230 ' + str(urlF), xbmc.LOGNOTICE)
-    return urlF
-
-
 def pesquisa():
-        keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
+        hosts = []
+        temp = []
+        keyb = xbmc.Keyboard('', 'Pesquisar Filmes/Series')
         keyb.doModal()
 
         if (keyb.isConfirmed()):
-                texto     = keyb.getText()
+                texto = keyb.getText()
                 pesquisa = urllib.quote(texto)
-                url         = base + '?s=%s' % str(pesquisa)
 
-                hosts = []
-                link  = openURL(url)
-                link = unicode(link, 'utf-8', 'ignore')
-                soup     = BeautifulSoup(link)
-                conteudo = soup.findAll('div',{'class':'row movies-list'})
-                filmes = conteudo[0]('a')
-                totF = len(filmes)
-                for filme in filmes:
-                        titF = filme["title"].encode('utf-8')
-                        urlF = filme["href"].encode('utf-8')
-                        imgF = filme.div.div["data-original"].encode('utf-8')
+                data = urllib.urlencode({'term':pesquisa})
+                url = base + 'findContent/' 
+
+                headers = {'Referer': url, 
+                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                           'Connection': 'keep-alive',
+                           'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                }
+                r = requests.post(url=url, data=data, headers=headers)
+                html = r.content
+                soup = BeautifulSoup(html, 'html.parser')
+                conteudo = soup('div', {'class':'videoboxGridview'})
+                itens = conteudo[0]('div', {'class':'vbItemImage'})
+                for i in itens:
+                        a = i.div['style']
+                        imgF = re.findall(r'.+url\(\'(.+?)\'\)',a)[0].encode('utf-8')
+                        urlF = i.a['href'].encode('utf-8')
+                        titF = i.a['title']+' '+i.span.text
+                        titF = titF.encode('utf-8')
+                        titF = titF.replace('Assistir','').replace('Online','')
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
-                a = []
-                for url, titulo, img in hosts:
-                    temp = [url, titulo, img]
-                    a.append(temp);
-                return a
+                return hosts
 
 def doPesquisaSeries():
         a = pesquisa()
+        if a is None : return
         total = len(a)
         for url2, titulo, img in a:
             addDir(titulo, url2, 26, img, False, total)
-
+            
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
+        
 def doPesquisaFilmes():
         a = pesquisa()
+        if a is None : return
         total = len(a)
         for url2, titulo, img in a:
             addDir(titulo, url2, 100, img, False, total)
+
         setViewFilmes()
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.megahfilmeshd] L306 ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
-        mensagemprogresso.create('MegaFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+        mensagemprogresso.create('OverFlix', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
         mensagemprogresso.update(0)
-
         titsT = []
         idsT = []
-        url2 = []
-        matriz = []
-
-        link  = openURL(url)
-        soup     = BeautifulSoup(link)
-        conteudo = soup("div", {"class": "fullplayer"})
-        article = conteudo[0]("div",{'class':"playerList playerListSmall"})
-        srvsdub     = article[0]("div",{"class":"item get_player_content"})
-        print srvsdub
-        totD = len(srvsdub)
-        print totD
-        for i in range(totD) :
-                urlF = srvsdub[i]['data-player-content']
-                iframe = BeautifulSoup(urlF)
-                urlD = iframe.iframe['src']
-                xbmc.log('[plugin.video.megahfilmeshd] L329 ' + str(urlD), xbmc.LOGNOTICE)
-                '''
-                if totD == 1 :
-                    urlVideo = urlD
-                else:
-                    link  = openURL(urlD)
-                    #link  = unicode(link, 'utf-8', 'ignore')
-                    soup     = BeautifulSoup(link)
-                    #urlVideo = soup.iframe['src']
-                    links = soup.findAll('iframe')
-                    if len(links) == 1 :
-                        #urlVideo = links[0]['src']
-                        urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
-                    else:
-                        xbmc.log('[plugin.video.megahfilmeshd] L314 ' + str(link), xbmc.LOGNOTICE)
-                        #urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
-                        token = re.findall(r'<a href="http://acessoaoface.info/redir.php\?token=(.+?)" target="_blank" class="big-icon-link">', str(link))[0]
-                        urlVideo = base64.b64decode(token)
-                        xbmc.log('[plugin.video.megahfilmeshd] L316 ' + str(urlVideo), xbmc.LOGNOTICE)
-                        #urlVideo = links[1]['src']
-                        #opID =    urlVideo.split('?')[1]
-                        #opID = opID.split('=')[1]
-                        #urlVideo = "http://openload.co/embed/" + opID
-                '''
-                srv = srvsdub[i].text
-                titsT.append(srv)
-                url2.append(urlD)
-
-        if not titsT : return
-
-        index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-
-        if index == -1 : return
-
-        i = index
-        urlVideo = url2[i]
-
-        if 'javascript' in urlVideo :
-                html = openURL(urlVideo)
-                soup = BeautifulSoup(html)
-                xbmc.log('[plugin.video.megahfilmeshd] L369 ' + str(urlVideo), xbmc.LOGNOTICE)
-                urlVideo = soup.iframe["src"]
-        elif 'action' in urlVideo :
-                html = openURL(urlVideo)
-                soup = BeautifulSoup(html)
-                urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(html))[0]
-                xbmc.log('[plugin.video.megahfilmeshd] L375 ' + str(urlVideo), xbmc.LOGNOTICE)
-        '''
-        t = requests.get(urlVideo)
-        urlVideo = t.url
-        '''
         
-        #conteudo = soup("div", {"class": "player-video"})
-        #links = conteudo[i]("iframe")
+        urlF = url+'?&area=online'
+        xbmc.log('[plugin.video.overflix] L227 - ' + str(urlF), xbmc.LOGNOTICE)
+        link = openURL(urlF)
+        soup = BeautifulSoup(link, 'html.parser')
+        #data = soup('div', {'class':'ipsColumns ipsColumns_collapsePhone'})
+        #btn = data[0]('a',{'class':'btnn iconized assistir'})[0]['href']
+        data = soup.iframe
+        btn = data['src']
+        xbmc.log('[plugin.video.overflix] L234 - ' + str(btn), xbmc.LOGNOTICE)
+        try:
+            ss = btn.split('/?')[1].split('&')
+            for s in ss:
+                hname = s.split('=')[0]
+                if 'down' not in hname:
+                    hkey = s.split('=')[1]
+                    titsT.append(hname)
+                    idsT.append(hkey)
 
-        #if len(links) == 0 : links = conteudo[0]("a")
+            if not titsT : return
 
-        #urlVideo = re.findall(r'data-src=[\'"]?([^\'" >]+)', str(links))[0]
-        #okID = urlVideo.split('embed/?v=')[1]
-        #urlVideo = okID
+            index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
 
+            if index == -1 : return
 
-        xbmc.log('[plugin.video.megahfilmeshd] L355 ' + str(urlVideo), xbmc.LOGNOTICE)
+            i = int(index)
+            urlVideo = titsT[i]
 
-        mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
+            if 'verystream' in urlVideo:
+                fxID = str(idsT[i])
+                urlVideo = 'https://verystream.com/e/%s' % fxID
+
+            elif 'streamango' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://streamango.com/embed/%s' % fxID
+                
+            elif 'rapidvideo' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
+                 
+            elif 'mystream' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://mstream.cloud/%s' % fxID
+                r = requests.get(urlVideo)
+                data = r.content
+                srv = re.findall('<meta name="og:image" content="([^"]+)">', data)[0]
+                url2Play = srv.replace('/img','').replace('jpg','mp4')
+                OK = False
+                
+            elif 'thevid' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://thevid.net/e/%s' % fxID
+                 
+            elif 'openload' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://openload.co/embed/%s' % fxID
+ 
+            elif 'vidoza' in urlVideo :
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
+                                       
+            elif 'jetload' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://jetload.net/e/%s' % fxID
+                xbmc.log('[plugin.video.overflix] L289 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                data = openURL(urlVideo)
+                srv = re.findall('id="srv" value="([^"]+)"', data)[0]
+                file_name = re.findall('file_name" value="([^"]+)"', data)[0]
+                file_low = re.findall('id="file_low" value="([^"]+)"', data)[0]
+                file_med = re.findall('id="file_med" value="([^"]+)"', data)[0]
+                file_high = re.findall('id="file_high" value="([^"]+)"', data)[0]
+                try:
+                    id_srv = re.findall('id="srv_id" value="([^"]+)"', data)[0]
+                except:
+                    id_srv = ''
+                    pass
+                if id_srv != '' : 
+                    url = 'https://jetload.net/api/download'
+                    data = urllib.urlencode({"file_name":file_name+'.mp4',"srv":id_srv})
+                    headers = {'Referer': urlVideo, 
+                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                           'Connection': 'keep-alive',
+                           'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                }
+                    xbmc.log('[plugin.video.overflix] L310 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                    r = requests.post(url=url, data=data, headers=headers)
+                    tipo = r.text
+                    ext = tipo.split('?')[0]
+                    ext2 = tipo.split('?')[1]
+                    head = {'Referer': urlVideo,
+                            'Content-Type': 'video/mp4',
+                            'Connection': 'keep-alive',
+                            'Origin': 'https://jetload.net',
+                            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                }
+                    head2 = urllib.urlencode(head)
+                    url2Play = tipo #ext+'.mp4?'+ext2+'|'+head2
+                    urlVideo =[]
+                    '''
+                    https://jetload.net/#!/d/37AQFHdsoCwT
+                    https://jetload.net/api/get_direct_video/37AQFHdsoCwT
+                    '''
+                    if file_high == '1'  :
+                        url2Play = srv+'/v2/schema/'+file_name+'/master.m3u8'
+                    elif file_med == '1' :
+                        url2Play = srv+'/v2/schema/'+file_name+'/med.m3u8'
+                    elif file_low == '1' :
+                        url2Play = srv+'/v2/schema/'+file_name+'/low.m3u8'
+
+                OK = False
+                
+            elif 'principal' in urlVideo :
+                fxID = str(idsT[i+1])
+                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
+                
+            xbmc.log('[plugin.video.overflix] L341 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        except:
+            pass
         
-        if 'nowvideo.php' in urlVideo :
-                nowID = urlVideo.split("id=")[1]
-                urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
+        try:
+            value = re.findall(r'<a style=".+?" href="(.+?)" class="btn iconized download" rel="nofollow" target="_blank"><i class="icon fa fa-download"></i> Baixar</a>', link)
+            urlVideo = value[0]
+        except:
+            pass
 
-        elif 'megahdfilmes.com' in urlVideo :
-                okID = urlVideo.split('url=')[1]
-                okID = base64.b64decode(okID)
-                if 'type=o' in okID:
-                    okID = okID.replace('id=','').replace('&type=o','')
-                    urlVideo = 'https://openload.co/embed/%s' % okID
-                elif 'type=v' in okID:
-                    okID = okID.replace('id=','').replace('&type=v','')
-                    urlVideo = 'https://verystream.com/e/%s' % okID
-                elif 'type=t' in okID:
-                    okID = okID.replace('id=','').replace('&type=t','')
-                    urlVideo = 'https://thevid.net/e/%s' % okID
-                xbmc.log('[plugin.video.megahfilmeshd] L410 ' + str(urlVideo), xbmc.LOGNOTICE)
-
-        elif 'thevid.net' in urlVideo :
-                okID = urlVideo.split('e/')[1]
-                urlVideo = 'http://thevid.net/e/%s' % okID
-
-        if OK : url2Play = urlresolver.resolve(urlVideo)
-
-        xbmc.log('[plugin.video.megahfilmeshd] L419 ' + str(url2Play), xbmc.LOGNOTICE)
+        if OK :
+            try:
+                url2Play = urlresolver.resolve(urlVideo)
+            except:
+                dialog = xbmcgui.Dialog()
+                dialog.ok(" Erro:", " Video removido! ")
+                url2Play = []
+                pass
 
         if not url2Play : return
+
+        xbmc.log('[plugin.video.overflix] L362 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         legendas = '-'
 
@@ -437,6 +378,7 @@ def player(name,url,iconimage):
         playlist.add(url2Play,listitem)
 
         xbmcPlayer = xbmc.Player()
+        xbmc.sleep(20000)
         xbmcPlayer.play(playlist)
 
         mensagemprogresso.update(100)
@@ -454,116 +396,140 @@ def player(name,url,iconimage):
                     xbmcPlayer.setSubtitles(sfile)
             else:
                 xbmcPlayer.setSubtitles(legendas)
-
 
 def player_series(name,url,iconimage):
+        #xbmc.log('[plugin.video.overflix] L398 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
-        mensagemprogresso.create('MegaFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+        mensagemprogresso.create('OverFlix', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
         mensagemprogresso.update(0)
-
         titsT = []
         idsT = []
-        url2 = []
-        matriz = []
 
-        data = url
-        url = 'https://megahdfilmes.com/wp-admin/admin-ajax.php'
-        req = urllib2.Request(url=url,data=data)
-        req.add_header('Referer',url)
-        req.add_header('Upgrade-Insecure-Requests',1)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
-        content = urllib2.urlopen(req).read()
-        soup = BeautifulSoup(content)
-        srvsdub     = soup("div",{"class":"item get_player_content"})
-        print srvsdub
-        totD = len(srvsdub)
-        print totD
-        for i in range(totD) :
-                urlF = srvsdub[i]['data-player-content']
-                iframe = BeautifulSoup(urlF)
-                urlD = iframe.iframe['src']
-                if totD == 1 :
-                    urlVideo = urlD
-                else:
-                    link  = openURL(urlD)
-                    link  = unicode(link, 'utf-8', 'ignore')
-                    soup     = BeautifulSoup(link)
-                    #urlVideo = soup.iframe['src']
-                    links = soup.findAll('iframe')
-                    if len(links) == 1 :
-                        #urlVideo = links[0]['src']
-                        urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
-                    else:
-                        urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(link))[0]
-                        xbmc.log('[plugin.video.megahfilmeshd] L450 ' + str(urlVideo), xbmc.LOGNOTICE)
-                        #urlVideo = links[1]['src']
-                        #opID =    urlVideo.split('?')[1]
-                        #opID = opID.split('=')[1]
-                        #urlVideo = "http://openload.co/embed/" + opID
-                srv = srvsdub[i].text
-                titsT.append(srv)
-                url2.append(urlVideo)
+        btn = url
+        #xbmc.log('[plugin.video.overflix] L407 - ' + str(btn), xbmc.LOGNOTICE)
+        try:
+            ss = btn.split('/?')[1].split('&')
+            for s in ss:
+                hname = s.split('=')[0]
+                if 'down' not in hname:
+                    hkey = s.split('=')[1]
+                    titsT.append(hname)
+                    idsT.append(hkey)
 
-        if not titsT : return
+            if not titsT : return
 
-        index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
+            index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
 
-        if index == -1 : return
+            if index == -1 : return
 
-        i = index
-        urlVideo = url2[i]
+            i = int(index)
+            urlVideo = titsT[i]
 
-        xbmc.log('[plugin.video.megahfilmeshd] L468 ' + str(urlVideo), xbmc.LOGNOTICE)
-        if 'javascript' in urlVideo :
-                html = openURL(urlVideo)
-                soup = BeautifulSoup(html)
-                xbmc.log('[plugin.video.megahfilmeshd] L472 ' + str(urlVideo), xbmc.LOGNOTICE)
-                urlVideo = soup.iframe["src"]
-        if 'action' in urlVideo :
-                html = openURL(urlVideo)
-                soup = BeautifulSoup(html)
-                urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(html))[0]
-                xbmc.log('[plugin.video.megahfilmeshd] L478 ' + str(urlVideo), xbmc.LOGNOTICE)
+            if 'verystream' in urlVideo:
+                fxID = str(idsT[i])
+                urlVideo = 'https://verystream.com/e/%s' % fxID
+
+            elif 'streamango' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://streamango.com/embed/%s' % fxID
                 
-        t = requests.get(urlVideo)
-        urlVideo = t.url
-        xbmc.log('[plugin.video.megahfilmeshd] L482 ' + str(urlVideo), xbmc.LOGNOTICE)
+            elif 'rapidvideo' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
 
-        mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
+            elif 'mystream' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://mstream.cloud/%s' % fxID
+                r = requests.get(urlVideo)
+                data = r.content
+                srv = re.findall('<meta name="og:image" content="([^"]+)">', data)[0]
+                url2Play = srv.replace('/img','').replace('jpg','mp4')
+                OK = False
+                
+            elif 'thevid' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://thevid.net/e/%s' % fxID
+                 
+            elif 'openload' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://openload.co/embed/%s' % fxID
+ 
+            elif 'vidoza' in urlVideo :
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
+                                       
+            elif 'jetload' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://jetload.net/e/%s' % fxID
+                xbmc.log('[plugin.video.overflix] L462 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                data = openURL(urlVideo)
+                srv = re.findall('id="srv" value="([^"]+)"', data)[0]
+                file_name = re.findall('file_name" value="([^"]+)"', data)[0]
+                file_low = re.findall('id="file_low" value="([^"]+)"', data)[0]
+                file_med = re.findall('id="file_med" value="([^"]+)"', data)[0]
+                file_high = re.findall('id="file_high" value="([^"]+)"', data)[0]
+                try:
+                    id_srv = re.findall('id="srv_id" value="([^"]+)"', data)[0]
+                except:
+                    id_srv = ''
+                    pass
 
-        if 'open.php' in urlVideo :
-                nowID = urlVideo.split("id=")[1]
-                urlVideo = 'https://openload.co/embed/%s' % nowID
+                if id_srv != '' : 
+                    url = 'https://jetload.net/api/download'
+                    data = urllib.urlencode({"file_name":file_name+'.mp4',"srv":id_srv})
+                    headers = {'Referer': urlVideo, 
+                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                           'Connection': 'keep-alive',
+                           'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                }
+                    xbmc.log('[plugin.video.overflix] L484 - ' + str(data), xbmc.LOGNOTICE)
+                    r = requests.post(url=url, data=data, headers=headers)
+                    tipo = r.text
+                    ext = tipo.split('?')[0]
+                    ext2 = tipo.split('?')[1]
+                    head = {'Referer': urlVideo,
+                            'Content-Type': 'video/mp4',
+                            'Connection': 'keep-alive',
+                            'Origin': 'https://jetload.net',
+                            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                }
+                    head2 = urllib.urlencode(head)
+                    url2Play = tipo #ext+'?'+ext2+'|'+head2
+                    urlVideo =[]
+                    xbmc.log('[plugin.video.overflix] L498 - ' + str(tipo), xbmc.LOGNOTICE)
+                else:
+                    if file_high == '1'  :
+                        url2Play = srv+'/v2/schema/'+file_name+'/master.m3u8'
+                    elif file_med == '1' :
+                        url2Play = srv+'/v2/schema/'+file_name+'/med.m3u8'
+                    elif file_low == '1' :
+                        url2Play = srv+'/v2/schema/'+file_name+'/low.m3u8'
+                    #url2Play = srv + "/v2/schema/%s/master.m3u8" % file_name
+                OK = False
+                
+            elif 'principal' in urlVideo :
+                fxID = str(idsT[i+1])
+                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
+                
+            xbmc.log('[plugin.video.overflix] L513- ' + str(urlVideo), xbmc.LOGNOTICE)
+                
+        except:
+            pass
 
-        elif 'megahdfilmes.com' in urlVideo :
-                okID = urlVideo.split('url=')[1]
-                okID = base64.b64decode(okID)
-                if 'type=o' in okID:
-                    okID = okID.replace('id=','').replace('&type=o','')
-                    urlVideo = 'https://openload.co/embed/%s' % okID
-                elif 'type=v' in okID:
-                    okID = okID.replace('id=','').replace('&type=v','')
-                    urlVideo = 'https://verystream.com/e/%s' % okID
-                elif 'type=t' in okID:
-                    okID = okID.replace('id=','').replace('&type=t','')
-                    urlVideo = 'https://thevid.net/e/%s' % okID
-
-        elif 'video.php' in urlVideo :
-                nowID = urlVideo.split("id=")[1]
-                urlVideo = 'https://openload.co/embed/%s' % nowID
-
-        elif 'openload.php' in urlVideo :
-                nowID = urlVideo.split("id=")[1]
-                urlVideo = 'https://openload.co/embed/%s' % nowID
-
-        elif 'thevid.net' in urlVideo :
-                okID = urlVideo.split('e/')[1]
-                urlVideo = 'http://thevid.net/e/%s' % okID
-
-        if OK : url2Play = urlresolver.resolve(urlVideo)
+        if OK :
+            try:
+                url2Play = urlresolver.resolve(urlVideo)
+            except:
+                dialog = xbmcgui.Dialog()
+                dialog.ok(" Erro:", " Video removido! ")
+                url2Play = []
+                pass
 
         if not url2Play : return
+
+        xbmc.log('[plugin.video.overflix] L529 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         legendas = '-'
 
@@ -596,8 +562,6 @@ def player_series(name,url,iconimage):
                     xbmcPlayer.setSubtitles(sfile)
             else:
                 xbmcPlayer.setSubtitles(legendas)
-
-        return OK
 
 ############################################################################################################
 
@@ -614,12 +578,24 @@ def openConfigEI():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        headers = {
-        "Referer": url,
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"
-    }
+        req = urllib2.Request(url)
+        req.add_header('Referer',url)
+        req.add_header('Upgrade-Insecure-Requests',1)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
+        response = urllib2.urlopen(req)
+        link=response.read()
+        response.close()
+        return link
+
+def postURL(url):
+        headers = {'Referer': base, 
+                   'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                   'Host': 'www.midiaflixhd.net',
+                   'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+        }
+
         req = urllib2.Request(url, "",headers)
-        req.get_method = lambda: 'GET'
+        req.get_method = lambda: 'POST'
         response = urllib2.urlopen(req)
         link=response.read()
         response.close()
@@ -646,7 +622,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
 
         liz.setProperty('fanart_image', fanart)
-        liz.setInfo(type="Video", infoLabels={"Title": name})
+        liz.setInfo(type="Video", infoLabels={"title": name})
 
         cmItems = []
 
@@ -750,7 +726,7 @@ if     mode == None : menuPrincipal()
 elif mode == 10      : getCategorias(url)
 elif mode == 20      : getFilmes(url)
 elif mode == 25      : getSeries(url)
-elif mode == 26      : getTemporadas(url)
+elif mode == 26      : getTemporadas(name,url,iconimage)
 elif mode == 27      : getEpisodios(name,url)
 elif mode == 30      : doPesquisaSeries()
 elif mode == 35      : doPesquisaFilmes()
