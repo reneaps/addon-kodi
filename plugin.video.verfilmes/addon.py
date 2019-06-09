@@ -5,19 +5,9 @@
 # Addon : VerFilmes
 # By AddonReneSilva - 17/02/2017
 # Atualizado (1.0.0) - 17/02/2017
-# Atualizado (1.0.1) - 27/07/2017
-# Atualizado (1.0.2) - 13/08/2017
-# Atualizado (1.0.3) - 14/08/2017
-# Atualizado (1.0.4) - 23/09/2017
-# Atualizado (1.0.5) - 01/07/2018
-# Atualizado (1.0.6) - 05/07/2018
-# Atualizado (1.0.7) - 05/07/2018
-# Atualizado (1.0.8) - 01/08/2018
-# Atualizado (1.0.9) - 21/03/2019
 # Atualizado (1.1.0) - 22/03/2019
-# Atualizado (1.1.1) - 08/04/2019
-# Atualizado (1.1.2) - 23/04/2019
 # Atualizado (1.1.3) - 26/04/2019
+# Atualizado (1.1.4) - 09/06/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -474,9 +464,10 @@ def player_series(name,url,iconimage):
 				fxID = fxID.replace('html','')
 				urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
 
-		elif 'vcstream.to2' in urlVideo :
-				fxID = urlVideo.split('embed/')[1]
-				urlVideo = 'https://vidcloud.co/v/%s' % fxID
+		elif 'vcstream=' in urlVideo :
+				fxID = urlVideo.split('=')[1]
+				fxID = fxID.split('&')[0]
+				urlVideo = 'https://vcstream.to/embed/%s' % fxID
 
 		elif 'thevid' in urlVideo :
 				fxID = urlVideo.split('e/')[1]
