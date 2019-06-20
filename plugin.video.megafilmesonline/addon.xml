@@ -5,6 +5,7 @@
 		<import addon="script.module.urlresolver" version="2.10.8"/>
 		<import addon="script.extendedinfo" version="3.0.0"/>
 		<import addon="script.module.requests" version="2.9.1"/>
+		<import addon="script.module.videohosts" version="1.0.0"/>
 		<import addon="script.module.beautifulsoup4" version="4.3.2"/>
 		<import addon="script.module.html5lib" />
   </requires>
