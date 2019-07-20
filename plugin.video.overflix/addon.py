@@ -7,6 +7,7 @@
 # Atualizado (1.0.1) - 10/05/2019
 # Atualizado (1.0.2) - 12/05/2019
 # Atualizado (1.0.3) - 20/06/2019
+# Atualizado (1.0.4) - 20/07/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -269,8 +270,11 @@ def player(name,url,iconimage):
             elif 'mystream' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://mstream.cloud/%s' % fxID
-                r = requests.get(urlVideo)
-                data = r.content
+                urlVideo = urlVideo.split('?')[0]
+                #urlVideo = 'https://mstream.cloud/%s' % fxID
+                data = openURL(urlVideo)
+                #r = requests.get(urlVideo)
+                #data = r.content
                 srv = re.findall('<meta name="og:image" content="([^"]+)">', data)[0]
                 url2Play = srv.replace('/img','').replace('jpg','mp4')
                 OK = False
