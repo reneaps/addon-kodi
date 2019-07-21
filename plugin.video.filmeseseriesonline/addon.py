@@ -14,6 +14,7 @@
 # Atualizado (1.2.6) - 02/05/2019
 # Atualizado (1.2.7) - 13/05/2019
 # Atualizado (1.2.8) - 14/05/2019
+# Atualizado (1.2.9) - 21/07/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -333,6 +334,10 @@ def player(name,url,iconimage):
                 fxID = urlVideo.split('=')[1]
                 urlVideo = 'https://www.raptu.com/?v=%s' % fxID
 
+        elif 'rapidvideo' in urlVideo :
+                fxID = urlVideo.split('=')[1]
+                urlVideo = 'https://www.rapidvideo.com/?v=%s' % fxID
+
         elif 'videoplayer=' in urlVideo :
                 fxID = urlVideo.split('=')[1]
                 urlVideo = 'https://www.fembed.com/v/%s' % fxID
@@ -372,11 +377,12 @@ def player(name,url,iconimage):
         elif 'thevid' in urlVideo :
                 fxID = urlVideo.split('=')[1]
                 urlVideo = 'https://thevid.net/e/%s' % fxID
+                
                 linkTV  = openURL(urlVideo)
                 sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
                 aMatches = re.compile(sPattern).findall(linkTV)
                 sUnpacked = jsunpack.unpack(aMatches[1])
-                url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
+                url2Play = re.findall('var vldAb="(.*?)"', sUnpacked)
                 url = str(url2Play[0])
                 url2Play = 'http:%s' % url if url.startswith("//") else url
 
@@ -492,6 +498,10 @@ def player_series(name,url,iconimage):
                 fxID = urlVideo.split('=')[1]
                 urlVideo = 'https://www.raptu.com/?v=%s' % fxID
 
+        elif 'rapidvideo' in urlVideo :
+                fxID = urlVideo.split('=')[1]
+                urlVideo = 'https://www.rapidvideo.com/?v=%s' % fxID
+
         elif 'megavid' in urlVideo :
                 fxID = urlVideo.split('=')[1]
                 urlVideo = 'http://megavid.tv/embed-%s.html' % fxID
@@ -539,7 +549,7 @@ def player_series(name,url,iconimage):
                 sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
                 aMatches = re.compile(sPattern).findall(linkTV)
                 sUnpacked = jsunpack.unpack(aMatches[1])
-                url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
+                url2Play = re.findall('var vldAb="(.*?)"', sUnpacked)
                 url = str(url2Play[0])
                 url2Play = 'http:%s' % url if url.startswith("//") else url
 
