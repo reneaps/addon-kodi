@@ -13,6 +13,7 @@
 # Atualizado (1.0.8) - 09/07/2018
 # Atualizado (1.0.9) - 18/04/2018
 # Atualizado (1.1.0) - 04/05/2018
+# Atualizado (1.1.1) - 28/07/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -47,7 +48,7 @@ def menuPrincipal():
 		setViewMenu()
 
 def getCategorias(url):
-		xbmc.log('[plugin.video.filmesonlinehd11] L47 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L50 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup = BeautifulSoup(link)
@@ -65,7 +66,7 @@ def getCategorias(url):
 		setViewMenu()
 
 def getFilmes(url):
-		xbmc.log('[plugin.video.filmesonlinehd11] L66 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L68 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
@@ -93,7 +94,7 @@ def getFilmes(url):
 		setViewFilmes()
 
 def getSeries(url):
-		#xbmc.log('[plugin.video.filmesonlinehd11] L91 - ' + str(url), xbmc.LOGNOTICE)
+		#xbmc.log('[plugin.video.filmesonlinehd11] L96 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
@@ -117,14 +118,14 @@ def getSeries(url):
 		setViewFilmes()
 
 def getTemporadas(url):
-		xbmc.log('[plugin.video.filmesonlinehd11] L115 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L120 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
 		soup     = BeautifulSoup(link)
 		conteudo = soup.findAll("div", {"class":"ui embed dimmable"})
 
 		urlF  = conteudo[0]["data-url"]
-		xbmc.log('[plugin.video.filmesonlinehd11] L122 - ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L127 - ' + str(urlF), xbmc.LOGNOTICE)
 
 		img = soup.find("div", {"class": "ui embed dimmable"})
 		if not img:
@@ -135,11 +136,11 @@ def getTemporadas(url):
 
 		link = openURL(urlF)
 		#link = unicode(link, 'utf-8', 'ignore')
-		xbmc.log('[plugin.video.filmesonlinehd11] L136 - ' + str(link), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L138 - ' + str(link), xbmc.LOGNOTICE)
 		'''
 		js = BeautifulSoup(link)
 		js = js.find('head')
-		xbmc.log('[plugin.video.filmesonlinehd11] L127 - ' + str(js), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L142 - ' + str(js), xbmc.LOGNOTICE)
 		js = js.find_all("script")
 		js = js[2]
 		js = js.text
@@ -174,14 +175,14 @@ def getTemporadas(url):
 			pass
 
 def getServidores(name, url, iconimage):
-		xbmc.log('[plugin.video.filmesonlinehd11] L175 - ' + str(dados), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L177 - ' + str(dados), xbmc.LOGNOTICE)
 		temp = []
 		episodios = []
 		imgF = iconimage
 
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')
-		xbmc.log('[plugin.video.filmesonlinehd11] L182 - ' + str(link), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L184 - ' + str(link), xbmc.LOGNOTICE)
 		episodes = re.findall(r'episodes\: \[(.+?)\],',link)[0]
 		episodes = episodes.split(",")
 		urlF = url
@@ -192,7 +193,7 @@ def getServidores(name, url, iconimage):
 				addDir(titF, urlF, 110, imgF, False, totD)
 
 def getEpisodios(name, url, iconimage):
-		xbmc.log('[plugin.video.filmesonlinehd11] L193 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L195 - ' + str(url), xbmc.LOGNOTICE)
 		s = name.replace("a Temporada","")
 		temp = []
 		episodios = []
@@ -203,11 +204,11 @@ def getEpisodios(name, url, iconimage):
 		conteudo = soup.findAll("div", {"class":"ui embed dimmable"})
 		xbmc.log('[plugin.video.filmesonlinehd11] L204 - ' + str(soup), xbmc.LOGNOTICE)
 		urlF  = conteudo[0]["data-url"]
-		xbmc.log('[plugin.video.filmesonlinehd11] L204 - ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L206 - ' + str(urlF), xbmc.LOGNOTICE)
 
 		link = openURL(urlF)
 		link = unicode(link, 'utf-8', 'ignore')
-		xbmc.log('[plugin.video.filmesonlinehd11] L208 - ' + str(link), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L210 - ' + str(link), xbmc.LOGNOTICE)
 		try:
 			dados = {}
 
@@ -264,7 +265,7 @@ def pesquisa():
 						titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
 						urlF = filme["href"]
 						imgF = filme.img["data-src"]
-						xbmc.log('[plugin.video.filmesonlinehd11] L266 - ' + str(filme), xbmc.LOGNOTICE)
+						xbmc.log('[plugin.video.filmesonlinehd11] L267 - ' + str(filme), xbmc.LOGNOTICE)
 						temp = (urlF,titF,imgF)
 						hosts.append(temp)
 
@@ -290,7 +291,7 @@ def doPesquisaFilmes():
 			addDir(titulo, url2, 100, img, False, total)
 
 def player(name,url,iconimage):
-		xbmc.log('[plugin.video.filmesonlinehd11] L235 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L293 - ' + str(url), xbmc.LOGNOTICE)
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
 		mensagemprogresso.create('FilmesOnlineHD11', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -331,7 +332,7 @@ def player(name,url,iconimage):
 
 		urlVideo = srvsdub[i]["Url"]
 		print urlVideo
-		xbmc.log('[plugin.video.filmesonlinehd11] L276 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L334 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -354,19 +355,19 @@ def player(name,url,iconimage):
 		elif '2actelecup.com' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'http://actelecup.com/video/%s/iframe' % okID
-				xbmc.log('[plugin.video.filmesonlinehd11] L354 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.filmesonlinehd11] L357 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 				link = openURL(urlVideo)
-				xbmc.log('[plugin.video.filmesonlinehd11] L357 - ' + str(link), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.filmesonlinehd11] L360 - ' + str(link), xbmc.LOGNOTICE)
 				link = unicode(link, 'utf-8', 'ignore')
 				ref = re.findall(r'ref\: \'(.+?)\'',link)[0]
 				#serial = re.findall(r'serial_token\: \'(.+?)\'',link)[0]
 				serial = re.findall(r'video_token\: \'(.+?)\'', link)[0]
 				urlR = 'https://actelecup.com/video/%s/iframe?nocontrols_translations=1&ref=%s&autoplay=1&start_time=null' % (serial, ref)
-				xbmc.log('[plugin.video.filmesonlinehd11] L363- ' + str(urlR), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.filmesonlinehd11] L366- ' + str(urlR), xbmc.LOGNOTICE)
 				#urlF = 'https://actelecup.com/manifest/index.m3u8?tok=%s' % ref
 				urlF = 'https://actelecup.com/manifest/mp4.json?tok=%s' % ref
-				xbmc.log('[plugin.video.filmesonlinehd11] L366- ' + str(urlF), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.filmesonlinehd11] L369- ' + str(urlF), xbmc.LOGNOTICE)
 				#url  = 'https://actelecup.com/manifest/mp4.json?tok=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzb3VyY2UiOiJzZXNzaW9uIiwiZXhwIjoxNTU1NTQyOTgzLCJ2IjoiOGQ1MmJmNGQ3MTMxYTk5YyIsImEiOnRydWUsInAiOjE2ODksImgiOiI1NDE0NTNhNWQxNzEzYTY3Y2FkZjZkYWJjOWE1ZTRlYmVmMTZlZTdiYWUwMzAyN2U4YjkxNDM2OGUxNGJkN2ZmIn0.HJ1p7ZG2NdkSoyQ4vO1pICox0H4_G__rC-MJqIhHDcc'
 
 				headers = {
@@ -391,18 +392,18 @@ def player(name,url,iconimage):
 				if qual == None : return
 				index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
 				if index == -1 : return
-				xbmc.log('[plugin.video.filmesonlinehd11] L365 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.filmesonlinehd11] L394 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				i = int(qual[index])
 				i = index
-				xbmc.log('[plugin.video.filmesonlinehd11] L365 - ' + str(i), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.filmesonlinehd11] L397 - ' + str(i), xbmc.LOGNOTICE)
 				url2Play = urlVideo[i]
 
 				OK = False
 				xbmc.log('[plugin.video.filmesonlinehd11] L357 - ' + str(url2Play), xbmc.LOGNOTICE)
 
-		elif 'actelecup.com' in urlVideo :
+		elif 'akugyash.com' in urlVideo :
 				okID = urlVideo.split('/')[4]
-				urlVideo = 'http://actelecup.com/video/%s/iframe' % okID
+				urlVideo = 'http://akugyash.com/video/%s/iframe' % okID
 				xbmc.log('[plugin.video.filmesonlinehd11] L290 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = moonwalk.get_playlist(urlVideo)
 				urlVideo = urlVideo[0]
@@ -414,7 +415,7 @@ def player(name,url,iconimage):
 				i = int(qual[index])
 				url2Play = urlVideo[i]
 				OK = False
-				#xbmc.log('[plugin.video.filmesonlinehd11] L293 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				#xbmc.log('[plugin.video.filmesonlinehd11] L417 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		elif 'thevid' in urlVideo :
 				okID = urlVideo.split('e/')[1]
@@ -430,7 +431,7 @@ def player(name,url,iconimage):
 				url2Play = []
 				pass
 
-		if url2Play : xbmc.log('[plugin.video.filmesonlinehd11] L341 - ' + str(url2Play), xbmc.LOGNOTICE)
+		if url2Play : xbmc.log('[plugin.video.filmesonlinehd11] L433 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		if not url2Play : return
 
@@ -473,12 +474,12 @@ def player_series(name,url,iconimage):
 		mensagemprogresso.create('FilmesOnlineHD11', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
 		mensagemprogresso.update(0)
 
-		xbmc.log('[plugin.video.filmesonlinehd11] L457 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L476 - ' + str(url), xbmc.LOGNOTICE)
 
 		#link  = openURL(url)
 		#link = unicode(link, 'utf-8', 'ignore')
 		#soup = BeautifulSoup(link)
-		xbmc.log('[plugin.video.filmesonlinehd11] L462 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L481 - ' + str(url), xbmc.LOGNOTICE)
 		urlVideo = url
 
 		mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
@@ -499,12 +500,12 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('embed')[1]
 				urlVideo = 'https://ok.ru/videoembed%s' % fxID
 
-		elif 'actelecup.com' in urlVideo :
+		elif 'akugyash.com' in urlVideo :
 				okID = urlVideo.split('/')[4]
-				urlVideo = 'https://actelecup.com/video/%s/iframe' % okID
-				xbmc.log('[plugin.video.filmesonlinehd11] L486 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				urlVideo = 'https://akugyash.com/video/%s/iframe' % okID
+				xbmc.log('[plugin.video.filmesonlinehd11] L505 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = moonwalk.get_playlist(urlVideo)
-				xbmc.log('[plugin.video.filmesonlinehd11] L488 - ' + str(urlVideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.filmesonlinehd11] L507 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = urlVideo[0]
 				qual = []
 				for i in urlVideo:
@@ -632,7 +633,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 def getInfo(url)	:
 		link = openURL(url)
 		titO = re.findall('<h1 class="ui inverted header">(.*?)</h1>', link)[0]
-		xbmc.log('[plugin.video.filmesonlinehd11] L504 - ' + str(titO), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.filmesonlinehd11] L635 - ' + str(titO), xbmc.LOGNOTICE)
 		titO = titO.split('-')[0]
 
 		xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
