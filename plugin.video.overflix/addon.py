@@ -8,6 +8,7 @@
 # Atualizado (1.0.2) - 12/05/2019
 # Atualizado (1.0.3) - 20/06/2019
 # Atualizado (1.0.4) - 20/07/2019
+# Atualizado (1.0.5) - 27/07/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -123,13 +124,21 @@ def getTemporadas(name,url,iconimage):
         sname = soup.title.text.replace('-','|').split('|')[0]
         sname = sname.replace('Assistir','').replace('Online','')
         data = soup('div', {'class':'ipsColumns ipsColumns_collapsePhone'})
+        imgF = data[0].img['src']
         url = data[0]('a',{'class':'btnn iconized assistir'})[0]['href']
         html = openURL(url)
+        soup = BeautifulSoup(html, 'html.parser')
+        try:
+            data = soup.iframe
+            url = data['src']
+            html = openURL(url)
+            soup = BeautifulSoup(html, 'html.parser')
+        except:
+            pass 
         soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', attrs={'class':'box'})
         filmes = conteudo[0]('li')
         totF = len(filmes)
-        imgF = data[0].img['src']
         urlF = url
         i = 1
         while i <= totF:
@@ -271,13 +280,21 @@ def player(name,url,iconimage):
                 fxID = str(idsT[i])
                 urlVideo = 'https://mstream.cloud/%s' % fxID
                 urlVideo = urlVideo.split('?')[0]
-                #urlVideo = 'https://mstream.cloud/%s' % fxID
-                data = openURL(urlVideo)
-                #r = requests.get(urlVideo)
-                #data = r.content
+                '''
+                headers = {
+					#'Referer': urlvideo,
+					'Host':'mstream.cloud',
+					'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+					'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+					'Connection':'keep-alive',
+					'upgrade-insecure-requests': '1'}
+                #xbmc.log('[plugin.video.overflix] L276 - ' + str(data), xbmc.LOGNOTICE)
+                r = requests.get(url=urlVideo, headers=headers)
+                data = r.content
                 srv = re.findall('<meta name="og:image" content="([^"]+)">', data)[0]
                 url2Play = srv.replace('/img','').replace('jpg','mp4')
                 OK = False
+                '''
                 
             elif 'thevid' in urlVideo :
                 fxID = str(idsT[i])
