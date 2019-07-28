@@ -8,7 +8,7 @@
 # Atualizado (1.0.2) - 12/05/2019
 # Atualizado (1.0.3) - 20/06/2019
 # Atualizado (1.0.4) - 20/07/2019
-# Atualizado (1.0.5) - 27/07/2019
+# Atualizado (1.0.6) - 27/07/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -268,6 +268,10 @@ def player(name,url,iconimage):
                 fxID = str(idsT[i])
                 urlVideo = 'https://verystream.com/e/%s' % fxID
 
+            elif 'onlystream' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://onlystream.tv/e/%s' % fxID
+                  
             elif 'streamango' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://streamango.com/embed/%s' % fxID
@@ -440,7 +444,7 @@ def player_series(name,url,iconimage):
         idsT = []
 
         btn = url
-        #xbmc.log('[plugin.video.overflix] L407 - ' + str(btn), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.overflix] L443 - ' + str(btn), xbmc.LOGNOTICE)
         try:
             ss = btn.split('/?')[1].split('&')
             for s in ss:
@@ -466,7 +470,11 @@ def player_series(name,url,iconimage):
             elif 'streamango' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://streamango.com/embed/%s' % fxID
-                
+
+            elif 'onlystream' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://onlystream.tv/e/%s' % fxID
+                                
             elif 'rapidvideo' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
@@ -546,7 +554,7 @@ def player_series(name,url,iconimage):
                 fxID = str(idsT[i+1])
                 urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
                 
-            xbmc.log('[plugin.video.overflix] L513- ' + str(urlVideo), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.overflix] L549- ' + str(urlVideo), xbmc.LOGNOTICE)
                 
         except:
             pass
