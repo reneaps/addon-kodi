@@ -8,6 +8,7 @@
 # Atualizado (1.0.2) - 23/04/2019
 # Atualizado (1.0.3) - 07/05/2019
 # Atualizado (1.0.4) - 13/05/2019
+# Atualizado (1.0.5) - 03/08/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -235,9 +236,11 @@ def player(name,url,iconimage):
         idsT = []
 
         link = openURL(url)
-        soup = BeautifulSoup(link, 'html.parser')
-        dooplay = re.findall(r'<li id="player-option-1" class="dooplay_player_option.+?" data-type="(.+?)" data-post="(.+?)" data-nume="(.+?)">', link)
-        
+        #soup = BeautifulSoup(link, 'html.parser')
+        dooplay = re.findall(r'<li id=\'player-option-1\' class=\'dooplay_player_option\' data-type=\'(.+?)\' data-post=\'(.+?)\' data-nume=\'(.+?)\'>', link)
+                              #<li id=\'player-option-1\' class=\'dooplay_player_option\' data-type=\'(.+?))\' data-post=\'(.+?))\' data-nume=\'(.+?)\'>
+        for dtype, dpost, dnume in dooplay:
+                print dtype, dpost, dnume
         try:
             p = soup('p', limit=5)[0]
             plot = p.text.replace('kk-star-ratings','')
@@ -245,21 +248,19 @@ def player(name,url,iconimage):
             plot = 'Sem Sinopse'
             pass
         try:
-            for dtype, dpost, dnume in dooplay:
-                print dtype, dpost, dnume
-            headers = {'Referer': url,
-                       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                       'Host': 'www.midiaflixhd.net',
-                       'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-            }
-            urlF = 'https://www.midiaflixhd.net/wp-admin/admin-ajax.php'
-            data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
-            xbmc.log('[plugin.video.midiaflixhd] L257 - ' + str(data), xbmc.LOGNOTICE)
-            r = requests.post(url=urlF, data=data, headers=headers)
-            html = r.content
-            soup = BeautifulSoup(html, 'html.parser')
-            urlF = soup.iframe['src']
-            xbmc.log('[plugin.video.midiaflixhd] L262 - ' + str(html), xbmc.LOGNOTICE)
+                headers = {'Referer': url,
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Host': 'www.midiaflixhd.net',
+                        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                }
+                urlF = 'https://www.midiaflixhd.net/wp-admin/admin-ajax.php'
+                xbmc.log('[plugin.video.midiaflixhd] L257 - ' + str(dooplay), xbmc.LOGNOTICE)
+                data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
+                r = requests.post(url=urlF, data=data, headers=headers)
+                html = r.content
+                soup = BeautifulSoup(html, 'html.parser')
+                urlF = soup.iframe['src']
+                xbmc.log('[plugin.video.midiaflixhd] L262 - ' + str(html), xbmc.LOGNOTICE)
         except:
             pass
 
@@ -350,23 +351,51 @@ def player(name,url,iconimage):
                 data = urllib.urlencode({'id': idS})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
-                soup = BeautifulSoup(html, 'html.parser')
                 _html = str(html)
                 b = json.loads(_html.decode('hex'))
-                urlF = b['url']
-                urlVideo = urlF
-
-                xbmc.log('[plugin.video.midiaflixhd] L359 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                try:
+                        urlF = b['url']
+                        urlVideo = urlF
+                except:
+                        c = b['video'][0]
+                        urlF = c['file']
+                        url2Play = urlF
+                        OK = False
+                        pass
+                
+                xbmc.log('[plugin.video.midiaflixhd] L366 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
                 if 'letsupload.co' in urlVideo:
                         nowID = urlVideo.split("=")[1]
                         urlVideo = "https://letsupload.co/plugins/mediaplayer/site/_embed.php?u=%s" % nowID
-                        OK = True
+                        r = requests.get(urlVideo)
+                        url2Play = re.findall(r'file: "(.+?)",', r.text)[0]
+                        OK = False
+
+                elif 'embed.mystream.to' in urlVideo:
+                        html = openURL(urlVideo)
+                        e = re.findall('<meta name="twitter:image" content="(.+?)">', html)[0]
+                        url2Play = e.replace('/img', '').replace('jpg','mp4')
+                        xbmc.log('[plugin.video.midiaflixhd] L377 - ' + str(url2Play), xbmc.LOGNOTICE)
+                        OK = False
+
+                elif 'gofilmes.me' in urlVideo:
+                        headers = {
+                                'Referer': urlVideo,
+                                'authority': 'gofilmes.me',
+                                'Upgrade-Insecure-Requests': '1',
+                                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                        }
+                        r = requests.get(url=urlVideo, headers=headers)
+                        e = re.findall('sources:\s*\[\{\'file\':\'(.+?)\', type:\'mp4\', default:\'true\'\}\],', r.content)[0]
+                        url2Play = e #+ '%7C' + urllib.urlencode(headers)       
+                        OK = False
 
                 elif '4toshare' in urlVideo :
                         r = requests.get(urlVideo)
                         e = re.findall('{src:\s*"(.+?)", type: "(.+?)", res:\s*.+?, label: "(.+?)"}', r.text)
-                        headers = {'Referer': urlVideo,
+                        headers = {
+                                'Referer': urlVideo,
                                 'Host': 's2.4toshare.com',
                                 'Upgrade-Insecure-Requests': '1',
                                 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
@@ -377,7 +406,7 @@ def player(name,url,iconimage):
                 elif 'video.php' in urlVideo :
                         fxID = urlVideo.split('u=')[1]
                         urlVideo = base64.b64decode(fxID)
-                        xbmc.log('[plugin.video.midiaflixhd] L380 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.midiaflixhd] L407 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         OK = True
 
                 elif 'actelecup.com' in urlVideo :
@@ -402,7 +431,7 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        xbmc.log('[plugin.video.midiaflixhd] L405 - ' + str(url2Play), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L432 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         if not url2Play : return
 
@@ -526,7 +555,9 @@ def player_series(name,url,iconimage):
                 if 'letsupload.co' in urlVideo:
                         nowID = urlVideo.split("=")[1]
                         urlVideo = "https://letsupload.co/plugins/mediaplayer/site/_embed.php?u=%s" % nowID
-                        OK = True
+                        r = requests.get(urlVideo)
+                        url2Play = re.findall(r'file: "(.+?)",', r.text)[0]
+                        OK = False
                 
                 if 'videok7.online' in urlVideo :
                         url2Play = urlVideo
