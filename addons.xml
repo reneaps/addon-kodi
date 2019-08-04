@@ -123,7 +123,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.filmesonlinex" name="FILMESONLINEX" version="1.0.0" provider-name="Cleiton Leonel Creton">
+<addon id="plugin.video.filmesonlinex" name="FILMESONLINEX" version="1.0.1" provider-name="Cleiton Leonel Creton">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.urlresolver" version="1.0.0"/>

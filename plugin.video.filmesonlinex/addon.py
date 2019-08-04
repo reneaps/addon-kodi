@@ -16,7 +16,7 @@ except:
     import simplejson as json
 h = HTMLParser.HTMLParser()
 
-versao = '1.0.0'
+versao = '1.0.1'
 addon_id = 'plugin.video.filmesonlinex'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -167,7 +167,16 @@ def player(name,url,iconimage):
     xbmc.log('[plugin.video.filmesonlinex] L165 - ' + str(url), xbmc.LOGNOTICE)
      #<div class='cel'><a class='video2' target='_blank' id="video" rel='nofollow' href=''>Dublado HD 720P</a></div>
      #<div class='web'><a class='video2' target='_blank' id="video" rel='nofollow' href='(.+?)'>Dublado HD 720P</a></div>
-    link_houst = re.compile(r'<div class=\'web\'><a class=\'video2\' target=\'\_blank\' id=\"video\" rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[0]
+    try:
+        link_houst = re.compile(r'<div class=\'web\'><a class=\'video\' id="video" rel=\'nofollow\' href=\'(.+?)\'>.+?</a').findall(html)[0]
+        pass
+    except:
+        pass
+    try:
+        link_houst = re.compile(r'<div class=\'web\'><a class=\'video2\' target=\'\_blank\' id=\"video\" rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)[0]
+        pass
+    except:
+        pass
     if not link_houst:
         link_houst = re.compile(r'<div class=\'mob\'><a class=\'video2\' rel=\'nofollow\' href=\'(.+?)\'>.+?</a></div>').findall(html)
     xbmc.log('[plugin.video.filmesonlinex] L171 - ' + str(link_houst), xbmc.LOGNOTICE)
@@ -201,7 +210,8 @@ def player(name,url,iconimage):
         link_video = 'https://playflixhd.co/api/source/%s/' % idVD
         html = post_url(link_video)
     elif 'adtly.in' in link_houst:
-        link_video = link_houst
+        idVD = link_houst.split('v/')[1]
+        link_video = 'https://adtly.in/api/source/%s' % idVD
         html = post_url(link_video)
         xbmc.log('[plugin.video.filmesonlinex] L206 - ' + str(link_video), xbmc.LOGNOTICE)
     else:
@@ -258,7 +268,7 @@ def abrir_url(url):
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
     req.get_method = lambda: 'GET'
     response = urllib2.urlopen(req)
-    link=response.read()
+    link = response.read()
     response.close()
     del response
     return link
@@ -268,7 +278,7 @@ def post_url(url):
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
     req.get_method = lambda: 'POST'
     response = urllib2.urlopen(req)
-    link=response.read()
+    link = response.read()
     response.close()
     del response
     return link
