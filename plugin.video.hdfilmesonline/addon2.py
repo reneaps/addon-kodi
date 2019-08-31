@@ -18,7 +18,6 @@
 # Atualizado (1.1.1) - 22/03/2019
 # Atualizado (1.1.2) - 07/04/2019
 # Atualizado (1.1.3) - 27/07/2019
-# Atualizado (1.1.4) - 31/08/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -31,7 +30,7 @@ from urlparse import urlparse
 from resources.lib.BeautifulSoup        import BeautifulSoup
 from resources.lib                        import jsunpack
 
-version   = '1.1.4'
+version   = '1.1.2'
 addon_id  = 'plugin.video.hdfilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -584,12 +583,10 @@ def openConfigEI():
 
 def openURL(url):
         req = urllib2.Request(url)
-        #req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        req.add_header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3')
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
         response = urllib2.urlopen(req)
         link=response.read()
-        #response.close()
+        response.close()
         return link
 
 def addDir(name, url, mode, iconimage, total=1, pasta=True):

@@ -14,7 +14,7 @@
 # Atualizado (1.2.6) - 02/05/2019
 # Atualizado (1.2.7) - 13/05/2019
 # Atualizado (1.2.8) - 14/05/2019
-# Atualizado (1.2.9) - 21/07/2019
+# Atualizado (1.3.0) - 31/08/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -26,20 +26,20 @@ from resources.lib      import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version      = '1.2.8'
+version      = '1.3.0'
 addon_id     = 'plugin.video.filmeseseriesonline'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
 artfolder    = addonfolder + '/resources/media/'
 fanart       = addonfolder + '/resources/media/fanart.png'
 addon_handle = int(sys.argv[1])
-base         = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNlc2VyaWVzb25saW5lLm5ldC8=')
+base         = base64.b64decode('aHR0cHM6Ly9maWxtZXNvbmxpbmVzZXJpZXMubmV0')
 
 ############################################################################################################
 
 def menuPrincipal():
         addDir('Categorias'                 , base                              ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + '/filmes/lancamentos/'     ,   20, artfolder + 'ultimos.png')
+        addDir('Lançamentos'                , base + '/filmes/lancamentos/'      ,   20, artfolder + 'ultimos.png')
         addDir('Filmes em HD'               , base + '/filmes/filmes-hd/'       ,   20, artfolder + 'filmes.png')
         addDir('Filmes Dublados'            , base + '/?s=dublado&tipo=video'   ,   20, artfolder + 'filmes.png')
         addDir('Series'                     , base + '/series-hd/'              ,   25, artfolder + 'series.png')
@@ -127,7 +127,6 @@ def getSeries(url):
         xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
 
 def getTemporadas(url):
-        xbmc.log('[plugin.video.filmeseseriesonline] L128 - ' + str(url), xbmc.LOGNOTICE)
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
 
@@ -611,7 +610,7 @@ def openURL(url):
         req = urllib2.Request(url)
         req.add_header('Referer',url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36')
-        response = urllib2.urlopen(req, timeout=3.0)
+        response = urllib2.urlopen(req)
         link=response.read()
         response.close()
         return link
