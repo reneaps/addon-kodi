@@ -13,6 +13,7 @@
 # Atualizado (1.0.8) - 08/06/2018
 # Atualizado (1.0.9) - 09/06/2018
 # Atualizado (1.1.0) - 14/06/2018
+# Atualizado (1.1.1) - 01/09/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -343,7 +344,7 @@ def player(name,url,iconimage):
 		totD = len(srvsdub)
 		print totD
 		for i in range(totD) :
-				urlF = srvsdub[i].a['href']
+				urlF = srvsdub[i].a['href'].encode('utf-8')
 				srv = srvsdub[i].a['href']
 				domain = urlparse(srv)
 				domain = domain.netloc.split('.')[0]
@@ -374,6 +375,14 @@ def player(name,url,iconimage):
 		if 'nowvideo.php' in urlVideo :
 				nowID = urlVideo.split("id=")[1]
 				urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
+
+		elif 'verystream' in urlVideo:
+				if '/e/' in urlVideo : 
+						fxID = urlVideo.split("/e/")[1]
+						urlVideo = 'https://verystream.com/e/%s' % fxID
+				elif 'stream' in urlVideo : 
+						fxID = urlVideo.split("/stream/")[1]
+						urlVideo = 'https://verystream.com/stream/%s' % fxID
 
 		elif 'video.tt' in urlVideo :
 				vttID = urlVideo.split('e/')[1]
@@ -408,17 +417,10 @@ def player(name,url,iconimage):
 				urlVideo = 'http://hqq.tv/player/embed_player.php?vid=%s' % okID
 
 		elif 'thevid' in urlVideo :
-				fxID = urlVideo.split('e/')[1]
-				urlVideo = 'http://thevid.net/v/%s' % fxID
-				'''linkTV  = openURL(urlVideo)
-				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
-				aMatches = re.compile(sPattern).findall(linkTV)
-				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl_\d+="(.*?)"', sUnpacked)
-				if not url2Play : url2Play = re.findall('var url_\d+="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])
+				fxID = urlVideo.split('/')[4]
+				urlVideo = 'https://thevid.tv/v/%s/' % fxID
 
-				OK = False'''
+		xbmc.log('[plugin.video.megafilmesonlinehd] L422 ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
@@ -547,14 +549,6 @@ def player_series(name,url,iconimage):
 		elif 'thevid.net' in urlVideo :
 				fxID = urlVideo.split('/e/')[1]
 				urlVideo = 'http://thevid.net/v/%s' % fxID
-				'''linkTV  = openURL(urlVideo)
-				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
-				aMatches = re.compile(sPattern).findall(linkTV)
-				sUnpacked = jsunpack.unpack(aMatches[1])
-				url2Play = re.findall('var vurl3="(.*?)"', sUnpacked)
-				url2Play = str(url2Play[0])
-
-				OK = False'''
 
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
@@ -608,7 +602,7 @@ def openConfigEI():
 
 def openURL(url):
 		req = urllib2.Request(url)
-		req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
 		response = urllib2.urlopen(req)
 		link=response.read()
 		response.close()
