@@ -5,7 +5,8 @@
 # Addon : Filmes e Series Online
 # By AddonReneSilva - 03/05/2019
 # Atualizado (1.0.0) - 03/05/2019
-# Atualizado (1.0.0) - 26/05/2019
+# Atualizado (1.0.1) - 26/05/2019
+# Atualizado (1.0.2) - 05/09/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -35,7 +36,7 @@ sbase        = 'http://vseries.me/'
 
 def menuPrincipal():
 		addDir('Categorias'                 , base                              ,   10, artfolder + 'categorias.png')
-		addDir('Lançamentos'                , base + '/filmes/lancamentos/'     ,   20, artfolder + 'ultimos.png')
+		addDir('Lançamentos'                , base + '/genero/lancamentos/'     ,   20, artfolder + 'ultimos.png')
 		addDir('Series'                     , sbase + '/series-hd/'             ,   25, artfolder + 'series.png')
 		addDir('Pesquisa Series'            , '--'                              ,   30, artfolder + 'pesquisa.png')
 		addDir('Pesquisa Filmes'            , '--'                              ,   35, artfolder + 'pesquisa.png')
@@ -69,7 +70,7 @@ def getCategorias(url):
 def getFilmes(url):
 		html = openURL(url)
 		soup = BeautifulSoup(html, 'html5lib')
-		conteudo = soup('div',{'class':'main'})
+		conteudo = soup('main',{'class':'main'})
 		filmes = conteudo[0]('div',{'class':'poster'})
 		totF = len(filmes)
 
@@ -351,7 +352,7 @@ def player(name,url,iconimage):
 				url2Play = 'http:%s' % url if url.startswith("//") else url
 				OK = False
 
-		elif '2gofilmes.me/play' in urlVideo:
+		elif 'gofilmes.me/play/?' in urlVideo:
 				r = requests.get(urlVideo)
 				html = r.content
 				js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
@@ -360,13 +361,33 @@ def player(name,url,iconimage):
 				xbmc.log('[plugin.video.gofilmes] L359 - ' + str(url2Play), xbmc.LOGNOTICE)
 				OK = False
 
+		elif 'gofilmes.me/play/m.php' in urlVideo:
+				r = requests.get(urlVideo)
+				html = r.content
+				#js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
+				#b = json.loads(js)
+				#url2Play = b['g']
+				url2Play = re.findall('sources:\s*\[\{\'file\':\'(.+?)\',', html)[0]
+				xbmc.log('[plugin.video.gofilmes] L359 - ' + str(url2Play), xbmc.LOGNOTICE)
+				OK = False
+
 		elif 'ruvid.nl' in urlVideo :
 				fxID = urlVideo.split('v/')[-1]
-				urlVideo = 'https://www.ruvid.nl/v/%s' % fxID
+				urlF = 'https://www.ruvid.nl/api/source/%s' % fxID
+				data = 'r=&d=ruvid.nl'
+				headers = {
+				'referer': urlVideo,
+				'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36',
+				'content-type': 'application/json',
+				}
+				r = requests.post(url=urlF, data=data, headers=headers)
+				b = json.loads(r.text)
+				url2Play = b['data'][0]['file']
+				OK = False
 
-		elif 'alforenao.com/' in urlVideo :
+		elif 'akugyash.com/' in urlVideo :
 				okID = urlVideo.split('/')[4]
-				urlVideo = 'http://alforenao.com//video/%s/iframe' % okID
+				urlVideo = 'http://akugyash.com/video/%s/iframe' % okID
 				urlVideo = moonwalk.get_playlist(urlVideo)
 				urlVideo = urlVideo[0]
 				qual = []
