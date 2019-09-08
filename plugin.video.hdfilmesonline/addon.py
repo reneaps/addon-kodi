@@ -19,6 +19,7 @@
 # Atualizado (1.1.2) - 07/04/2019
 # Atualizado (1.1.3) - 27/07/2019
 # Atualizado (1.1.4) - 31/08/2019
+# Atualizado (1.1.5) - 08/09/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -31,7 +32,7 @@ from urlparse import urlparse
 from resources.lib.BeautifulSoup        import BeautifulSoup
 from resources.lib                        import jsunpack
 
-version   = '1.1.4'
+version   = '1.1.5'
 addon_id  = 'plugin.video.hdfilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -318,12 +319,12 @@ def player(name,url,iconimage):
                 soup = BeautifulSoup(html)
                 data = soup.iframe
                 urlVideo = data['src']
+                if 'woof.tube' in urlVideo :
+                        fxID = urlVideo.split('/e/')[1]
+                        urlVideo = 'https://verystream.com/e/%s' % fxID 
  
-
         elif 'verystream' in urlVideo:
-
                 fxID = str(idsT[i])
-
                 urlVideo = 'https://verystream.com/e/%s' % fxID
 
                 
