@@ -21,6 +21,8 @@
 # Atualizado (1.1.4) - 31/08/2019
 # Atualizado (1.1.5) - 08/09/2019
 # Atualizado (1.1.6) - 08/09/2019
+# Atualizado (1.1.7) - 08/09/2019
+# Atualizado (1.1.8) - 09/09/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -31,9 +33,9 @@ import json
 from urlparse import urlparse
 
 from resources.lib.BeautifulSoup        import BeautifulSoup
-from resources.lib                        import jsunpack
+from resources.lib                      import jsunpack
 
-version   = '1.1.6'
+version   = '1.1.8'
 addon_id  = 'plugin.video.hdfilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -288,8 +290,9 @@ def player(name,url,iconimage):
                             urllink = link.split('url=')[1]
                             domain = urlparse(urllink)
                             domain = domain.netloc.split('.')[0]
+                            nsrv = 'Servidor_%s' % str(i)
                             urlF.append(urllink)
-                            titsT.append(domain)
+                            titsT.append(nsrv)
 
         xbmc.log('[plugin.video.hdfilmesonline] L283 ' + str(urlF), xbmc.LOGNOTICE)
 
@@ -324,12 +327,7 @@ def player(name,url,iconimage):
                 if 'woof.tube' in urlVideo :
                         fxID = urlVideo.split('/e/')[1]
                         urlVideo = 'https://verystream.com/e/%s' % fxID 
- 
-        elif 'verystream' in urlVideo:
-                fxID = str(idsT[i])
-                urlVideo = 'https://verystream.com/e/%s' % fxID
 
-                
         elif 'vfilmesonline.net' in urlVideo :
                 fxID = urlVideo.split('/')[4]
                 urlF = 'https://vfilmesonline.net/api/source/%s' % fxID
@@ -382,6 +380,7 @@ def player(name,url,iconimage):
         playlist.clear()
 
         listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
+		
         listitem.setPath(url2Play)
         listitem.setProperty('mimetype','video/mp4')
         listitem.setProperty('IsPlayable', 'true')
