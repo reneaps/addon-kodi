@@ -14,6 +14,7 @@
 # Atualizado (1.0.9) - 18/04/2018
 # Atualizado (1.1.0) - 04/05/2018
 # Atualizado (1.1.1) - 28/07/2019
+# Atualizado (1.1.2) - 10/09/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -351,6 +352,15 @@ def player(name,url,iconimage):
 		elif 'openload2' in urlVideo :
 				okID = urlVideo.split('embed/')[1]
 				urlVideo = 'https://openload.co/embed/%s' % okID
+
+		elif 'woof.tube' in urlVideo:
+				okID = urlVideo.split('/e/')[1]
+				if '/e/' in urlVideo : 
+						fxID = urlVideo.split("/e/")[1]
+						urlVideo = 'https://verystream.com/e/%s' % fxID
+				elif 'stream' in urlVideo : 
+						fxID = urlVideo.split("/stream/")[1]
+						urlVideo = 'https://verystream.com/stream/%s' % fxID
 
 		elif '2actelecup.com' in urlVideo :
 				okID = urlVideo.split('/')[4]
