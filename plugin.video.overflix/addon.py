@@ -9,6 +9,7 @@
 # Atualizado (1.0.3) - 20/06/2019
 # Atualizado (1.0.4) - 20/07/2019
 # Atualizado (1.0.6) - 27/07/2019
+# Atualizado (1.0.7) - 10/09/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -21,7 +22,7 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version   = '1.0.3'
+version   = '1.0.7'
 addon_id  = 'plugin.video.overflix'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -286,12 +287,12 @@ def player(name,url,iconimage):
                 urlVideo = urlVideo.split('?')[0]
                 '''
                 headers = {
-					#'Referer': urlvideo,
-					'Host':'mstream.cloud',
-					'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
-					'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-					'Connection':'keep-alive',
-					'upgrade-insecure-requests': '1'}
+                    #'Referer': urlvideo,
+                    'Host':'mstream.cloud',
+                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                    'Connection':'keep-alive',
+                    'upgrade-insecure-requests': '1'}
                 #xbmc.log('[plugin.video.overflix] L276 - ' + str(data), xbmc.LOGNOTICE)
                 r = requests.get(url=urlVideo, headers=headers)
                 data = r.content
@@ -311,6 +312,14 @@ def player(name,url,iconimage):
             elif 'vidoza' in urlVideo :
                     fxID = str(idsT[i])
                     urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
+                    
+            elif 'mix' in urlVideo :
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://mixdrop.co/e/%s' % fxID
+                    data = openURL(urlVideo)
+                    url2Play = re.findall('MDCore.vsrc = "(.*?)";', data)[0]
+                    url2Play = 'http:%s' % url2Play if url2Play.startswith("//") else url2Play
+                    OK = False
 
             elif 'onlystream' in urlVideo :
                     fxID = str(idsT[i])
@@ -321,62 +330,62 @@ def player(name,url,iconimage):
                     OK = False
 
             elif 'jetload' in urlVideo :
-		            fxID = str(idsT[i])
-		            urlVideo = 'https://jetload.net/e/%s' % fxID
-		            xbmc.log('[plugin.video.overflix] L296 - ' + str(urlVideo), xbmc.LOGNOTICE)
-		            data = openURL(urlVideo)
-		            xbmc.log('[plugin.video.overflix] L298 - ' + str(data), xbmc.LOGNOTICE)
-		            srv = re.findall('id="srv" value="([^"]+)"', data)[0]
-		            file_name = re.findall('file_name" value="([^"]+)"', data)[0]
-		            file_low = re.findall('id="file_low" value="([^"]+)"', data)[0]
-		            file_med = re.findall('id="file_med" value="([^"]+)"', data)[0]
-		            file_high = re.findall('id="file_high" value="([^"]+)"', data)[0]
-		            try:
-		                id_srv = re.findall('id="srv_id" value="([^"]+)"', data)[0]
-		            except:
-		                id_srv = ''
-		                pass
-		            if id_srv != '' : 
-		                url = 'https://jetload.net/api/download'
-		                data = urllib.urlencode({"file_name":file_name+'.mp4',"srv":id_srv})
-		                headers = {'Referer': urlVideo, 
-		                       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-		                       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-		                       'Connection': 'keep-alive',
-		                       'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-		            }
-		                
-		                r = requests.post(url=url, data=data, headers=headers)
-		                tipo = r.text
-		                xbmc.log('[plugin.video.overflix] L321 - ' + str(url)+str(data), xbmc.LOGNOTICE)
-		                ext = tipo.split('?')[0]
-		                ext2 = tipo.split('?')[1]
-		                head = {'Referer': urlVideo,
-		                        'Content-Type': 'video/mp4',
-		                        'Connection': 'keep-alive',
-		                        'Origin': 'https://jetload.net',
-		                        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-		            }
-		                head2 = urllib.urlencode(head)
-		                url2Play = tipo #ext+'.mp4?'+ext2+'|'+head2
-		                urlVideo =[]
-		                '''
-		                https://jetload.net/#!/d/37AQFHdsoCwT
-		                https://jetload.net/api/get_direct_video/37AQFHdsoCwT
-		                '''
-		            if file_high == '1'  :
-		                url2Play = srv+'/v2/schema/archive/'+file_name+'/master.m3u8'
-		            elif file_med == '1' :
-		                url2Play = srv+'/v2/schema/archive/'+file_name+'/med.m3u8'
-		            elif file_low == '1' :
-		                url2Play = srv+'/v2/schema/archive/'+file_name+'/low.m3u8'
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://jetload.net/e/%s' % fxID
+                    xbmc.log('[plugin.video.overflix] L296 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                    data = openURL(urlVideo)
+                    xbmc.log('[plugin.video.overflix] L298 - ' + str(data), xbmc.LOGNOTICE)
+                    srv = re.findall('id="srv" value="([^"]+)"', data)[0]
+                    file_name = re.findall('file_name" value="([^"]+)"', data)[0]
+                    file_low = re.findall('id="file_low" value="([^"]+)"', data)[0]
+                    file_med = re.findall('id="file_med" value="([^"]+)"', data)[0]
+                    file_high = re.findall('id="file_high" value="([^"]+)"', data)[0]
+                    try:
+                        id_srv = re.findall('id="srv_id" value="([^"]+)"', data)[0]
+                    except:
+                        id_srv = ''
+                        pass
+                    if id_srv != '' : 
+                        url = 'https://jetload.net/api/download'
+                        data = urllib.urlencode({"file_name":file_name+'.mp4',"srv":id_srv})
+                        headers = {'Referer': urlVideo, 
+                               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                               'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                               'Connection': 'keep-alive',
+                               'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                    }
+                        
+                        r = requests.post(url=url, data=data, headers=headers)
+                        tipo = r.text
+                        xbmc.log('[plugin.video.overflix] L321 - ' + str(url)+str(data), xbmc.LOGNOTICE)
+                        ext = tipo.split('?')[0]
+                        ext2 = tipo.split('?')[1]
+                        head = {'Referer': urlVideo,
+                                'Content-Type': 'video/mp4',
+                                'Connection': 'keep-alive',
+                                'Origin': 'https://jetload.net',
+                                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                    }
+                        head2 = urllib.urlencode(head)
+                        url2Play = tipo #ext+'.mp4?'+ext2+'|'+head2
+                        urlVideo =[]
+                        '''
+                        https://jetload.net/#!/d/37AQFHdsoCwT
+                        https://jetload.net/api/get_direct_video/37AQFHdsoCwT
+                        '''
+                    if file_high == '1'  :
+                        url2Play = srv+'/v2/schema/archive/'+file_name+'/master.m3u8'
+                    elif file_med == '1' :
+                        url2Play = srv+'/v2/schema/archive/'+file_name+'/med.m3u8'
+                    elif file_low == '1' :
+                        url2Play = srv+'/v2/schema/archive/'+file_name+'/low.m3u8'
 
-		            OK = False
+                    OK = False
                 
             elif 'principal' in urlVideo :
-		            fxID = str(idsT[i+1])
-		            urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
-		            
+                    fxID = str(idsT[i+1])
+                    urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
+                    
             xbmc.log('[plugin.video.overflix] L350 - ' + str(urlVideo), xbmc.LOGNOTICE)
         except:
             pass
