@@ -15,6 +15,7 @@
 # Atualizado (1.1.0) - 04/05/2018
 # Atualizado (1.1.1) - 28/07/2019
 # Atualizado (1.1.2) - 10/09/2019
+# Atualizado (1.1.3) - 21/09/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -266,7 +267,7 @@ def pesquisa():
 						titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
 						urlF = filme["href"]
 						imgF = filme.img["data-src"]
-						xbmc.log('[plugin.video.filmesonlinehd11] L267 - ' + str(filme), xbmc.LOGNOTICE)
+						#xbmc.log('[plugin.video.filmesonlinehd11] L267 - ' + str(filme), xbmc.LOGNOTICE)
 						temp = (urlF,titF,imgF)
 						hosts.append(temp)
 
@@ -413,7 +414,7 @@ def player(name,url,iconimage):
 
 		elif 'akugyash.com' in urlVideo :
 				okID = urlVideo.split('/')[4]
-				urlVideo = 'http://akugyash.com/video/%s/iframe' % okID
+				urlVideo = 'http://algidri.com/video/%s/iframe' % okID
 				xbmc.log('[plugin.video.filmesonlinehd11] L290 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = moonwalk.get_playlist(urlVideo)
 				urlVideo = urlVideo[0]
