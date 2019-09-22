@@ -76,7 +76,8 @@ def getFilmes(url):
 		if not conteudo :
 			conteudo = soup("div", {"class": "ui five special doubling cards"})
 		filmes   = conteudo[0]("a", {"class": "ui card"})
-		
+		if not conteudo : return
+
 		totF = len(filmes)
 		
 		for filme in filmes:
@@ -89,7 +90,8 @@ def getFilmes(url):
 
 		try :
 				proxima = re.findall('<a rel="next" class="item" href="(.*?)">Pr.*?<i class="angle right icon"></i></a>', link)[0]
-				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
+				getFilmes(proxima)
+				#addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
 		except :
 				pass
 
@@ -412,7 +414,7 @@ def player(name,url,iconimage):
 				OK = False
 				xbmc.log('[plugin.video.filmesonlinehd11] L357 - ' + str(url2Play), xbmc.LOGNOTICE)
 
-		elif 'akugyash.com' in urlVideo :
+		elif 'iframe' in urlVideo :
 				okID = urlVideo.split('/')[4]
 				urlVideo = 'http://algidri.com/video/%s/iframe' % okID
 				xbmc.log('[plugin.video.filmesonlinehd11] L290 - ' + str(urlVideo), xbmc.LOGNOTICE)
