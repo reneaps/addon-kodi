@@ -597,23 +597,22 @@ def openURL(url):
 def addDir(name, url, mode, iconimage, total=1, pasta=True):
         u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
         ok = True
-        liz = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
+        liz = xbmcgui.ListItem(name)
         liz.setProperty('fanart_image', fanart)
         liz.setInfo(type = "Video", infoLabels = {"title": name})
+        liz.setArt({ 'icon': iconimage, 'thumb': iconimage })
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
         return ok
 
 def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
         u  = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
         ok = True
-
-        liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
-
+        liz = xbmcgui.ListItem(name)
         liz.setProperty('fanart_image', iconimage)
         liz.setInfo(type="Video", infoLabels={"Title": name, "Plot": plot})
+        liz.setArt({ 'icon': iconimage, 'thumb': iconimage })
 
         cmItems = []
-
         cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
         cmItems.append(('[COLOR lime]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=99)'%(sys.argv[0], urllib.quote_plus(url))))
 

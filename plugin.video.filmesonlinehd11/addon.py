@@ -16,6 +16,8 @@
 # Atualizado (1.1.1) - 28/07/2019
 # Atualizado (1.1.2) - 10/09/2019
 # Atualizado (1.1.3) - 21/09/2019
+# Atualizado (1.1.4) - 09/10/2019
+# Atualizado (1.1.5) - 09/10/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -90,8 +92,8 @@ def getFilmes(url):
 
 		try :
 				proxima = re.findall('<a rel="next" class="item" href="(.*?)">Pr.*?<i class="angle right icon"></i></a>', link)[0]
-				getFilmes(proxima)
-				#addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
+				#getFilmes(proxima)
+				addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
 		except :
 				pass
 
@@ -415,8 +417,8 @@ def player(name,url,iconimage):
 				xbmc.log('[plugin.video.filmesonlinehd11] L357 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		elif 'iframe' in urlVideo :
-				okID = urlVideo.split('/')[4]
-				urlVideo = 'http://algidri.com/video/%s/iframe' % okID
+				#okID = urlVideo.split('/')[4]
+				#urlVideo = 'https://acterbiz.com/video/%s/iframe' % okID
 				xbmc.log('[plugin.video.filmesonlinehd11] L290 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = moonwalk.get_playlist(urlVideo)
 				urlVideo = urlVideo[0]
@@ -431,8 +433,8 @@ def player(name,url,iconimage):
 				#xbmc.log('[plugin.video.filmesonlinehd11] L417 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		elif 'thevid' in urlVideo :
-				okID = urlVideo.split('e/')[1]
-				urlVideo = 'http://thevid.net/v/%s' % okID
+				okID = urlVideo.split('/e/')[1]
+				urlVideo = 'http://thevid.tv/e/%s' % okID
 
 
 		if OK :
@@ -513,9 +515,9 @@ def player_series(name,url,iconimage):
 				fxID = urlVideo.split('embed')[1]
 				urlVideo = 'https://ok.ru/videoembed%s' % fxID
 
-		elif 'akugyash.com' in urlVideo :
+		elif 'iframe' in urlVideo :
 				okID = urlVideo.split('/')[4]
-				urlVideo = 'https://akugyash.com/video/%s/iframe' % okID
+				urlVideo = 'https://acterbiz.com/video/%s/iframe' % okID
 				xbmc.log('[plugin.video.filmesonlinehd11] L505 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				urlVideo = moonwalk.get_playlist(urlVideo)
 				xbmc.log('[plugin.video.filmesonlinehd11] L507 - ' + str(urlVideo), xbmc.LOGNOTICE)
