@@ -16,6 +16,7 @@
 # Atualizado (1.2.8) - 14/05/2019
 # Atualizado (1.3.0) - 31/08/2019
 # Atualizado (1.3.1) - 08/09/2019
+# Atualizado (1.3.2) - 13/10/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -27,7 +28,7 @@ from resources.lib      import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version      = '1.3.0'
+version      = '1.3.2'
 addon_id     = 'plugin.video.filmeseseriesonline'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
