@@ -10,6 +10,7 @@
 # Atualizado (1.0.3) - 14/04/2018
 # Atualizado (1.0.4) - 30/05/2019
 # Atualizado (1.0.5) - 21/09/2019
+# Atualizado (1.0.6) - 13/10/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -394,9 +395,12 @@ def openURL(url):
 def addDir(name, url, mode, iconimage, total=1, pasta=True):
         u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
         ok = True
-        liz = xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
+
+        liz = xbmcgui.ListItem(name)
         liz.setProperty('fanart_image', fanart)
         liz.setInfo(type = "Video", infoLabels = {"title": name})
+        liz.setArt({ 'icon': iconimage, 'thumb': iconimage })
+
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
         return ok
 
@@ -404,10 +408,10 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
         u  = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
         ok = True
 
-        liz = xbmcgui.ListItem(name, iconImage="iconimage", thumbnailImage=iconimage)
-
+        liz = xbmcgui.ListItem(name)
         liz.setProperty('fanart_image', fanart)
-        liz.setInfo(type="Video", infoLabels={"Title": name, "Plot": plot})
+        liz.setInfo(type = "Video", infoLabels = {"title": name})
+        liz.setArt({ 'icon': iconimage, 'thumb': iconimage })
 
         cmItems = []
 
