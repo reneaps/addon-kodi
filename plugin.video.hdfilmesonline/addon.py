@@ -23,6 +23,7 @@
 # Atualizado (1.1.6) - 08/09/2019
 # Atualizado (1.1.7) - 08/09/2019
 # Atualizado (1.1.9) - 30/11/2019
+# Atualizado (1.2.0) - 30/11/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -274,14 +275,15 @@ def player(name,url,iconimage):
         matriz = []
         urlF = []
 
-        xbmc.log('[plugin.video.hdfilmesonline] L263 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.hdfilmesonline] L277 - ' + str(url), xbmc.LOGNOTICE)
         link  = openURL(url)
         link  = unicode(link, 'utf-8', 'ignore')
         soup  = BeautifulSoup(link)
         links = soup.findAll('div', {'class':'movieplay'})
+        xbmc.log('[plugin.video.hdfilmesonline] L282 - ' + str(links), xbmc.LOGNOTICE)
 
         for i in  range (0,len(links)):
-            link = links[i].iframe['src']
+            link = links[i].iframe['data-wpfc-original-src']
             urllink = ""
             if not "embed_player.php" in link:
                 if not "/hd/embed/" in link:
