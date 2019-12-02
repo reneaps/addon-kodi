@@ -329,9 +329,9 @@ def player(name,url,iconimage):
                 okID = urlVideo.split('embed/')[1]
                 urlVideo = 'https://ok.ru/videoembed/%s' % okID
 
-        elif 'openload2' in urlVideo :
-                okID = urlVideo.split('embed/')[1]
-                urlVideo = 'https://openload.co/embed/%s' % okID
+        elif 'vcdn.io' in urlVideo :
+                okID = urlVideo.split('v/')[1]
+                urlVideo = 'https://www.fembed.com/v/%s' % okID
 
         elif 'woof.tube' in urlVideo:
                 okID = urlVideo.split('/e/')[1]
@@ -341,6 +341,17 @@ def player(name,url,iconimage):
                 elif 'stream' in urlVideo : 
                         fxID = urlVideo.split("/stream/")[1]
                         urlVideo = 'https://verystream.com/stream/%s' % fxID
+
+        elif 'csst.online' in urlVideo :
+                link = openURL(urlVideo)
+                #xbmc.log('[plugin.video.filmesonlinehd11] L347 - ' + str(link), xbmc.LOGNOTICE)
+                link = unicode(link, 'utf-8', 'ignore')
+                ref = re.findall(r'file\:\s*\"(.+?)\"',link)[-1]
+                fxID = ref.split(',')[-1]
+                fxID = fxID.split(']')[-1]
+                url2Play = fxID
+                OK = False
+                xbmc.log('[plugin.video.filmesonlinehd11] L350 - ' + str(fxID), xbmc.LOGNOTICE)
 
         elif '2actelecup.com' in urlVideo :
                 okID = urlVideo.split('/')[4]
@@ -433,7 +444,7 @@ def player(name,url,iconimage):
 
         listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
         listitem.setPath(url2Play)
-        listitem.setProperty('mimetype','video/mp4')
+        #listitem.setProperty('mimetype','video/mp4')
         listitem.setProperty('IsPlayable', 'true')
         playlist.add(url2Play,listitem)
 
