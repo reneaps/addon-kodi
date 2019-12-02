@@ -8,8 +8,9 @@
 import sys
 import xbmcgui
 import xbmcplugin
+import urllib
 
-addon_handle = int (sys.argv [1])
+addon_handle = int(sys.argv[1])
 
 def pesquisa():
 		keyb = xbmc.Keyboard('', 'Entre com URL:')
@@ -17,7 +18,7 @@ def pesquisa():
 
 		if (keyb.isConfirmed()):
 				texto	 = keyb.getText()
-				pesquisa = urllib.quote(texto)
+				pesquisa = texto #urllib.quote_plus(texto)
 				url		 = str(pesquisa)
 		return url
 				
@@ -25,6 +26,7 @@ xbmcplugin.setContent (addon_handle, 'movies')
 
 url = pesquisa()
 li = xbmcgui.ListItem('Meu primeiro video', iconImage = 'DefaultVideo.png')
-xbmcplugin.addDirectoryItem (manipular = addon_handle, url = url, listitem = li)
+#xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]), succeeded=True, listitem=li)
+xbmcplugin.addDirectoryItem (handle = addon_handle, url = url, listitem = li)
 
 xbmcplugin.endOfDirectory (addon_handle)
