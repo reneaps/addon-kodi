@@ -263,7 +263,8 @@ def player(name,url,iconimage):
         urlF = players[i]['data-src']
 
         if 'index.html' in urlF :
-            url2Play = urlF
+            fxID = urlF.split('id=')[1]
+            url2Play = 'https://002.yandexcloud.ga/drive/hls/%s/%s.m3u8' % (fxID, fxID)
         else :
             res = urlF.split('/')[4]
             url2Play = base64.b64decode(res + "===")
@@ -274,7 +275,7 @@ def player(name,url,iconimage):
 
         urlVideo = ''
                 
-        xbmc.log('[plugin.video.FilmesOnlinePlus] L278 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        #xbmc.log('[plugin.video.FilmesOnlinePlus] L278 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         if OK :
             try:
