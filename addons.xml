@@ -342,6 +342,33 @@
   </extension>
 </addon>
 
+<addon id="plugin.video.superflix" name="SuperFlix" version="1.0.0" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="script.module.urlresolver" version="1.0.0"/>
+		<import addon="script.module.videohosts" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+		<import addon="script.module.requests" version="2.9.1"/>
+		<import addon="script.module.html5lib" />
+        <import addon="script.extendedinfo" />
+		<import addon="inputstream.adaptive"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary lang="en">SuperFlix</summary>
+        <description lang="en">
+            No addon SuperFlix você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+        </description>
+  </extension>
+</addon>
+
 <addon id="plugin.video.teutorrent" name="TeuTorrent" version="1.0.2" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
