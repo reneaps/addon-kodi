@@ -19,6 +19,7 @@ import time
 version	  = '1.0.0'
 addon_id  = 'plugin.video.superflix'
 selfAddon = xbmcaddon.Addon(id=addon_id)
+addon = xbmcaddon.Addon()
 _handle = int(sys.argv[1])
 
 addonfolder = selfAddon.getAddonInfo('path')
@@ -109,8 +110,8 @@ def getSeries(url):
 		for f in lista:
 				filme = f('article', attrs={'class':'TPost C'})
 				titF = filme[0].a.text.encode('utf-8')
-				urlF = filme[0].a['href']
-				imgF = filme[0].img['src']
+				urlF = filme[0].a['href'].encode('utf-8')
+				imgF = filme[0].img['src'].encode('utf-8')
 				imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
 				addDir(titF, urlF, 26, imgF)
 
@@ -131,6 +132,7 @@ def getTemporadas(name,url,iconimage):
 		dados = conteudo[0]('article', attrs={'class':'TPost Single'})
 		figure = dados[0]('div', {'class':'Image'})
 		imgF = figure[0].img['src']
+		imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
 		seasons = conteudo[0]('div',{'class':'Wdgt AABox'})
 		totF = len(seasons)
 		i = 0
@@ -144,6 +146,7 @@ def getTemporadas(name,url,iconimage):
 		xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
+		xbmc.log('[plugin.video.SuperFlix] L148 - ' + str(url), xbmc.LOGNOTICE)
 		n = name.replace('ª Temporada', '')
 		n = int(n)
 		n = n - 1
@@ -159,9 +162,14 @@ def getEpisodios(name, url):
 		totF = len(episodes)
 		#print(episodes)
 		for i in episodes:
-			urlF = i.a['href']
-			titF = urlF.split('/')[4]
-			imgF = 'http:' + i.img['src']
+			urlF = i.a['href'].encode('utf-8')
+			titF = urlF.split('/')[4].encode('utf-8')
+			try:
+				imgF = i.img['src']
+			except:
+				pass
+			imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+			xbmc.log('[plugin.video.SuperFlix] L167 - ' + str(imgF), xbmc.LOGNOTICE)
 			addDirF(titF, urlF, 110, imgF, False, totF)
 
 		xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
@@ -188,16 +196,18 @@ def pesquisa():
 				r = requests.post(url=url, data=data, headers=headers)
 				link = r.content
 				link = unicode(link, 'utf-8', 'replace')
-				soup = BeautifulSoup(link, 'html.parser')
-				conteudo = soup('div', attrs={'class':'galeria'})
-				filmes = conteudo[0]('div', attrs={'class':'box-filme'})
-				totF = len(filmes)
-
-				for filme in filmes:
-						titF = filme.a['title'].encode("utf-8")
-						titF = titF.replace('Assistir','X').replace('Online','')
-						urlF = filme.a['href'].encode("utf-8")
-						imgF = filme.img['src'].encode("utf-8")
+				soup = BeautifulSoup(link, "html5lib")
+				conteudo = soup('main')
+				dados = conteudo[0]('ul')
+				lista = dados[0]('li')
+				totF = len(lista)
+				
+				for f in lista:
+						filme = f('article', attrs={'class':'TPost C'})
+						titF = filme[0].h3.text.encode('utf-8')
+						urlF = filme[0].a['href']
+						imgF = filme[0].img['src']
+						imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
 						temp = [urlF, titF, imgF]
 						hosts.append(temp)
 
@@ -286,8 +296,8 @@ def player(name,url,iconimage):
 			fxID = urlF.split('id=')[1]
 			t = int(round(time.time() * 1000))
 			#urlF = 'https://lbplus.sfplayer.net/hls/%s/%s.playlist.m3u8?t=%s' % (fxID, fxID, t)
-			urlF = 'https://slave1plus.sfplayer.net/hls/%s/%s.m3u8' % (fxID, fxID)
-			#urlF = 'https://slave2plus.sfplayer.net/vl/%s?t=%s' % (fxID, t)
+			#urlF = 'https://slave1plus.sfplayer.net/hls/%s/%s.m3u8' % (fxID, fxID)
+			#urlF = 'https://slave1plus.sfplayer.net/vl/%s?t=%s' % (fxID, t)
 			#'https://002.yandexcloud.ga/drive/hls/%s/%s.m3u8' % (fxID, fxID)
 			url2Play = urlF 
 		else :
@@ -319,14 +329,22 @@ def player(name,url,iconimage):
 		playlist = xbmc.PlayList(1)
 		playlist.clear()
 
-		listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
-		listitem.setPath(url2Play)
-		listitem.setMimeType("application/x-mpegURL")
-		listitem.setProperty('inputstreamaddon','inputstream.adaptive')
-		listitem.setProperty('inputstream.adaptive.manifest_type','hls')
-		listitem.setProperty('IsPlayable', 'true')
-		playlist.add(url2Play,listitem)
-
+		if "m3u8" in url2Play:
+				#ip = addon.getSetting("inputstream")
+				listitem = xbmcgui.ListItem(name, path=url2Play)
+				listitem.setArt({"thumb": iconimage, "icon": iconimage})
+				listitem.setProperty('IsPlayable', 'true')
+				listitem.setMimeType('application/vnd.apple.mpegurl')
+				listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+				listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
+				playlist.add(url2Play,listitem)
+		else:
+				listitem = xbmcgui.ListItem(name, path=url2Play)
+				listitem.setArt({"thumb": iconimage, "icon": iconimage})
+				listitem.setProperty('IsPlayable', 'true')
+				listitem.setMimeType('video/mp4')
+				playlist.add(url2Play,listitem)
+				
 		xbmcPlayer = xbmc.Player()
 		
 		while xbmcPlayer.play(playlist) :
@@ -398,16 +416,30 @@ def player_series(name,url,iconimage):
 		html = r.content
 		soup = BeautifulSoup(html, "html5lib")
 		urlF = soup('iframe')[0]['src']
-		xbmc.log('[plugin.video.SuperFlix] L365 - ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.SuperFlix] L410 - ' + str(urlF), xbmc.LOGNOTICE)
 		headers = {'Referer': urlF, 
 		   'Upgrade-Insecure-Requests': '1',
 		   'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
 		   }
-		r = requests.get(urlF,headers)
+		r = requests.get(urlF) #,headers)
 		link = r.text
 		#link = openURL(urlF)
-		urlVideo = re.findall(r'\"file\":\"(.*?)\"', link)[0]		
+		urlVideo = r.url #re.findall(r'\"file\":\"(.*?)\"', link)[0]
 		
+		if 'index.html' in urlVideo :
+			fxID = urlVideo.split('id=')[1]
+			t = int(round(time.time() * 1000))
+			#urlVideo = 'https://lbplus.sfplayer.net/hls/%s/%s.playlist.m3u8?t=%s' % (fxID, fxID, t)
+			#urlVideo = 'https://slave1plus.sfplayer.net/hls/%s/%s.m3u8' % (fxID, fxID)
+			#urlVideo = 'https://slave1plus.sfplayer.net/vl/%s?t=%s' % (fxID, t)
+			#'https://002.yandexcloud.ga/drive/hls/%s/%s.m3u8' % (fxID, fxID)
+			url2Play = urlVideo
+			OK =False
+		elif 'play' in urlVideo :
+			res = urlVideo.split('/')[4]
+			url2Play = base64.b64decode(res + "===")
+			OK = False
+			
 		try:
 
 			if 'mix' in urlVideo :
@@ -425,9 +457,8 @@ def player_series(name,url,iconimage):
 				url2Play = 'http:%s' % url if url.startswith("//") else url
 				OK = False
 
-			elif 'onlystream' in urlVideo :
-				fxID = str(idsT[i])
-				urlVideo = 'https://onlystream.tv/e/%s' % fxID
+			elif 'drive.google.com' in urlVideo :
+				OK = True
 
 			elif 'streamango' in urlVideo :
 				fxID = str(idsT[i])
@@ -462,7 +493,7 @@ def player_series(name,url,iconimage):
 				url2Play = urlVideo
 				OK = False
 				
-			xbmc.log('[plugin.video.SuperFlix] L440 - ' + str(urlVideo), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.SuperFlix] L488 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				
 		except:
 			pass
@@ -478,7 +509,7 @@ def player_series(name,url,iconimage):
 
 		if not url2Play : return
 
-		xbmc.log('[plugin.video.SuperFlix] L532 - ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.SuperFlix] L504 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		legendas = '-'
 
@@ -487,11 +518,21 @@ def player_series(name,url,iconimage):
 		playlist = xbmc.PlayList(1)
 		playlist.clear()
 
-		listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
-		listitem.setPath(url2Play)
-		listitem.setProperty('mimetype','video/mp4')
-		listitem.setProperty('IsPlayable', 'true')
-		playlist.add(url2Play,listitem)
+		if "playlist.m3u8" in url2Play:
+				ip = addon.getSetting("inputstream")
+				listitem = xbmcgui.ListItem(name, path=url2Play)
+				listitem.setArt({"thumb": iconimage, "icon": iconimage})
+				listitem.setProperty('IsPlayable', 'true')
+				listitem.setMimeType("application/vnd.apple.mpegurl")
+				listitem.setProperty("inputstreamaddon", "inputstream.adaptive")
+				listitem.setProperty("inputstream.adaptive.manifest_type", "hls")
+				playlist.add(url2Play,listitem)
+		else:
+				listitem = xbmcgui.ListItem(name, path=url2Play)
+				listitem.setArt({"thumb": iconimage, "icon": iconimage})
+				listitem.setProperty('IsPlayable', 'true')
+				listitem.setMimeType("video/mp4")
+				playlist.add(url2Play,listitem)
 
 		xbmcPlayer = xbmc.Player()
 		xbmcPlayer.play(playlist)
