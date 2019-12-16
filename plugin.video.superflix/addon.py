@@ -36,7 +36,7 @@ def menuPrincipal():
 		addDir('Categorias Filmes'			, base + 'assistir-filmes-online/'		 	,	 10, artfolder + 'categorias.png')
 		addDir('Categorias Series'			, base + 'assistir-series-online/'		 	,	 10, artfolder + 'categorias.png')
 		addDir('Lançamentos'				, base + 'categoria/assistir-filmes-lancamentos-2019-online/' ,		20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'			, base + 'assistir-filmes-dublados-online/' ,	 20, artfolder + 'pesquisa.png')
+		addDir('Filmes Dublados'			, base + 'categoria/assistir-filmes-dublados-online/' ,	 20, artfolder + 'pesquisa.png')
 		addDir('Filmes Mais Assistidos'	 	, base + v_views							,	 20, artfolder + 'pesquisa.png')
 		addDir('Series'						, base + 'assistir-series-online/'			,	 25, artfolder + 'legendados.png')
 		addDir('Pesquisa Series'			, '--'										,	 30, artfolder + 'pesquisa.png')
