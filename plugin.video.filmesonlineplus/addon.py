@@ -31,16 +31,15 @@ v_views     = 'navegar/filmes-1/?alphabet=all&sortby=v_views&sortdirection=desc'
 ############################################################################################################
 
 def menuPrincipal():
-		addDir('Categorias Filmes'          , base + ''                             ,        10, artfolder + 'categorias.png')
+		addDir('Categorias Filmes'          , base						,        10, artfolder + 'categorias.png')
 		#addDir('Categorias Series'          , base + sbase                          ,        10, artfolder + 'categorias.png')
-		addDir('Lançamentos'                , base + 'lancamento/'                  ,        20, artfolder + 'lancamentos.png')
-		addDir('Filmes Dublados'            , base + '?s=dublado'                   ,        20, artfolder + 'pesquisa.png')
-		#addDir('Filmes Mais Assistidos'     , base + v_views                         ,        20, artfolder + 'pesquisa.png')
-		addDir('Series'                     , sbase 	                           ,        25, artfolder + 'legendados.png')
-		addDir('Pesquisa Series'            , '--'                                 ,        30, artfolder + 'pesquisa.png')
-		addDir('Pesquisa Filmes'            , '--'                                  ,        35, artfolder + 'pesquisa.png')
-		addDir('Configurações'              , base                                  ,       999, artfolder + 'config.png', 1, False)
-		addDir('Configurações ExtendedInfo' , base                                  ,      1000, artfolder + 'config.png', 1, False)
+		addDir('Lançamentos'                , base + 'lancamento/'		,        20, artfolder + 'lancamentos.png')
+		addDir('Filmes Dublados'            , base + '?s=dublado'  		,        20, artfolder + 'pesquisa.png')
+		addDir('Series'                     , sbase						,        25, artfolder + 'legendados.png')
+		addDir('Pesquisa Series'            , '--'						,        30, artfolder + 'pesquisa.png')
+		addDir('Pesquisa Filmes'            , '--'						,        35, artfolder + 'pesquisa.png')
+		addDir('Configurações'              , base						,       999, artfolder + 'config.png', 1, False)
+		addDir('Configurações ExtendedInfo' , base						,      1000, artfolder + 'config.png', 1, False)
 
 		setViewMenu()
 
