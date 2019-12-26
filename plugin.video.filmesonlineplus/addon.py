@@ -414,19 +414,19 @@ def player_series(name,url,iconimage):
 				urlVideo = 'https://verystream.com/e/%s' % fxID
 					
 			elif 'mix' in urlVideo :
-					fxID = str(idsT[i])
-					urlVideo = 'https://mixdrop.co/e/%s' % fxID
-					data = openURL(urlVideo)
-					#url2Play = re.findall('MDCore.vsrc = "(.*?)";', data)[0]
-					#url2Play = 'http:%s' % url2Play if url2Play.startswith("//") else url2Play
-					sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
-					aMatches = re.compile(sPattern).findall(data)
-					sUnpacked = jsunpack.unpack(aMatches[0])
-					xbmc.log('[plugin.video.FilmesOnlinePlus] L379 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-					url2Play = re.findall('MDCore.vsrc="(.*?)"', sUnpacked)
-					url = str(url2Play[0])
-					url2Play = 'http:%s' % url if url.startswith("//") else url
-					OK = False
+				fxID = str(idsT[i])
+				urlVideo = 'https://mixdrop.co/e/%s' % fxID
+				data = openURL(urlVideo)
+				#url2Play = re.findall('MDCore.vsrc = "(.*?)";', data)[0]
+				#url2Play = 'http:%s' % url2Play if url2Play.startswith("//") else url2Play
+				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+				aMatches = re.compile(sPattern).findall(data)
+				sUnpacked = jsunpack.unpack(aMatches[0])
+				xbmc.log('[plugin.video.FilmesOnlinePlus] L379 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+				url2Play = re.findall('MDCore.vsrc="(.*?)"', sUnpacked)
+				url = str(url2Play[0])
+				url2Play = 'http:%s' % url if url.startswith("//") else url
+				OK = False
 
 			elif 'only' in urlVideo :
 				fxID = str(idsT[i])
@@ -450,7 +450,7 @@ def player_series(name,url,iconimage):
 				fxID = str(idsT[i])
 				urlVideo = 'https://streamango.com/embed/%s' % fxID
 
-			elif 'vt=' in urlVideo :
+			elif 'vt' in urlVideo :
 				fxID = str(idsT[i])
 				urlVideo = 'http://vidto.me/embed-%s.html' % fxID
 
@@ -484,13 +484,13 @@ def player_series(name,url,iconimage):
 				urlVideo = 'https://waaw.tv/watch_video.php?v=%s' % fxID
  
 			elif 'vidoza' in urlVideo :
-					fxID = str(idsT[i])
-					urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
+				fxID = str(idsT[i])
+				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
 
 			elif 'stream' in urlVideo :
-					fxID = str(idsT[i])
-					urlVideo = 'https://streamz.cc/%s' % fxID
-																		   
+				fxID = str(idsT[i])
+				urlVideo = 'https://streamz.cc/%s' % fxID
+
 			elif 'jetload' in urlVideo :
 				fxID = str(idsT[i])
 				urlVideo = 'https://jetload.net/e/%s' % fxID
