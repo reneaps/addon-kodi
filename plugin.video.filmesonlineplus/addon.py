@@ -4,6 +4,7 @@
 # Addon : FilmesOnlinePlus
 # By AddonBrasil - 22/11/2019
 # Atualizado (1.0.0) - 22/11/2019
+# Atualizado (1.0.1) - 26/12/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -16,7 +17,7 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version   = '1.0.0'
+version   = '1.0.1'
 addon_id  = 'plugin.video.filmesonlineplus'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -531,7 +532,7 @@ def player_series(name,url,iconimage):
 				listitem = xbmcgui.ListItem(name, path=url2Play)
 				listitem.setArt({"thumb": iconimage, "icon": iconimage})
 				listitem.setProperty('IsPlayable', 'true')
-				listitem.setMimeType('application/vnd.apple.mpegurl')
+				listitem.setMimeType('video/m3u8')
 				listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
 				listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
 				playlist.add(url2Play,listitem)
