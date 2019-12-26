@@ -10,6 +10,7 @@
 # Atualizado (2.1.0) - 19/06/2019
 # Atualizado (2.1.1) - 20/07/2019
 # Atualizado (2.1.2) - 21/11/2019
+# Atualizado (2.1.3) - 26/12/2019
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -21,7 +22,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib				 import jsunpack
 from time						 import time
 
-version	  = '2.1.2'
+version	  = '2.1.3'
 addon_id  = 'plugin.video.megafilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -336,7 +337,7 @@ def player(name,url,iconimage):
 							pass
 						url2Play = base64.b64decode(okID)
 						OK = False
-				xbmc.log('[plugin.video.megahfilmeshd] L334 ' + str(url2Play), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.megahfilmeshd] L334 ' + str(urlVideo), xbmc.LOGNOTICE)
 		'''
 		t = requests.get(urlVideo)
 		urlVideo = t.url
@@ -377,6 +378,18 @@ def player(name,url,iconimage):
 		elif 'thevid.net' in urlVideo :
 				okID = urlVideo.split('e/')[1]
 				urlVideo = 'http://thevid.net/e/%s' % okID
+
+		elif 'play' in urlVideo :
+				linkTV  = openURL(urlVideo)		
+				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+				aMatches = re.compile(sPattern).findall(linkTV)
+				sUnpacked = jsunpack.unpack(aMatches[0])
+				url2Play = re.findall('file:"(.*?)"', sUnpacked)
+				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+				url2Play = str(url2Play[0])
+				xbmc.log('[plugin.video.megahfilmeshd] L521 ' + str(url2Play), xbmc.LOGNOTICE)
+				OK = False
 
 		if OK : url2Play = urlresolver.resolve(urlVideo)
 
@@ -507,6 +520,18 @@ def player_series(name,url,iconimage):
 		elif 'cdn' in urlVideo :
 				url2Play = urlVideo
 				xbmc.log('[plugin.video.megahfilmeshd] L504 ' + str(url2Play), xbmc.LOGNOTICE)
+				OK = False
+
+		elif 'play' in urlVideo :
+				linkTV  = openURL(urlVideo)		
+				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+				aMatches = re.compile(sPattern).findall(linkTV)
+				sUnpacked = jsunpack.unpack(aMatches[0])
+				url2Play = re.findall('file:"(.*?)"', sUnpacked)
+				if not url2Play : url2Play = re.findall('var rick="(.*?)"', sUnpacked)
+				xbmc.log('[plugin.video.filmeseseriesonline] L380 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+				url2Play = str(url2Play[0])
+				xbmc.log('[plugin.video.megahfilmeshd] L521 ' + str(url2Play), xbmc.LOGNOTICE)
 				OK = False
 
 		if OK : url2Play = urlresolver.resolve(urlVideo)
