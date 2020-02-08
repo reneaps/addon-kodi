@@ -12,6 +12,7 @@
 # Atualizado (1.0.7) - 10/09/2019
 # Atualizado (1.0.8) - 18/11/2019
 # Atualizado (1.0.9) - 05/02/2020
+# Atualizado (1.1.0) - 09/02/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -24,7 +25,7 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version   = '1.0.9'
+version   = '1.1.0'
 addon_id  = 'plugin.video.overflix'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -207,14 +208,17 @@ def pesquisa():
                 html = r.content
                 soup = BeautifulSoup(html, 'html.parser')
                 conteudo = soup('div', {'class':'videoboxGridview'})
-                itens = conteudo[0]('div', {'class':'vbItemImage'})
-                for i in itens:
-                        a = i.div['style']
-                        imgF = re.findall(r'.+url\(\'(.+?)\'\)',a)[0].encode('utf-8')
-                        urlF = i.a['href'].encode('utf-8')
-                        titF = i.a['title']+' '+i.span.text
-                        titF = titF.encode('utf-8')
+                filmes = conteudo[0]('div', attrs={'class':'vbItemImage'})
+                titulos = conteudo[0]('li', attrs={'class':'ipsDataItem ipsPad_half'})
+                totF = len(filmes)
+
+                for i in range(0, totF) :
+                        #xbmc.log('[plugin.video.overflix] L83 - ' + str(filmes[i]), xbmc.LOGNOTICE)
+                        titF = titulos[i].a['title'].encode("utf-8")
                         titF = titF.replace('Assistir','').replace('Online','')
+                        urlF = filmes[i].a['href'].encode("utf-8")
+                        image_news = filmes[i]('div', {'class':'vb_image_container'})[0]
+                        imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0].encode("utf-8")
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
