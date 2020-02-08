@@ -4,7 +4,8 @@
 # Addon : FilmesOnlinePlus
 # By AddonBrasil - 22/11/2019
 # Atualizado (1.0.0) - 22/11/2019
-# Atualizado (1.0.1) - 26/12/2019
+# Atualizado (1.0.1) - 27/12/2019
+# Atualizado (1.0.2) - 08/02/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -17,7 +18,7 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version   = '1.0.1'
+version   = '1.0.2'
 addon_id  = 'plugin.video.filmesonlineplus'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -287,15 +288,17 @@ def player(name,url,iconimage):
 
 		conteudo = soup('div', {'id':'player-video'})
 		players = conteudo[0]('iframe')
-		#xbmc.log('[plugin.video.FilmesOnlinePlus] L262 - ' + str(players), xbmc.LOGNOTICE)
 		urlF = players[i]['data-src']
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L290 - ' + str(urlF), xbmc.LOGNOTICE)
 
 		if 'index.html' in urlF :
 			fxID = urlF.split('id=')[1]
 			url2Play = 'https://002.yandexcloud.ga/drive/hls/%s/%s.m3u8' % (fxID, fxID)
-		else :
+		elif '.m3u8' not in urlF :
 			res = urlF.split('/')[4]
 			url2Play = base64.b64decode(res + "===")
+		elif '.m3u8' in urlF :
+			url2Play = urlF
 
 		xbmc.log('[plugin.video.FilmesOnlinePlus] L272 - ' + str(url2Play), xbmc.LOGNOTICE)
 
@@ -341,6 +344,7 @@ def player(name,url,iconimage):
 				listitem.setProperty('IsPlayable', 'true')
 				listitem.setMimeType('video/mp4')
 				playlist.add(url2Play,listitem)
+
 		xbmcPlayer = xbmc.Player()
 		
 		while xbmcPlayer.play(playlist) :
@@ -414,19 +418,19 @@ def player_series(name,url,iconimage):
 				urlVideo = 'https://verystream.com/e/%s' % fxID
 					
 			elif 'mix' in urlVideo :
-				fxID = str(idsT[i])
-				urlVideo = 'https://mixdrop.co/e/%s' % fxID
-				data = openURL(urlVideo)
-				#url2Play = re.findall('MDCore.vsrc = "(.*?)";', data)[0]
-				#url2Play = 'http:%s' % url2Play if url2Play.startswith("//") else url2Play
-				sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
-				aMatches = re.compile(sPattern).findall(data)
-				sUnpacked = jsunpack.unpack(aMatches[0])
-				xbmc.log('[plugin.video.FilmesOnlinePlus] L379 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-				url2Play = re.findall('MDCore.vsrc="(.*?)"', sUnpacked)
-				url = str(url2Play[0])
-				url2Play = 'http:%s' % url if url.startswith("//") else url
-				OK = False
+					fxID = str(idsT[i])
+					urlVideo = 'https://mixdrop.co/e/%s' % fxID
+					data = openURL(urlVideo)
+					#url2Play = re.findall('MDCore.vsrc = "(.*?)";', data)[0]
+					#url2Play = 'http:%s' % url2Play if url2Play.startswith("//") else url2Play
+					sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+					aMatches = re.compile(sPattern).findall(data)
+					sUnpacked = jsunpack.unpack(aMatches[0])
+					xbmc.log('[plugin.video.FilmesOnlinePlus] L379 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+					url2Play = re.findall('MDCore.vsrc="(.*?)"', sUnpacked)
+					url = str(url2Play[0])
+					url2Play = 'http:%s' % url if url.startswith("//") else url
+					OK = False
 
 			elif 'only' in urlVideo :
 				fxID = str(idsT[i])
@@ -450,7 +454,7 @@ def player_series(name,url,iconimage):
 				fxID = str(idsT[i])
 				urlVideo = 'https://streamango.com/embed/%s' % fxID
 
-			elif 'vt' in urlVideo :
+			elif 'vt=' in urlVideo :
 				fxID = str(idsT[i])
 				urlVideo = 'http://vidto.me/embed-%s.html' % fxID
 
@@ -484,13 +488,13 @@ def player_series(name,url,iconimage):
 				urlVideo = 'https://waaw.tv/watch_video.php?v=%s' % fxID
  
 			elif 'vidoza' in urlVideo :
-				fxID = str(idsT[i])
-				urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
+					fxID = str(idsT[i])
+					urlVideo = 'https://vidoza.net/embed-%s.html' % fxID
 
 			elif 'stream' in urlVideo :
-				fxID = str(idsT[i])
-				urlVideo = 'https://streamz.cc/%s' % fxID
-
+					fxID = str(idsT[i])
+					urlVideo = 'https://streamz.cc/%s' % fxID
+																		   
 			elif 'jetload' in urlVideo :
 				fxID = str(idsT[i])
 				urlVideo = 'https://jetload.net/e/%s' % fxID
@@ -532,7 +536,7 @@ def player_series(name,url,iconimage):
 				listitem = xbmcgui.ListItem(name, path=url2Play)
 				listitem.setArt({"thumb": iconimage, "icon": iconimage})
 				listitem.setProperty('IsPlayable', 'true')
-				listitem.setMimeType('video/m3u8')
+				listitem.setMimeType('application/vnd.apple.mpegurl')
 				listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
 				listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
 				playlist.add(url2Play,listitem)
