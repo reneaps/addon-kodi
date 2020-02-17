@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<<<<<<< HEAD
 <addon id="plugin.video.filmesonlineplus" name="FilmesOnlinePlus" version="1.0.2" provider-name="AddonReneSilva">
+=======
+<addon id="plugin.video.filmesonlineplus" name="FilmesOnlinePlus" version="1.0.3" provider-name="AddonReneSilva">
+>>>>>>> 0804e9b2825c1451fa279ead98cd8bbeda6c9aec
   <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.urlresolver" version="1.0.0"/>
