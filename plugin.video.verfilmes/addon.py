@@ -9,6 +9,7 @@
 # Atualizado (1.1.3) - 26/04/2019
 # Atualizado (1.1.4) - 09/06/2019
 # Atualizado (1.1.5) - 23/11/2019
+# Atualizado (1.1.6) - 19/02/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -145,13 +146,12 @@ def getEpisodios(name, url):
         episodios = []
 
         link  = openURL(url)
-        link = unicode(link, 'utf-8', 'ignore')
+        #link = unicode(link, 'utf-8', 'ignore')
 
-        soup = BeautifulSoup(link)
+        soup = BeautifulSoup(link,)
         conteudo = soup("div", {"class": "videos"})
         arquivo = conteudo[0]("li", {"class": "video" + str(n) + "-code"})
         perfil = soup('div',{'id':'perfil_conteudo'})
-
         sname = perfil[0].h1.text.encode('utf-8')
 
         sname = sname.split('-')[0].strip()
@@ -160,12 +160,11 @@ def getEpisodios(name, url):
             temporadas = arquivo[0]('table')
             filmes = temporadas[0]('a')
             audio = str(arquivo[0].span.text)
-
             totF = len(filmes)
 
             for filme in filmes:
-                    titF = filme.text.decode('unicode-escape').encode('utf-8')
-                    titF = titF.replace('Assistir ','').replace('Filme ','').replace('Episdio', 'Episodio') + " " +audio #" Dublado"
+                    titF = filme.text.encode('utf-8')
+                    titF = titF.replace('Assistir ','').replace('â&euro;&ldquo;','').replace('Ã³', 'o') + " " +audio #" Dublado"
                     titF = sname + " "+str(n) + "T " + titF
                     urlF = filme.get("href").encode('utf-8', 'ignore')
                     urlF = base + urlF
@@ -182,7 +181,7 @@ def getEpisodios(name, url):
             totF = len(filmes)
 
             for filme in filmes:
-                    titF = filme.text.decode('unicode-escape').encode('utf-8')
+                    titF = filme.text.encode('utf-8')
                     titF = titF.replace('Assistir ','').replace('Filme ','').replace('Episdio', 'Episodio') + " " +audio #" Legendado"
                     titF = sname + " "+str(n) + "T " + titF
                     urlF = filme.get("href").encode('utf-8', 'ignore')
