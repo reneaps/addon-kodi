@@ -4,6 +4,7 @@
 # Addon : BKSeries
 # By AddonBrasil - 06/12/2019
 # Atualizado (1.0.0) - 06/12/2019
+# Atualizado (1.0.1) - 17/02/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -155,7 +156,7 @@ def getEpisodios(name, url):
 				urlF = i.a['href']
 				urlF = urlF.split('v=')[-1]
 				urlF = 'https://www.bkseries.com/video/blogger.php?v=' + urlF
-				titF = i.a['title']
+				titF = i.a['title'].encode('utf-8')
 				addDirF(titF, urlF, 110, imgF, False, totF)
 		except:
 			pass
@@ -166,7 +167,7 @@ def getEpisodios(name, url):
 				urlF = i.a['href']
 				urlF = urlF.split('v=')[-1]
 				urlF = 'https://www.bkseries.com/video/blogger.php?v=' + urlF
-				titF = i.a['title']
+				titF = i.a['title'].encode('utf-8')
 				addDirF(titF, urlF, 110, imgF, False, totF)
 		except:
 			pass
@@ -320,7 +321,7 @@ def player(name,url,iconimage):
 				xbmcPlayer.setSubtitles(legendas)
 
 def player_series(name,url,iconimage):
-		#xbmc.log('[plugin.video.FilmesOnlinePlus] L398 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L323 - ' + str(url), xbmc.LOGNOTICE)
 		OK = True
 		mensagemprogresso = xbmcgui.DialogProgress()
 		mensagemprogresso.create('FilmesOnlinePlus', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -335,7 +336,7 @@ def player_series(name,url,iconimage):
 		filmes = filmes[0]('a')
 		totF = len(filmes)
 
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L344 - ' + str(totF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L338 - ' + str(totF), xbmc.LOGNOTICE)
 
 		for s in filmes:
 			hname = s.text.encode('utf-8')
@@ -358,6 +359,8 @@ def player_series(name,url,iconimage):
 			
 			urlVideo = idsT[i]
 
+			xbmc.log('[plugin.video.FilmesOnlinePlus] L361 - ' + str(urlVideo), xbmc.LOGNOTICE)
+
 			if 'jw.php' in urlVideo:
 				fxID = urlVideo.split('v=')[-1]
 				url2Play = 'https://www.bkseries.com/videozin/video-play.mp4/?contentId=%s' % fxID
@@ -373,7 +376,7 @@ def player_series(name,url,iconimage):
 				url2Play = 'https://www.bkseries.com/videozin/video-play.mp4/?contentId=%s' % fxID
 				OK = False
 
-			xbmc.log('[plugin.video.FilmesOnlinePlus] L379 - ' + str(urlVideo), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.FilmesOnlinePlus] L378 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				
 		except:
 			pass
@@ -389,7 +392,7 @@ def player_series(name,url,iconimage):
 
 		if not url2Play : return
 
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L532 - ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L394 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		legendas = '-'
 
