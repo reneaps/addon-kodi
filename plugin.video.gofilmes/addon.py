@@ -9,6 +9,7 @@
 # Atualizado (1.0.2) - 05/09/2019
 # Atualizado (1.0.3) - 13/10/2019
 # Atualizado (1.0.4) - 13/10/2019
+# Atualizado (1.0.5) - 08/02/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -24,7 +25,7 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version      = '1.0.3'
+version      = '1.0.5'
 addon_id     = 'plugin.video.gofilmes'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')

@@ -11,6 +11,8 @@
 # Atualizado (1.0.6) - 27/07/2019
 # Atualizado (1.0.7) - 10/09/2019
 # Atualizado (1.0.8) - 18/11/2019
+# Atualizado (1.0.9) - 05/02/2020
+# Atualizado (1.1.0) - 09/02/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -23,7 +25,7 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version   = '1.0.7'
+version   = '1.1.0'
 addon_id  = 'plugin.video.overflix'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -77,13 +79,16 @@ def getFilmes(url):
         soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup('div', attrs={'class':'ipsGrid ipsPad_half'})
         filmes = conteudo[0]('div', attrs={'class':'vbItemImage'})
+        titulos = conteudo[0]('li', attrs={'class':'ipsDataItem ipsPad_half'})
         totF = len(filmes)
 
-        for filme in filmes:
-                titF = filme.a['title'].encode("utf-8")
+        #for filme in filmes:
+        for i in range(0, totF) :
+                #xbmc.log('[plugin.video.overflix] L83 - ' + str(filmes[i]), xbmc.LOGNOTICE)
+                titF = titulos[i].a['title'].encode("utf-8")
                 titF = titF.replace('Assistir','').replace('Online','')
-                urlF = filme.a['href'].encode("utf-8")
-                image_news = filme('div', {'class':'vb_image_container'})[0]
+                urlF = filmes[i].a['href'].encode("utf-8")
+                image_news = filmes[i]('div', {'class':'vb_image_container'})[0]
                 imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0].encode("utf-8")
                 addDirF(titF, urlF, 100, imgF, False, totF)
 
@@ -102,12 +107,15 @@ def getSeries(url):
         soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup('div', attrs={'class':'ipsGrid ipsPad_half'})
         filmes = conteudo[0]('div', attrs={'class':'vbItemImage'})
+        titulos = conteudo[0]('li', attrs={'class':'ipsDataItem ipsPad_half'})
+        totF = len(filmes)
 
-        for filme in filmes:
-                titF = filme.a["title"].encode("utf-8")
+        #for filme in filmes:
+        for i in range(0, totF) :
+                titF = titulos[i].a['title'].encode("utf-8")
                 titF = titF.replace('Assistir','').replace('Online','')
-                urlF = filme.a["href"].encode('utf-8')
-                image_news = filme('div', {'class':'vb_image_container'})[0]
+                urlF = filmes[i].a['href'].encode("utf-8")
+                image_news = filmes[i]('div', {'class':'vb_image_container'})[0]
                 imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0]
                 addDir(titF, urlF, 26, imgF)
 
@@ -200,14 +208,17 @@ def pesquisa():
                 html = r.content
                 soup = BeautifulSoup(html, 'html.parser')
                 conteudo = soup('div', {'class':'videoboxGridview'})
-                itens = conteudo[0]('div', {'class':'vbItemImage'})
-                for i in itens:
-                        a = i.div['style']
-                        imgF = re.findall(r'.+url\(\'(.+?)\'\)',a)[0].encode('utf-8')
-                        urlF = i.a['href'].encode('utf-8')
-                        titF = i.a['title']+' '+i.span.text
-                        titF = titF.encode('utf-8')
+                filmes = conteudo[0]('div', attrs={'class':'vbItemImage'})
+                titulos = conteudo[0]('li', attrs={'class':'ipsDataItem ipsPad_half'})
+                totF = len(filmes)
+
+                for i in range(0, totF) :
+                        #xbmc.log('[plugin.video.overflix] L83 - ' + str(filmes[i]), xbmc.LOGNOTICE)
+                        titF = titulos[i].a['title'].encode("utf-8")
                         titF = titF.replace('Assistir','').replace('Online','')
+                        urlF = filmes[i].a['href'].encode("utf-8")
+                        image_news = filmes[i]('div', {'class':'vb_image_container'})[0]
+                        imgF = re.findall(r'url\(\'(.+?)\'\);',str(image_news))[0].encode("utf-8")
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
@@ -306,7 +317,7 @@ def player(name,url,iconimage):
                  
             elif 'mystream' in urlVideo :
                 fxID = str(idsT[i])
-                urlVideo = 'https://mstream.icu/%s' % fxID
+                urlVideo = 'https://mstream.xyz/%s' % fxID
                 
             elif 'thevid' in urlVideo :
                 fxID = str(idsT[i])
@@ -323,6 +334,7 @@ def player(name,url,iconimage):
             elif 'mix' in urlVideo :
                     fxID = str(idsT[i])
                     urlVideo = 'https://mixdrop.co/e/%s' % fxID
+                    '''
                     data = openURL(urlVideo)
                     #url2Play = re.findall('MDCore.vsrc = "(.*?)";', data)[0]
                     #url2Play = 'http:%s' % url2Play if url2Play.startswith("//") else url2Play
@@ -330,10 +342,10 @@ def player(name,url,iconimage):
                     aMatches = re.compile(sPattern).findall(data)
                     sUnpacked = jsunpack.unpack(aMatches[0])
                     xbmc.log('[plugin.video.overflix] L330 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-                    url2Play = re.findall('MDCore.vsrc="(.*?)"', sUnpacked)
+                    url2Play = re.findall('MDCore.wurl="(.*?)"', sUnpacked)
                     url = str(url2Play[0])
                     url2Play = 'http:%s' % url if url.startswith("//") else url
-                    OK = False
+                    OK = False'''
 
             elif 'jetload' in urlVideo :
                     fxID = str(idsT[i])
@@ -454,11 +466,15 @@ def player_series(name,url,iconimage):
                     aMatches = re.compile(sPattern).findall(data)
                     sUnpacked = jsunpack.unpack(aMatches[0])
                     xbmc.log('[plugin.video.overflix] L435 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-                    url2Play = re.findall('MDCore.vsrc="(.*?)"', sUnpacked)
+                    url2Play = re.findall('MDCore.wurl="(.*?)"', sUnpacked)
                     url = str(url2Play[0])
                     url2Play = 'http:%s' % url if url.startswith("//") else url
                     OK = False
-
+                 
+            elif 'go' in urlVideo :
+                fxID = str(idsT[i])
+                urlVideo = 'https://gounlimited.to/embed-%s.html' % fxID
+                
             elif 'onlystream' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://onlystream.tv/e/%s' % fxID

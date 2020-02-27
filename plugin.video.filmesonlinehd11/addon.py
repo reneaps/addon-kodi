@@ -1,12 +1,13 @@
 ﻿#####################################################################
 # -*- coding: utf-8 -*-
 #####################################################################
-# Addon : FilmesOnLineHD1
+# Addon : FilmesOnLineHD11
 # By AddonReneSilva - 02/11/2016
 # Atualizado (1.0.1) - 02/11/2016
 # Atualizado (1.1.0) - 04/05/2018
 # Atualizado (1.1.5) - 09/10/2019
 # Atualizado (1.1.6) - 09/10/2019
+# Atualizado (1.1.7) - 12/01/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -24,8 +25,8 @@ selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/img/'
 fanart      = addonfolder + '/fanart.png'
-base        = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNvbmxpbmVoZDExLmNj')
-
+base        = base64.b64decode('aHR0cHM6Ly93d3cuZmlsbWVzb25saW5laGQxMi5jYy8=')
+#base        = base64.b64decode('aHR0cDovL3d3dy5maWxtZXNvbmxpbmVoZDExLmNj')
 ############################################################################################################
 
 def menuPrincipal():
@@ -321,6 +322,40 @@ def player(name,url,iconimage):
                 nowID = urlVideo.split("id=")[1]
                 urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
 
+        elif 'mix' in urlVideo :
+                data = openURL(urlVideo)
+                sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+                aMatches = re.compile(sPattern).findall(data)
+                sUnpacked = jsunpack.unpack(aMatches[0])
+                xbmc.log('[plugin.video.overflix] L435 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+                url2Play = re.findall('MDCore.furl="(.*?)"', sUnpacked)
+                url = str(url2Play[0])
+                url2Play = 'http:%s' % url if url.startswith("//") else url
+                OK = False
+
+        elif 'jawcloud' in urlVideo :
+                headers = {'Referer': urlVideo,
+
+                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+
+                           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+
+                           'upgrade-insecure-requests': '1',
+
+                           'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'
+
+                }
+                r = requests.get(url=urlVideo,headers=headers)
+                link = r.content
+                xbmc.log('[plugin.video.filmesonlinehd11] L343 - ' + str(link), xbmc.LOGNOTICE)
+                link = unicode(link, 'utf-8', 'ignore')
+                ref = re.findall(r'source src=\s*\"(.+?)\"',link)[-1]
+                fxID = ref #.split(',')[-1]
+                #fxID = fxID.split(']')[-1]
+                url2Play = fxID
+                OK = False
+                xbmc.log('[plugin.video.filmesonlinehd11] L344 - ' + str(fxID), xbmc.LOGNOTICE)
+
         elif 'flashx.php' in urlVideo :
                 fxID = urlVideo.split('id=')[1]
                 urlVideo = 'http://www.flashx.tv/embed-%s.html' % fxID
@@ -492,6 +527,24 @@ def player_series(name,url,iconimage):
                 vttID = urlVideo.split('e/')[1]
                 urlVideo = 'http://www.video.tt/watch_video.php?v=%s' % vttID
 
+        elif 'jawcloud' in urlVideo :
+                headers = {'Referer': urlVideo,
+                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                           'upgrade-insecure-requests': '1',
+                           'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'
+                }
+                r = requests.get(url=urlVideo,headers=headers)
+                link = r.content
+                xbmc.log('[plugin.video.filmesonlinehd11] L343 - ' + str(link), xbmc.LOGNOTICE)
+                link = unicode(link, 'utf-8', 'ignore')
+                ref = re.findall(r'source src=\s*\"(.+?)\"',link)[-1]
+                fxID = ref #.split(',')[-1]
+                #fxID = fxID.split(']')[-1]
+                url2Play = fxID
+                OK = False
+                xbmc.log('[plugin.video.filmesonlinehd11] L344 - ' + str(fxID), xbmc.LOGNOTICE)
+
         elif 'flashx.php' in urlVideo :
                 fxID = urlVideo.split('id=')[1]
                 urlVideo = 'http://www.flashx.tv/playvid-%s.html' % fxID
@@ -588,9 +641,9 @@ def openConfigEI():
 
 def openURL(url):
         req = urllib2.Request(url)
-        req.add_header('Referer',url)
-        req.add_header('User-Agent', 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C)')
-        #req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        req.add_header('Referer', url)
+        #req.add_header('User-Agent', 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C)')
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         response = urllib2.urlopen(req)
         link=response.read()
         response.close()
