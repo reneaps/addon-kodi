@@ -17,7 +17,7 @@ except:
     import simplejson as json
 h = HTMLParser.HTMLParser()
 
-versao = '1.0.2'
+versao = '1.0.3'
 addon_id = 'plugin.video.filmesonlinex'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -224,13 +224,14 @@ def player(name,url,iconimage):
             except:
                 pass
             xbmc.log('[plugin.video.filmesonlinex] L233 - ' + str(link_houst), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.filmesonlinex] L234 - ' + str(link_video), xbmc.LOGNOTICE)
             if not link_video:
                 try:
                     urlVideo = link_houst
             
-                    if 'oload2' in urlVideo :
+                    if 'secvideo1' in urlVideo :
                             fxID = urlVideo.split('embed/')[1]
-                            urlVideo = 'https://openload.co/embed/%s' % fxID
+                            urlVideo = 'https://secvideo1.online/embed/%s' % fxID
 
                     elif 'thevid' in urlVideo :
                             fxID = urlVideo.split('/e/')[1]
@@ -239,7 +240,11 @@ def player(name,url,iconimage):
                     elif 'vcdn.io' in urlVideo :
                             fxID = urlVideo.split('/v/')[1]
                             urlVideo = 'https://www.fembed.com/v/%s' % fxID
-
+                            
+                    elif 'mixdrop' in urlVideo :
+                            fxID = urlVideo.split('/e/')[1]
+                            urlVideo = 'https://mixdrop.co/e/%s' % fxID
+                            
                     link_video = urlresolver.resolve(urlVideo)
                     urlF = link_video #.split("|")[0]
                     sfile = ['720p']

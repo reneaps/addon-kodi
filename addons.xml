@@ -123,39 +123,7 @@
   </extension>
 </addon>
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<addon id="plugin.video.filmesonlineplus" name="FilmesOnlinePlus" version="1.0.2" provider-name="AddonReneSilva">
-=======
-<addon id="plugin.video.filmesonlineplus" name="FilmesOnlinePlus" version="1.0.3" provider-name="AddonReneSilva">
->>>>>>> 0804e9b2825c1451fa279ead98cd8bbeda6c9aec
-  <requires>
-        <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.urlresolver" version="1.0.0"/>
-		<import addon="script.module.videohosts" version="1.0.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-		<import addon="script.module.requests" version="2.9.1"/>
-        <import addon="script.extendedinfo" />
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-        <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-        <language>en</language>
-        <platform>all</platform>
-        <summary lang="en">FilmesOnlinePlus</summary>
-        <description lang="en">
-            No addon FilmesOnlinePlus você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
-            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
-        </description>
-  </extension>
-</addon>
-
->>>>>>> 0aeb7dc144954628d33f86ca85d761f4aea41b00
-<addon id="plugin.video.filmesonlinex" name="FILMESONLINEX" version="1.0.2" provider-name="Cleiton Leonel Creton">
+<addon id="plugin.video.filmesonlinex" name="FILMESONLINEX" version="1.0.3" provider-name="Cleiton Leonel Creton">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.urlresolver" version="1.0.0"/>
@@ -163,6 +131,7 @@
     <import addon="script.module.simplejson" optional="true"/>
     <import addon="script.module.parsedom" optional="true"/>
     <import addon="script.module.beautifulsoup4" optional="true"/>
+	<import addon="script.module.html5lib" />
 	<import addon="script.module.videohosts" version="1.0.0"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="addon.py">
