@@ -1,11 +1,12 @@
 <?xml version="0.0.1" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.gofilmes" name="GoFilmes" version="1.0.5" provider-name="AddonReneSilva">
+<addon id="plugin.video.gofilmes" name="GoFilmes" version="1.0.6" provider-name="AddonReneSilva">
   <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.urlresolver" version="1.0.0"/>
         <import addon="script.extendedinfo" />
 		<import addon="script.module.videohosts" version="1.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+		<import addon="script.module.html5lib" />
         <import addon="script.module.requests" version="2.9.1"/>
   </requires>
     

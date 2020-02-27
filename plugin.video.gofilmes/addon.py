@@ -1,5 +1,6 @@
 ﻿#####################################################################
 #####################################################################
+#####################################################################
 # -*- coding: utf-8 -*-
 #####################################################################
 # Addon : Filmes e Series Online
@@ -10,6 +11,7 @@
 # Atualizado (1.0.3) - 13/10/2019
 # Atualizado (1.0.4) - 13/10/2019
 # Atualizado (1.0.5) - 08/02/2020
+# Atualizado (1.0.6) - 27/02/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -25,7 +27,7 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version      = '1.0.5'
+version      = '1.0.6'
 addon_id     = 'plugin.video.gofilmes'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
@@ -83,7 +85,7 @@ def getFilmes(url):
             titF = filme.a['title'].encode('utf-8').replace('Assistir ','')
             urlF = filme.a['href'].encode('utf-8')
             imgF = filme.img['data-src'].encode('utf-8')
-            #xbmc.log('[plugin.video.gofilmes] L79 - ' + str(imgF), xbmc.LOGNOTICE)
+            #xbmc.log('[plugin.video.gofilmes] L87 - ' + str(imgF), xbmc.LOGNOTICE)
             pltF = ''
             addDirF(titF, urlF, 100, imgF, False, totF, pltF)
 
@@ -112,7 +114,7 @@ def getSeries(url):
             titF = filme('div',{'class':'tt'})[0].text.encode('utf-8')
             urlF = sbase + filme.a['href'].encode('utf-8')
             imgF = filme.img['src'].encode('utf-8')
-            #xbmc.log('[plugin.video.gofilmes] L108 - ' + str(urlF), xbmc.LOGNOTICE)
+            #xbmc.log('[plugin.video.gofilmes] L116 - ' + str(urlF), xbmc.LOGNOTICE)
             addDir(titF, urlF, 26, imgF)
 
         try :
@@ -150,7 +152,7 @@ def getTemporadas(url):
         xbmcplugin.setContent(int(sys.argv[1]), 'seasons')
 
 def getEpisodios(name, url):
-        xbmc.log('[plugin.video.gofilmes] L146 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.gofilmes] L154 - ' + str(url), xbmc.LOGNOTICE)
         n = name.replace('ª Temporada', '')
         n = int(n)
         temp = []
@@ -163,7 +165,7 @@ def getEpisodios(name, url):
         soup = BeautifulSoup(html, "html5lib")
         img = soup.find("div", {"class": "p1"}).img['src']
         conteudo = soup('div',{'class':'eps'})
-        xbmc.log('[plugin.video.gofilmes] L159 - ' + str(n), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.gofilmes] L167 - ' + str(n), xbmc.LOGNOTICE)
         arquivo = conteudo[0]('div',{'class':'temp'+str(n)+'-view'})
         series = arquivo[0]('ul')
 
@@ -271,7 +273,7 @@ def doPesquisaFilmes():
         setViewFilmes()
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.gofilmes] L267 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.gofilmes] L275 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmesESeriesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -307,7 +309,7 @@ def player(name,url,iconimage):
         i = int(index)
         urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
 
-        xbmc.log('[plugin.video.gofilmes] L305 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.gofilmes] L311 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -361,17 +363,35 @@ def player(name,url,iconimage):
                 js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
                 b = json.loads(js)
                 url2Play = b['g']
-                xbmc.log('[plugin.video.gofilmes] L359 - ' + str(url2Play), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.gofilmes] L365 - ' + str(url2Play), xbmc.LOGNOTICE)
                 OK = False
 
-        elif 'gofilmes.me/play/m.php' in urlVideo:
+        elif 'gofilmes.me/play/h.php' in urlVideo:
                 r = requests.get(urlVideo)
                 html = r.content
                 #js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
                 #b = json.loads(js)
                 #url2Play = b['g']
                 url2Play = re.findall('sources:\s*\[\{\'file\':\'(.+?)\',', html)[0]
-                xbmc.log('[plugin.video.gofilmes] L359 - ' + str(url2Play), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.gofilmes] L375 - ' + str(url2Play), xbmc.LOGNOTICE)
+                OK = False
+
+        elif 'openvid.xyz' in urlVideo:
+                fxID = urlVideo.split('/v/')[1]
+                urlVideo = 'https://openvid.xyz/api/source/%s' % fxID
+                r = requests.post(urlVideo)
+                html = r.content
+                #js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
+                js = json.loads(html)
+                s = js['data']
+                qual = []
+                for i in s:
+                    qual.append(i['label'])
+                index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
+                if index == -1 : return
+                i = int(index)
+                xbmc.log('[plugin.video.gofilmes] L392 - ' + str(qual[i]), xbmc.LOGNOTICE)
+                url2Play = js['data'][i]['file']
                 OK = False
 
         elif 'ruvid.nl' in urlVideo :
@@ -403,7 +423,7 @@ def player(name,url,iconimage):
                 url2Play = urlVideo[i]
                 OK = False
 
-        xbmc.log('[plugin.video.gofilmes] L381 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.gofilmes] L425 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         if OK :
             try:
@@ -413,6 +433,7 @@ def player(name,url,iconimage):
                 dialog.ok(" Erro:", " Video removido! ")
                 url2Play = []
                 pass
+                
         if not url2Play : return
 
         legendas = '-'
@@ -449,7 +470,7 @@ def player(name,url,iconimage):
                 xbmcPlayer.setSubtitles(legendas)
 
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.gofilmes] L418 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.gofilmes] L472 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmesESeriesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -490,7 +511,7 @@ def player_series(name,url,iconimage):
 
         urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
         
-        xbmc.log('[plugin.video.gofilmes] L460 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.gofilmes] L513 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
         '''
@@ -554,10 +575,28 @@ def player_series(name,url,iconimage):
                 url2Play = 'http:%s' % url if url.startswith("//") else url
                 OK = False
 
+        elif 'openvid.xyz' in urlVideo:
+                fxID = urlVideo.split('/v/')[1]
+                urlVideo = 'https://openvid.xyz/api/source/%s' % fxID
+                r = requests.post(urlVideo)
+                html = r.content
+                #js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
+                js = json.loads(html)
+                s = js['data']
+                qual = []
+                for i in s:
+                    qual.append(i['label'])
+                index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
+                if index == -1 : return
+                i = int(index)
+                xbmc.log('[plugin.video.gofilmes] L591 - ' + str(qual[i]), xbmc.LOGNOTICE)
+                url2Play = js['data'][i]['file']
+                OK = False
+
         elif 'alforenao.com/' in urlVideo :
                 okID = urlVideo.split('/')[4]
                 urlVideo = 'http://alforenao.com//video/%s/iframe' % okID
-                xbmc.log('[plugin.video.gofilmes] L527 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.gofilmes] L598 - ' + str(urlVideo), xbmc.LOGNOTICE)
                 urlVideo = moonwalk.get_playlist(urlVideo)
                 urlVideo = urlVideo[0]
                 qual = []
@@ -569,7 +608,7 @@ def player_series(name,url,iconimage):
                 url2Play = urlVideo[i]
                 OK = False
         '''
-        xbmc.log('[plugin.video.gofilmes] L539 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.gofilmes] L610 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         if OK : url2Play = urlresolver.resolve(urlVideo)
 
