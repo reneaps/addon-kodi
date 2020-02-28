@@ -662,8 +662,12 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 
 def getInfo(url)    :
         link = openURL(url)
-        titO = re.findall('<h2 class="title">(.*?)</h2>', link)[0]
-
+        titO = re.findall('<meta property="og:title" content="(.*?)">', link)[0]
+        titO = titO.split("(")[0]
+        titO = titO.replace('Assistir ','').replace(' Dublado ','').replace('Online','')
+        titO = titO.replace(' Legendado ','').replace('(2019)','')
+        #xbmc.log('[plugin.video.overflix] L665 - ' + str(titO), xbmc.LOGNOTICE)
+        
         xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
