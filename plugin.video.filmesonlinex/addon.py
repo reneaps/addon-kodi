@@ -17,7 +17,7 @@ except:
     import simplejson as json
 h = HTMLParser.HTMLParser()
 
-versao = '1.0.3'
+versao = '1.0.4'
 addon_id = 'plugin.video.filmesonlinex'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -228,10 +228,19 @@ def player(name,url,iconimage):
             if not link_video:
                 try:
                     urlVideo = link_houst
+                    OK = True
             
                     if 'secvideo1' in urlVideo :
                             fxID = urlVideo.split('embed/')[1]
                             urlVideo = 'https://secvideo1.online/embed/%s' % fxID
+                            html = abrir_url(urlVideo)
+                            links = re.findall(r'file\:"(.*?)",', html)[-1]
+                            links = links.split(',')
+                            srvs = re.sub(r'.\[.+?\]','\'',str(links))
+                            srvs = re.sub(r'.\[.+?\]','\'',str(links))
+                            srvs = srvs.split(',')
+                            urlVideo = links[1][6:] 
+                            OK = False
 
                     elif 'thevid' in urlVideo :
                             fxID = urlVideo.split('/e/')[1]
@@ -245,8 +254,18 @@ def player(name,url,iconimage):
                             fxID = urlVideo.split('/e/')[1]
                             urlVideo = 'https://mixdrop.co/e/%s' % fxID
                             
-                    link_video = urlresolver.resolve(urlVideo)
-                    urlF = link_video #.split("|")[0]
+                    elif 'jawcloud' in urlVideo :
+                            link = abrir_url(urlVideo)
+                            link = unicode(link, 'utf-8', 'ignore')
+                            urlVideo = re.findall(r'source src=\s*\"(.+?)\"',link)[-1]
+                            OK = False
+                
+                    if OK :
+                        link_video = urlresolver.resolve(urlVideo)
+                    else:
+                        link_video = urlVideo
+                        
+                    urlF = link_video
                     sfile = ['720p']
                     xbmc.log('[plugin.video.filmesonlinex] L239 - ' + str(link_video), xbmc.LOGNOTICE)
                     addLink(name.replace('Assistir Agora: ','') + ' ' + str(sfile),urlF,imgF,sfile)
