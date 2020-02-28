@@ -13,6 +13,7 @@
 # Atualizado (1.0.8) - 18/11/2019
 # Atualizado (1.0.9) - 05/02/2020
 # Atualizado (1.1.0) - 09/02/2020
+# Atualizado (1.1.1) - 28/02/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -284,48 +285,54 @@ def player(name,url,iconimage):
             urlVideo = titsT[i]
 
             if 'verystream' in urlVideo:
-                fxID = str(idsT[i])
-                urlVideo = 'https://verystream.com/e/%s' % fxID
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://verystream.com/e/%s' % fxID
 
             elif 'onlystream' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://onlystream.tv/e/%s' % fxID
-                headers = {
-                    'Referer': urlvideo,
-                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                    'Connection':'keep-alive',
-                    'upgrade-insecure-requests': '1'}
-                xbmc.log('[plugin.video.overflix] L301 - ' + str(urlvideo), xbmc.LOGNOTICE)
-                r = requests.get(url=urlVideo, headers=headers)
-                data = r.content
-                url2Play = re.findall('sources\:\s*\[{file\:"([^"]+)",', data)[0]
-                xbmc.log('[plugin.video.overflix] L280 - ' + str(url2Play), xbmc.LOGNOTICE)
-                OK = False
-                  
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://onlystream.tv/e/%s' % fxID
+                    headers = {
+                        'Referer': urlvideo,
+                        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+                        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                        'Connection':'keep-alive',
+                        'upgrade-insecure-requests': '1'}
+                    xbmc.log('[plugin.video.overflix] L301 - ' + str(urlvideo), xbmc.LOGNOTICE)
+                    r = requests.get(url=urlVideo, headers=headers)
+                    data = r.content
+                    url2Play = re.findall('sources\:\s*\[{file\:"([^"]+)",', data)[0]
+                    xbmc.log('[plugin.video.overflix] L280 - ' + str(url2Play), xbmc.LOGNOTICE)
+                    OK = False
+                      
             elif 'streamango' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://streamango.com/embed/%s' % fxID
-                
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://streamango.com/embed/%s' % fxID
+                    
             elif 'rapidvideo' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
-                 
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
+                     
             elif 'go' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://gounlimited.to/embed-%s.html' % fxID
-                 
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://gounlimited.to/embed-%s.html' % fxID
+                     
             elif 'mystream' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://mstream.xyz/%s' % fxID
-                
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://mstream.fun/%s' % fxID
+                    html = openURL(urlVideo)
+                    urlF = re.findall(r'<meta name="og:image" content="(.*?)">', html)[0]
+                    url = urlF.split('/snapshot.jpg')[0] + ".mp4"
+                    url2Play = 'http:%s' % url if url.startswith("//") else url
+                    xbmc.log('[plugin.video.overflix] L326 - ' + str(url2Play), xbmc.LOGNOTICE)
+                    OK = False
+                    
             elif 'thevid' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://thevid.net/e/%s' % fxID
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://thevid.net/e/%s' % fxID
                  
             elif 'openload' in urlVideo :
-                fxID = str(idsT[i])
-                urlVideo = 'https://openload.co/embed/%s' % fxID
+                    fxID = str(idsT[i])
+                    urlVideo = 'https://openload.co/embed/%s' % fxID
  
             elif 'vidoza' in urlVideo :
                     fxID = str(idsT[i])
@@ -500,16 +507,17 @@ def player_series(name,url,iconimage):
             elif 'rapidvideo' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
-
+                     
             elif 'mystream' in urlVideo :
                 fxID = str(idsT[i])
-                urlVideo = 'https://mstream.cloud/%s' % fxID
-                r = requests.get(urlVideo)
-                data = r.content
-                srv = re.findall('<meta name="og:image" content="([^"]+)">', data)[0]
-                url2Play = srv.replace('/img','').replace('jpg','mp4')
+                urlVideo = 'https://mstream.fun/%s' % fxID
+                html = openURL(urlVideo)
+                urlF = re.findall(r'<meta name="og:image" content="(.*?)">', html)[0]
+                url = urlF.split('/snapshot.jpg')[0] + ".mp4"
+                url2Play = 'http:%s' % url if url.startswith("//") else url
+                xbmc.log('[plugin.video.overflix] L326 - ' + str(url2Play), xbmc.LOGNOTICE)
                 OK = False
-                
+               
             elif 'thevid' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://thevid.net/e/%s' % fxID
