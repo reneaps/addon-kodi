@@ -123,6 +123,31 @@
   </extension>
 </addon>
 
+<addon id="plugin.video.filmesonlineplus" name="FilmesOnlinePlus" version="1.0.4" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="script.module.urlresolver" version="1.0.0"/>
+		<import addon="script.module.videohosts" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+		<import addon="script.module.requests" version="2.9.1"/>
+        <import addon="script.extendedinfo" />
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary lang="en">FilmesOnlinePlus</summary>
+        <description lang="en">
+            No addon FilmesOnlinePlus vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+        </description>
+  </extension>
+</addon>
+
 <addon id="plugin.video.filmesonlinex" name="FILMESONLINEX" version="1.0.4" provider-name="Cleiton Leonel Creton">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
