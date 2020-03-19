@@ -10,6 +10,7 @@
 # Atualizado (1.1.9) - 30/11/2019
 # Atualizado (1.2.0) - 30/11/2019
 # Atualizado (1.2.1) - 16/03/2020
+# Atualizado (1.2.2) - 19/03/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -22,7 +23,7 @@ from urlparse import urlparse
 from resources.lib.BeautifulSoup        import BeautifulSoup
 from resources.lib                      import jsunpack
 
-version   = '1.2.1'
+version   = '1.2.2'
 addon_id  = 'plugin.video.hdfilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -174,6 +175,7 @@ def getEpisodios(name, url):
                 link = links[i].find('div', {'class':"numerando"})
                 titF = links[i].find('div', {'class':"numerando"}).text.encode('utf-8','replace')
                 urlF = links[i].a['href']
+                imgF = links[i].a.img['src']
                 titN = links[i]('div', {'class':"episodiotitle"})
                 titN = titN[0].a.text.encode('utf-8','replace')
                 titF = titF + " - " + titN
@@ -401,6 +403,7 @@ def player_series(name,url,iconimage):
             return
 
         OK = True
+        legendas = '-'
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('HDFilmesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
         mensagemprogresso.update(0)
@@ -437,7 +440,7 @@ def player_series(name,url,iconimage):
         if 'stream.php' in link:
                 fxID = link.split('f=')[-1]
                 links = base64.b64decode(fxID)
-                links = links.replace('\r\n','')
+                links = links.strip() #.replace('\r\n','')
                 xbmc.log('[plugin.video.hdfilmesonline] L426 ' + str(links), xbmc.LOGNOTICE)
 
         if "onclick" in str(links):
@@ -458,7 +461,8 @@ def player_series(name,url,iconimage):
             srv = links
             if not "hdfilmesonlinegratis" in links :
                 domain = urlparse(srv)
-                link2 = domain.netloc.split('.')[0]
+                #link2 = domain.netloc.split('.')[0]
+                link2 = re.sub(r'(.*www\.)?([^\.?]+).*', '\g<2>', srv)
                 urlF.append(srv)
                 hosts.append(link2)
                 titsT.append(link2)
@@ -518,10 +522,10 @@ def player_series(name,url,iconimage):
 
                 OK = False
                 
-        elif 'playersmartflixhd' in urlVideo :
+        elif 'playerhd' in urlVideo or 'playersmartflixhd' in urlVideo :
             fxID = urlVideo.split('v/')[1]
-            urlVideo = 'https://playersmartflixhd.xyz/api/source/%s' % (fxID)
-            data = urllib.urlencode({'r':'','d':'playersmartflixhd.xyz'})
+            urlVideo = 'https://playerhd.xyz/api/source/%s' % (fxID)
+            data = urllib.urlencode({'r':'','d':'playerhd.xyz'})
             headers = {
                 'Referer': urlVideo,
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
@@ -535,7 +539,16 @@ def player_series(name,url,iconimage):
  
                 js = json.loads(html)
                 js = js['data']
-                #xbmc.log('[plugin.video.HDFilmesOnline] L523 - ' + str(js), xbmc.LOGNOTICE)
+                try:
+                    lg = json.loads(html)
+                    lg['captions']
+                    lgID = lg['captions'][0]['id']
+                    lgHA = lg['captions'][0]['hash']
+                    legendas = 'https://www.playerhd.xyz/asset/userdata/229304/caption/%s/%s.srt' % (lgHA,lgID)
+                    xbmc.log('[plugin.video.HDFilmesOnline] L543 - ' + str(legendas), xbmc.LOGNOTICE)
+                except:
+                    legendas = False
+                    pass
                 qual = []
                 urlVideo = []
                 for i in js:
@@ -565,7 +578,7 @@ def player_series(name,url,iconimage):
 
         if not url2Play : return
 
-        legendas = '-'
+        if not legendas : legendas = '-'
 
         mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
 
