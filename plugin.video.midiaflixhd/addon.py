@@ -11,6 +11,7 @@
 # Atualizado (1.0.5) - 03/08/2019
 # Atualizado (1.0.6) - 18/03/2020
 # Atualizado (1.0.7) - 30/03/2020
+# Atualizado (1.0.8) - 31/03/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -24,14 +25,14 @@ from bs4 import BeautifulSoup
 from resources.lib               import jsunpack
 from time                        import time
 
-version   = '1.0.7'
+version   = '1.0.8'
 addon_id  = 'plugin.video.midiaflixhd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = base64.b64decode('aHR0cDovL3d3dy5taWRpYWZsaXhoZC5uZXQv')
+base        = base64.b64decode('aHR0cHM6Ly93d3cubWlkaWFmbGl4aGQubmV0Lw==')
 
 ############################################################################################################
 
@@ -59,13 +60,15 @@ def getCategorias(url):
         for categoria in categorias:
                 titC = categoria.a.text.encode('utf-8','')
                 urlC = categoria.a["href"]
+                urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
+                urlC = base + urlC if urlC.startswith("categoria") else urlC
                 imgC = artfolder + limpa(titC) + '.png'
                 addDir(titC,urlC,20,imgC)
 
         setViewMenu()
 
 def getFilmes(url):
-        xbmc.log('[plugin.video.midiaflixhd] L66 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L70 ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, 'html.parser')
@@ -73,8 +76,8 @@ def getFilmes(url):
                 conteudo = soup("div",{"class":"animation-2 items"})
                 filmes = conteudo[0]('div',{'class':'poster'})
         except:
-                conteudo = soup("article",{"class":"item movies"})
-                filmes = conteudo[0]('div',{'class':'poster'})
+                filmes = soup("article",{"class":"item movies"})
+                #filmes = conteudo[0]('div',{'class':'poster'})
                 dtinfo = soup.findAll('div', {'class':'animation-1 dtinfo'})
                 texto = dtinfo[0]('div', {'class':'texto'})
                 pass
@@ -84,7 +87,12 @@ def getFilmes(url):
         for filme in filmes:
                 titF = filme.img["alt"].encode("utf-8")
                 urlF = filme.a["href"].encode('utf-8')
+                urlF = base + urlF if urlF.startswith("/filmes") else urlF
+                urlF = base + "filmes/" + urlF if urlF.startswith("assistir") else urlF
                 imgF = filme.img["src"].encode('utf-8')
+                imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                imgF = base + imgF if imgF.startswith("/wp-content") else imgF
+                imgF = base + imgF if imgF.startswith("wp-content") else imgF
                 try:
                     texto = dtinfo[i]('div', {'class':'texto'})
                     pltF = texto[0].text #sinopse(urlF)
@@ -95,7 +103,7 @@ def getFilmes(url):
                 addDirF(titF, urlF, 100, imgF, False, totF, pltF)
 
         try :
-                proxima = re.findall('<link rel="next" href="(.+?)" />', link)[0]
+                proxima = re.findall('<link rel="next" href="(.+?)">', link)[0]
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
                 pass
@@ -123,6 +131,7 @@ def getSeries(url):
                 imgF = filme.img["src"].encode("utf-8")
                 imgF = imgF.replace('w185', 'w300')
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                imgF = base + imgF if imgF.startswith("/wp-content") else imgF
                 texto = dtinfo[i]('div', {'class':'texto'})
                 pltF = texto[0].text #sinopse(urlF)
                 i = i + 1
@@ -134,7 +143,8 @@ def getSeries(url):
         except :
                 pass
 
-        xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
+        #xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
+        setViewFilmes()
 
 def getTemporadas(name,url,iconimage):
         xbmc.log('[plugin.video.midiaflixhd] L138 ' + str(url), xbmc.LOGNOTICE)
@@ -206,8 +216,16 @@ def pesquisa():
                 for filme in filmes:
                         titF = filme.img["alt"].encode('utf-8')
                         urlF = filme.a["href"].encode('utf-8')
+                        urlF = base + urlF if urlF.startswith("/filmes") else urlF
+                        urlF = base + urlF if urlF.startswith("filmes") else urlF
+                        urlF = base + urlF if urlF.startswith("/series") else urlF
+                        urlF = base + urlF if urlF.startswith("series") else urlF
+                        urlF = base + "filmes/" + urlF if urlF.startswith("assistir") else urlF
                         imgF = filme.img["src"].encode('utf-8')
                         imgF = imgF.replace('w92', 'w400')
+                        imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                        imgF = base + imgF if imgF.startswith("/wp-content") else imgF
+                        imgF = base + imgF if imgF.startswith("wp-content") else imgF
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
@@ -244,7 +262,7 @@ def player(name,url,iconimage):
         idsT = []
 
         link = openURL(url)
-        dooplay = re.findall(r'<li id=\'player-option-1\' class=\'dooplay_player_option\' data-type=\'(.+?)\' data-post=\'(.+?)\' data-nume=\'(.+?)\'>', link)
+        dooplay = re.findall(r'<li id=[\'"]player-option-1[\'"] class=[\'"]dooplay_player_option[\'"] data-type=[\'"](.+?)[\'"] data-post=[\'"](.+?)[\'"] data-nume=[\'"](.+?)[\'"]>', link)
 
         for dtype, dpost, dnume in dooplay:
                 print dtype, dpost, dnume
@@ -275,7 +293,7 @@ def player(name,url,iconimage):
         html = openURL(urlF)
         urlVideo = urlF
         try:
-            urlVideo = re.findall(r'var JWp = \{\'mp4file\': \'(.+?)\',', html)[0]
+            urlVideo = re.findall(r'var JWp = \{[\'"]mp4file[\'"]: [\'"](.+?)[\'"],', html)[0]
             xbmc.log('[plugin.video.midiaflixhd] L271 - ' + str(html), xbmc.LOGNOTICE)
             url2Play = urlVideo
             OK = False
@@ -394,7 +412,7 @@ def player(name,url,iconimage):
                                 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                         }
                         r = requests.get(url=urlVideo, headers=headers)
-                        e = re.findall('sources:\s*\[\{\'file\':\'(.+?)\', type:\'mp4\', default:\'true\'\}\],', r.content)[0]
+                        e = re.findall('sources:\s*\[\{[\'"]file[\'"]:[\'"](.+?)[\'"], type:[\'"]mp4[\'"], default:[\'"]true[\'"]\}\],', r.content)[0]
                         url2Play = e #+ '%7C' + urllib.urlencode(headers)       
                         OK = False
 
@@ -501,7 +519,7 @@ def player_series(name,url,iconimage):
         dtype = dados[0]['data-type']
         dpost = dados[0]['data-post']
         dnume = dados[0]['data-nume']
-        #dooplay = re.findall(r'<li id=\'player-option-1\' class=\'dooplay_player_option.+?\' data-type=\'(.+?)\' data-post=\'(.+?)\' data-nume=\'(.+?)\'>', link)
+        #dooplay = re.findall(r'<li id=[\'"]player-option-1[\'"] class=[\'"]dooplay_player_option.+?[\'"] data-type=[\'"](.+?)[\'"] data-post=[\'"](.+?)[\'"] data-nume=[\'"](.+?)[\'"]>', link)
         #try:
         #for dtype, dpost, dnume in dooplay:
                 #print dtype, dpost, dnume
