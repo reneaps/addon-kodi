@@ -8,6 +8,7 @@
 # Atualizado (1.1.5) - 09/10/2019
 # Atualizado (1.1.6) - 09/10/2019
 # Atualizado (1.1.7) - 12/01/2020
+# Atualizado (1.1.8) - 03/04/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -127,6 +128,13 @@ def getTemporadas(url):
         imgF = imgF
 
         link = openURL(urlF)
+        dados = {}
+        dados = re.findall("links=(.*?);", link)[0]
+        srvsdub = json.loads(dados)
+        if 'Todas As Temporadas' in srvsdub[0]["Nome"] :
+                urlF = srvsdub[0]["Url"]
+                link = openURL(urlF)
+
         #link = unicode(link, 'utf-8', 'ignore')
         xbmc.log('[plugin.video.filmesonlinehd11] L138 - ' + str(link), xbmc.LOGNOTICE)
         '''
@@ -140,13 +148,9 @@ def getTemporadas(url):
         '''
         try:
             dados = {}
-
             dados = re.findall("links=(.*?);", link)[0]
-
             srvsdub = json.loads(dados)
-
             totF = len(srvsdub)
-
             for i in range(totF):
                     titF = srvsdub[i]["Nome"].encode('utf-8').capitalize()
                     #titF = titF.replace('\u00aa','ª')
@@ -477,14 +481,29 @@ def player(name,url,iconimage):
         playlist = xbmc.PlayList(1)
         playlist.clear()
 
-        listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
-        listitem.setPath(url2Play)
-        #listitem.setProperty('mimetype','video/mp4')
-        listitem.setProperty('IsPlayable', 'true')
-        playlist.add(url2Play,listitem)
+
+        if "m3u8" in url2Play:
+                #ip = addon.getSetting("inputstream")
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('application/vnd.apple.mpegurl')
+                listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+                listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
+                playlist.add(url2Play,listitem)
+        else:
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('video/mp4')
+                playlist.add(url2Play,listitem)
 
         xbmcPlayer = xbmc.Player()
-        xbmcPlayer.play(playlist)
+        
+        while xbmcPlayer.play(playlist) :
+            xbmc.sleep(20000)
+            if not xbmcPlayer.isPlaying():
+                xbmc.stop()
 
         mensagemprogresso.update(100)
         mensagemprogresso.close()
@@ -598,14 +617,28 @@ def player_series(name,url,iconimage):
         playlist = xbmc.PlayList(1)
         playlist.clear()
 
-        listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
-        listitem.setPath(url2Play)
-        listitem.setProperty('mimetype','video/mp4')
-        listitem.setProperty('IsPlayable', 'true')
-        playlist.add(url2Play,listitem)
+        if "m3u8" in url2Play:
+                #ip = addon.getSetting("inputstream")
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('application/vnd.apple.mpegurl')
+                listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+                listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
+                playlist.add(url2Play,listitem)
+        else:
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('video/mp4')
+                playlist.add(url2Play,listitem)
 
         xbmcPlayer = xbmc.Player()
-        xbmcPlayer.play(playlist)
+        
+        while xbmcPlayer.play(playlist) :
+            xbmc.sleep(20000)
+            if not xbmcPlayer.isPlaying():
+                xbmc.stop()
 
         mensagemprogresso.update(100)
         mensagemprogresso.close()
