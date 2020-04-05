@@ -12,6 +12,7 @@
 # Atualizado (1.0.6) - 18/03/2020
 # Atualizado (1.0.7) - 30/03/2020
 # Atualizado (1.0.8) - 31/03/2020
+# Atualizado (1.0.9) - 05/04/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -127,7 +128,9 @@ def getSeries(url):
                 titF = titF.replace('assistir','').replace('online','')
                 titF = titF.replace('Assistir','').replace('Online','')
                 titF = titF.replace('á','a')
-                urlF = url + filme.a["href"].encode('utf-8')
+                urlF = filme.a["href"].encode('utf-8')
+                urlF = base + urlF if urlF.startswith("/series") else urlF
+                urlF = base + "series/" + urlF if urlF.startswith("assistir") else urlF
                 imgF = filme.img["src"].encode("utf-8")
                 imgF = imgF.replace('w185', 'w300')
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
