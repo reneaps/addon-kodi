@@ -11,6 +11,7 @@
 # Atualizado (1.2.0) - 30/11/2019
 # Atualizado (1.2.1) - 16/03/2020
 # Atualizado (1.2.2) - 19/03/2020
+# Atualizado (1.2.3) - 10/04/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -23,7 +24,7 @@ from urlparse import urlparse
 from resources.lib.BeautifulSoup        import BeautifulSoup
 from resources.lib                      import jsunpack
 
-version   = '1.2.2'
+version   = '1.2.3'
 addon_id  = 'plugin.video.hdfilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -299,8 +300,17 @@ def player(name,url,iconimage):
                 html = openURL(urlVideo)
                 html = unicode(html, 'utf-8', 'ignore')
                 soup = BeautifulSoup(html)
-                url2Play = re.compile(r'\{\"file\":"(.*?)",\"type\":".*?",\"label\":".+?"', re.DOTALL).findall(html)[0]
-                OK = False
+                try:
+                    conteudo = soup('iframe')
+                    urlVideo = conteudo[0]['src']
+                except:
+                    pass
+                try:
+                    url2Play = re.compile(r'\{\"file\":"(.*?)",\"type\":".*?",\"label\":".+?"', re.DOTALL).findall(html)[0]
+                    OK = False
+                except:
+                    pass
+                xbmc.log('[plugin.video.hdfilmesonline] L312 ' + str(urlVideo), xbmc.LOGNOTICE)
 
         elif 'vfilmesonline.net' in urlVideo :
                 fxID = urlVideo.split('/')[4]
@@ -334,6 +344,46 @@ def player(name,url,iconimage):
                 xbmc.log('[plugin.video.hdfilmesonline] L331 ' + str(url2Play), xbmc.LOGNOTICE)
 
                 OK = False
+                
+        if 'playerhd.xyz' in urlVideo or 'playersmartflixhd.xyz' in urlVideo :
+                fxID = urlVideo.split('/v/')[1]
+                urlVideo = 'https://playerhd.xyz/api/source/%s' % (fxID)
+                data = urllib.urlencode({'r':urlF[i],'d':'playerhd.xyz'})
+                headers = {
+                    'Referer': urlVideo,
+                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                    'content-type':'application/x-www-form-urlencoded; charset=UTF-8'}
+                html = requests.post(url=urlVideo, data=data, headers=headers).content
+                if html:
+                    source_info = json.loads(html)
+                    url2Play = source_info["data"][0]["file"]
+                    #xbmc.log('[plugin.video.HDFilmesOnline] L520- ' + str(url2Play), xbmc.LOGNOTICE)
+                    js = json.loads(html)
+                    js = js['data']
+                    try:
+                        lg = json.loads(html)
+                        lg['captions']
+                        lgID = lg['captions'][0]['id']
+                        lgHA = lg['captions'][0]['hash']
+                        legendas = 'https://www.playerhd.xyz/asset/userdata/229304/caption/%s/%s.srt' % (lgHA,lgID)
+                        xbmc.log('[plugin.video.HDFilmesOnline] L543 - ' + str(legendas), xbmc.LOGNOTICE)
+                    except:
+                        legendas = False
+                        pass
+                    qual = []
+                    urlVideo = []
+                    for i in js:
+                            urlVideo.append(i['file'])
+                            qual.append(str(i['label']))
+                    if qual == None : return
+                    index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
+                    if index == -1 : return
+                    i = index
+                    url2Play = urlVideo[i]
+                    OK = False
+
+        xbmc.log('[plugin.video.hdfilmesonline] L385 ' + str(urlVideo), xbmc.LOGNOTICE)
 
         if OK :
             try:
@@ -346,7 +396,7 @@ def player(name,url,iconimage):
 
         if not url2Play : return
 
-        xbmc.log('[plugin.video.hdfilmesonline] L346 ' + str(url2Play), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.hdfilmesonline] L398 ' + str(url2Play), xbmc.LOGNOTICE)
 
         legendas = '-'
 
@@ -441,13 +491,13 @@ def player_series(name,url,iconimage):
                 fxID = link.split('f=')[-1]
                 links = base64.b64decode(fxID)
                 links = links.strip() #.replace('\r\n','')
-                xbmc.log('[plugin.video.hdfilmesonline] L426 ' + str(links), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.hdfilmesonline] L493 ' + str(links), xbmc.LOGNOTICE)
 
         if "onclick" in str(links):
             for i in links:
-                xbmc.log('[plugin.video.hdfilmesonline] L431 ' + str(links), xbmc.LOGNOTICE)
+                #xbmc.log('[plugin.video.hdfilmesonline] L497 ' + str(links), xbmc.LOGNOTICE)
                 link = i["onclick"]
-                xbmc.log('[plugin.video.hdfilmesonline] L433 ' + str(link), xbmc.LOGNOTICE)
+                #xbmc.log('[plugin.video.hdfilmesonline] L499 ' + str(link), xbmc.LOGNOTICE)
                 link2 = link.split("=")[1]
                 link2 = link2.replace("\'","")
                 link = link.split("=")[2]
@@ -467,7 +517,7 @@ def player_series(name,url,iconimage):
                 hosts.append(link2)
                 titsT.append(link2)
 
-        xbmc.log('[plugin.video.hdfilmesonline] L452 ' + str(urlF), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.hdfilmesonline] L519 ' + str(urlF), xbmc.LOGNOTICE)
 
         if not titsT : return
 
@@ -480,7 +530,7 @@ def player_series(name,url,iconimage):
         #urlVideo = base + "v/t/" + hosts[i]
         urlVideo = urlF[i]
 
-        xbmc.log('[plugin.video.hdfilmesonline] L461 - ' + str(titsT[i]), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.hdfilmesonline] L532 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -515,7 +565,7 @@ def player_series(name,url,iconimage):
                 sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
                 aMatches = re.compile(sPattern).findall(linkTV)
                 sUnpacked = jsunpack.unpack(aMatches[1])
-                xbmc.log('[plugin.video.hdfilmesonline] L492 ' + str(sUnpacked), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.hdfilmesonline] L567 ' + str(sUnpacked), xbmc.LOGNOTICE)
                 url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
                 url = str(url2Play[0])
                 url2Play = 'http:%s' % url if url.startswith("//") else url
@@ -545,7 +595,7 @@ def player_series(name,url,iconimage):
                     lgID = lg['captions'][0]['id']
                     lgHA = lg['captions'][0]['hash']
                     legendas = 'https://www.playerhd.xyz/asset/userdata/229304/caption/%s/%s.srt' % (lgHA,lgID)
-                    xbmc.log('[plugin.video.HDFilmesOnline] L543 - ' + str(legendas), xbmc.LOGNOTICE)
+                    xbmc.log('[plugin.video.HDFilmesOnline] L597 - ' + str(legendas), xbmc.LOGNOTICE)
                 except:
                     legendas = False
                     pass
@@ -559,12 +609,12 @@ def player_series(name,url,iconimage):
                 if index == -1 : return
                 #xbmc.log('[plugin.video.HDFilmesOnline] L532 - ' + str(urlVideo), xbmc.LOGNOTICE)
                 i = index
-                xbmc.log('[plugin.video.HDFilmesOnline] L535 - ' + str(i), xbmc.LOGNOTICE)
+                #xbmc.log('[plugin.video.HDFilmesOnline] L535 - ' + str(i), xbmc.LOGNOTICE)
                 url2Play = urlVideo[i]
                 
             OK = False
             
-        xbmc.log('[plugin.video.hdfilmesonline] 540 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.hdfilmesonline] 616 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         if OK :
             try:
@@ -577,6 +627,8 @@ def player_series(name,url,iconimage):
                 pass
 
         if not url2Play : return
+
+        xbmc.log('[plugin.video.hdfilmesonline] 630 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         if not legendas : legendas = '-'
 
