@@ -12,6 +12,7 @@
 # Atualizado (2.1.2) - 21/11/2019
 # Atualizado (2.1.3) - 26/12/2019
 # Atualizado (2.1.4) - 01/04/2020
+# Atualizado (2.1.5) - 22/04/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -23,7 +24,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 from time                        import time
 
-version   = '2.1.4'
+version   = '2.1.5'
 addon_id  = 'plugin.video.megafilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -52,7 +53,8 @@ def getCategorias(url):
         xbmc.log('[plugin.video.megafilmesonline] L51 ' + str(url), xbmc.LOGNOTICE)
         soup = BeautifulSoup(link)
         conteudo   = soup("div", {"class": "wrap"})
-        categorias = conteudo[3]("div", {"class": "cats itemSliderC owl-carousel"})
+        categorias = conteudo[3]("div", {"class": "cats itemSliderC owl-carousel"})
+
         categorias = categorias[0]("a")
         totC = len(categorias)
         for categoria in categorias:
@@ -108,7 +110,7 @@ def getSeries(url):
 
         xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 
-def getTemporadas(url):
+def getTemporadas(name, url, icoimage):
         link  = openURL(url)
         soup = BeautifulSoup(link)
         conteudo = soup('div',{'id':'playerArea'})
@@ -126,7 +128,7 @@ def getTemporadas(url):
 
         i = 1
         while i <= totD:
-            titF = str(i) + "ª Temporada"
+            titF = name + "&" + str(i) + "ª Temporada"
             try:
                 addDir(titF, urlF, 27, imgF)
             except:
@@ -135,7 +137,9 @@ def getTemporadas(url):
 
 def getEpisodios(name, url, iconimage):
         xbmc.log('[plugin.video.megafilmesonline] L134 ' + str(url), xbmc.LOGNOTICE)
-        n = name.replace('ª Temporada', '')
+        sea = name.split('&')[-1]
+        name = name.split('&')[0]
+        n = sea.replace('ª Temporada', '')
         n = int(n)
         n = (n-1)
         s = n
@@ -176,7 +180,7 @@ def getEpisodios(name, url, iconimage):
         js = js['episodes']
         xbmc.log('[plugin.video.megafilmesonline] L173 ' + str(js), xbmc.LOGNOTICE)
         for i in js:
-                titF = 'T' + str(n+1) + 'E' + i['ep']
+                titF = name + ' ' + 'T' + str(n+1) + 'E' + i['ep']
                 urlF = i['player'][0]['url']
                 if urlF == "" : titF = titF + ">>Indisponivel"
                 temp = (urlF, titF)
@@ -185,7 +189,7 @@ def getEpisodios(name, url, iconimage):
         total = len(episodios)
 
         for url, titulo in episodios:
-                xbmc.log('[plugin.video.megafilmesonline] L186 ' + str(url), xbmc.LOGNOTICE)
+                #xbmc.log('[plugin.video.megafilmesonline] L186 ' + str(url), xbmc.LOGNOTICE)
                 addDirF(titulo, url, 110, imgF, False, total)
 
 def pega(post_id,idname):
@@ -584,8 +588,8 @@ if     mode == None : menuPrincipal()
 elif mode == 10      : getCategorias(url)
 elif mode == 20      : getFilmes(url)
 elif mode == 25      : getSeries(url)
-elif mode == 26      : getTemporadas(url)
-elif mode == 27      : getEpisodios(name,url,iconimage)
+elif mode == 26      : getTemporadas(name, url, iconimage)
+elif mode == 27      : getEpisodios(name, url, iconimage)
 elif mode == 30      : doPesquisaSeries()
 elif mode == 35      : doPesquisaFilmes()
 elif mode == 40      : getFavoritos()
@@ -595,7 +599,7 @@ elif mode == 43      : cleanFavoritos()
 elif mode == 98      : getInfo(url)
 elif mode == 99      : playTrailer(name,url,iconimage)
 elif mode == 100     : player(name,url,iconimage)
-elif mode == 110     : player_series(name,url,iconimage)
+elif mode == 110     : player_series(name, url, iconimage)
 elif mode == 999     : openConfig()
 elif mode == 1000    : openConfigEI()
 
