@@ -13,6 +13,7 @@
 # Atualizado (1.2.2) - 19/03/2020
 # Atualizado (1.2.3) - 10/04/2020
 # Atualizado (1.2.4) - 26/04/2020
+# Atualizado (1.2.5) - 27/04/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -25,7 +26,7 @@ from urlparse import urlparse
 from resources.lib.BeautifulSoup        import BeautifulSoup
 from resources.lib                      import jsunpack
 
-version   = '1.2.4'
+version   = '1.2.5'
 addon_id  = 'plugin.video.hdfilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -132,6 +133,7 @@ def getSeries(url):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
 def getTemporadas(url):
+        xbmc.log('[plugin.video.hdfilmesonline] L135 ' + str(url), xbmc.LOGNOTICE)
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link)
@@ -149,12 +151,12 @@ def getTemporadas(url):
             a = links[i]('span',{'class':'title'})
             titF = a[0].text.encode('utf-8','replace')
             titF = titF.replace('&#8217;', '\'')
-            xbmc.log('[plugin.video.hdfilmesonline] L155 ' + str(titF), xbmc.LOGNOTICE)
             addDir(titF, urlF, 27, imgF, totF)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
+        xbmc.log('[plugin.video.hdfilmesonline] L158 ' + str(url), xbmc.LOGNOTICE)
         n = name.split('º')[0]
         n = n.replace('º Temporada', '')
         n = int(n)
@@ -164,6 +166,7 @@ def getEpisodios(name, url):
 
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
+        title = re.findall('<h1 class="titulopostagem">(.*?)</h1>', link)[0]
         soup = BeautifulSoup(link)
         episodios = soup.findAll('ul', {'class':'episodios'})
         links = episodios[n]('li')
@@ -180,7 +183,7 @@ def getEpisodios(name, url):
                 imgF = links[i].a.img['src']
                 titN = links[i]('div', {'class':"episodiotitle"})
                 titN = titN[0].a.text.encode('utf-8','replace')
-                titF = titF + " - " + titN
+                titF = title.encode('utf-8') + " T" + str(n+1) + " " + titN
                 addDirF(titF, urlF, 110, imgF, False, totF)
 
         xbmcplugin.setContent(int(sys.argv[1]), content='episodes')
