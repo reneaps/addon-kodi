@@ -13,6 +13,7 @@
 # Atualizado (2.1.3) - 26/12/2019
 # Atualizado (2.1.4) - 01/04/2020
 # Atualizado (2.1.5) - 22/04/2020
+# Atualizado (2.1.6) - 09/05/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -24,7 +25,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 from time                        import time
 
-version   = '2.1.5'
+version   = '2.1.6'
 addon_id  = 'plugin.video.megafilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -110,15 +111,16 @@ def getSeries(url):
 
         xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 
-def getTemporadas(name, url, icoimage):
+def getTemporadas(name, url, iconimage):
+        xbmc.log('[plugin.video.megafilmesonline] L114 ' + str(url), xbmc.LOGNOTICE)
         link  = openURL(url)
         soup = BeautifulSoup(link)
         conteudo = soup('div',{'id':'playerArea'})
         urlF = conteudo[0].iframe['src']
 
-        imgF = ""
-        imgF = re.findall(r'<meta property="og:image" content="(.*?)" />', link)
-        imgF = imgF[0]
+        #imgF = ""
+        #imgF = re.findall(r'<meta property="og:image" content="(.*?)" />', link)
+        imgF = iconimage
 
         link  = openURL(urlF)
         soup = BeautifulSoup(link)
@@ -138,7 +140,11 @@ def getTemporadas(name, url, icoimage):
 def getEpisodios(name, url, iconimage):
         xbmc.log('[plugin.video.megafilmesonline] L134 ' + str(url), xbmc.LOGNOTICE)
         sea = name.split('&')[-1]
-        name = name.split('&')[0]
+        texto = name.split('&')[0]
+        texto = texto.replace('ç','c').replace('ã','a').replace('õ','o')
+        texto = texto.replace('â','a').replace('ê','e').replace('ô','o')
+        texto = texto.replace('á','a').replace('é','e').replace('í','i')
+        name = texto.replace('ó','o').replace('ú','u')
         n = sea.replace('ª Temporada', '')
         n = int(n)
         n = (n-1)
@@ -282,11 +288,11 @@ def player(name,url,iconimage):
         js = json.loads(dados)
         js = js['data']   
         try:
-            lg = json.loads(html)
+            lg = json.loads(dados)
             lg['captions']
             lgID = lg['captions'][0]['id']
             lgHA = lg['captions'][0]['hash']
-            legendas = 'https://www.playerhd.xyz/asset/userdata/229304/caption/%s/%s.srt' % (lgHA,lgID)
+            legendas = 'https://player-megahdfilmes.com/asset/userdata/260169/caption/%s/%s.srt' % (lgHA,lgID)
             xbmc.log('[plugin.video.megafilmesonline] L282 - ' + str(legendas), xbmc.LOGNOTICE)
         except:
             legendas = False
@@ -319,7 +325,7 @@ def player(name,url,iconimage):
 
         if not url2Play : return
 
-        legendas = '-'
+        if not legendas : legendas = '-'
 
         mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
 
@@ -370,11 +376,11 @@ def player_series(name,url,iconimage):
         js = json.loads(dados)
         js = js['data']   
         try:
-            lg = json.loads(html)
+            lg = json.loads(dados)
             lg['captions']
             lgID = lg['captions'][0]['id']
             lgHA = lg['captions'][0]['hash']
-            legendas = 'https://www.playerhd.xyz/asset/userdata/229304/caption/%s/%s.srt' % (lgHA,lgID)
+            legendas = 'https://player-megahdfilmes.com/asset/userdata/260169/caption/%s/%s.srt' % (lgHA,lgID)
             xbmc.log('[plugin.video.megafilmesonline] L370 - ' + str(legendas), xbmc.LOGNOTICE)
         except:
             legendas = False
@@ -403,7 +409,7 @@ def player_series(name,url,iconimage):
 
         if not url2Play : return
 
-        legendas = '-'
+        if not legendas : legendas = '-'
 
         mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
 
@@ -536,7 +542,8 @@ def setViewFilmes() :
 def limpa(texto):
         texto = texto.replace('ç','c').replace('ã','a').replace('õ','o')
         texto = texto.replace('â','a').replace('ê','e').replace('ô','o')
-        texto = texto.replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u')
+        texto = texto.replace('á','a').replace('é','e').replace('í','i')
+        texto = texto.replace('ó','o').replace('ú','u')
         texto = texto.replace(' ','-')
         texto = texto.lower()
 

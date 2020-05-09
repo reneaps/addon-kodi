@@ -1,5 +1,5 @@
 <?xml version="0.0.1" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.megafilmesonline" name="MegaFilmesHD" version="2.1.5" provider-name="AddonReneSilva">
+<addon id="plugin.video.megafilmesonline" name="MegaFilmesHD" version="2.1.6" provider-name="AddonReneSilva">
   <requires>
     	<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.urlresolver" version="2.10.8"/>
