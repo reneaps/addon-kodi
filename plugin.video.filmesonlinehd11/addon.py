@@ -10,6 +10,7 @@
 # Atualizado (1.1.7) - 12/01/2020
 # Atualizado (1.1.8) - 03/04/2020
 # Atualizado (1.1.9) - 04/04/2020
+# Atualizado (1.2.0) - 28/05/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -103,8 +104,8 @@ def getSeries(url):
                 imgF = filme.img["data-src"]
                 addDir(titF, urlF, 26, imgF)
         try :
-                proxima = re.findall('<a class="item" href="(.*?)">Pr.*?<i class="angle right icon"></i></a>', link)[0]
-                addDir('Próxima Página >>', "http:"+proxima, 25, artfolder + 'proxima.png')
+                proxima = re.findall('<a rel="next" class="item" href="(.*?)">Pr.+<i class="angle right icon"></i></a>', link)[0]
+                addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
 
@@ -135,7 +136,7 @@ def getTemporadas(url):
                 urlF = srvsdub[0]["Url"]
                 link = openURL(urlF)
 
-        xbmc.log('[plugin.video.filmesonlinehd11] L137 - ' + str(link), xbmc.LOGNOTICE)
+        #xbmc.log('[plugin.video.filmesonlinehd11] L137 - ' + str(link), xbmc.LOGNOTICE)
 
         try:
             dados = {}
@@ -173,7 +174,7 @@ def getServidores(name, url, iconimage):
             #xbmc.log('[plugin.video.filmesonlinehd11] L172 - ' + str(dados), xbmc.LOGNOTICE)
             for i in range(totD):
                     titF = srvsdub[i]["Nome"].encode('utf-8')
-                    titF = titF + " - Episodio"
+                    titF = titF  if titF.startswith("Ep") else titF + " - Episodio"
                     urlF = srvsdub[i]["Url"]
                     addDirF(titF, urlF, 110, imgF, False, totD)
         except:
@@ -212,7 +213,7 @@ def getEpisodios(name, url, iconimage):
                 totD = len(srvsdub)
                 for i in range(totD):
                         titF = srvsdub[i]["Nome"].encode('utf-8')
-                        titF = titF + " - Episodio"
+                        titF = titF if titF.startswith("Ep") else titF + " - Episodio" 
                         urlF = srvsdub[i]["Url"]
                         addDirF(titF, urlF, 110, imgF, False, totD)
         except:
@@ -256,7 +257,6 @@ def pesquisa():
                         titF = filme.img["alt"].encode('utf-8').replace('Assistir ', '')
                         urlF = filme["href"]
                         imgF = filme.img["data-src"]
-                        #xbmc.log('[plugin.video.filmesonlinehd11] L258 - ' + str(filme), xbmc.LOGNOTICE)
                         temp = (urlF,titF,imgF)
                         hosts.append(temp)
 
@@ -383,7 +383,7 @@ def player(name,url,iconimage):
                         fxID = urlVideo.split("/stream/")[1]
                         urlVideo = 'https://verystream.com/stream/%s' % fxID
 
-        elif 'csst.online' in urlVideo :
+        elif 'fsst.online' in urlVideo :
                 link = openURL(urlVideo)
                 #xbmc.log('[plugin.video.filmesonlinehd11] L387 - ' + str(link), xbmc.LOGNOTICE)
                 link = unicode(link, 'utf-8', 'ignore')
@@ -545,7 +545,7 @@ def player_series(name,url,iconimage):
                 nowID = urlVideo.split("id=")[1]
                 urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
 
-        elif 'csst.online' in urlVideo :
+        elif 'fsst.online' in urlVideo :
                 link = openURL(urlVideo)
                 #xbmc.log('[plugin.video.filmesonlinehd11] L549 - ' + str(link), xbmc.LOGNOTICE)
                 link = unicode(link, 'utf-8', 'ignore')
