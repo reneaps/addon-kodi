@@ -12,6 +12,7 @@
 # Atualizado (1.0.4) - 13/10/2019
 # Atualizado (1.0.5) - 08/02/2020
 # Atualizado (1.0.6) - 27/02/2020
+# Atualizado (1.0.7) - 29/05/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -27,7 +28,7 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version      = '1.0.6'
+version      = '1.0.7'
 addon_id     = 'plugin.video.gofilmes'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
@@ -373,6 +374,19 @@ def player(name,url,iconimage):
                 #b = json.loads(js)
                 #url2Play = b['g']
                 url2Play = re.findall('sources:\s*\[\{\'file\':\'(.+?)\',', html)[0]
+                xbmc.log('[plugin.video.gofilmes] L375 - ' + str(url2Play), xbmc.LOGNOTICE)
+                OK = False
+
+        elif 'gofilmes.me/play/hd.php' in urlVideo:
+                fxID = urlVideo.split('php?')[1]
+                urlVideo = 'http://videoland.xyz/embed/%s' % fxID
+                r = requests.get(urlVideo)
+                html = r.content
+                xbmc.log('[plugin.video.gofilmes] L372 - ' + str(html), xbmc.LOGNOTICE)
+                #js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
+                #b = json.loads(js)
+                #url2Play = b['g']
+                url2Play = re.findall('file\:\s*\'(.+?)\',', html)[0]
                 xbmc.log('[plugin.video.gofilmes] L375 - ' + str(url2Play), xbmc.LOGNOTICE)
                 OK = False
 
