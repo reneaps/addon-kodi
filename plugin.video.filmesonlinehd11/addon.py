@@ -11,6 +11,7 @@
 # Atualizado (1.1.8) - 03/04/2020
 # Atualizado (1.1.9) - 04/04/2020
 # Atualizado (1.2.0) - 28/05/2020
+# Atualizado (1.2.1) - 24/06/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -334,7 +335,7 @@ def player(name,url,iconimage):
                 aMatches = re.compile(sPattern).findall(data)
                 sUnpacked = jsunpack.unpack(aMatches[0])
                 xbmc.log('[plugin.video.overflix] L335 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-                url2Play = re.findall('MDCore.furl="(.*?)"', sUnpacked)
+                url2Play = re.findall('MDCore.wurl="(.*?)"', sUnpacked)
                 url = str(url2Play[0])
                 url2Play = 'http:%s' % url if url.startswith("//") else url
                 OK = False
@@ -382,6 +383,16 @@ def player(name,url,iconimage):
                 elif 'stream' in urlVideo : 
                         fxID = urlVideo.split("/stream/")[1]
                         urlVideo = 'https://verystream.com/stream/%s' % fxID
+
+        elif 'csst.online' in urlVideo :
+                link = openURL(urlVideo)
+                #xbmc.log('[plugin.video.filmesonlinehd11] L387 - ' + str(link), xbmc.LOGNOTICE)
+                link = unicode(link, 'utf-8', 'ignore')
+                ref = re.findall(r'file\:\s*\"(.+?)\"',link)[-1]
+                fxID = ref.split(',')[-1]
+                fxID = fxID.split(']')[-1]
+                url2Play = fxID
+                OK = False
 
         elif 'fsst.online' in urlVideo :
                 link = openURL(urlVideo)
@@ -473,7 +484,7 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        if url2Play : xbmc.log('[plugin.video.filmesonlinehd11] L475 - ' + str(url2Play), xbmc.LOGNOTICE)
+        if url2Play : xbmc.log('[plugin.video.filmesonlinehd11] L486 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         if not url2Play : return
 
