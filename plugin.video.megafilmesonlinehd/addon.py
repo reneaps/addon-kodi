@@ -199,7 +199,7 @@ def pesquisa():
                 totF = len(filmes)
 
                 for filme in filmes:
-                        titF = filme.a.getText().encode('utf-8')
+                        titF = filme.a.h3.getText().encode('utf-8')
                         urlF = filme.a["href"].encode('utf-8')
                         imgF = filme.img["src"].encode('utf-8')
                         imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
