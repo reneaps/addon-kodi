@@ -15,6 +15,7 @@
 # Atualizado (1.1.0) - 14/06/2018
 # Atualizado (1.1.1) - 01/09/2019
 # Atualizado (1.1.2) - 27/03/2020
+# Atualizado (1.1.3) - 07/07/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -25,7 +26,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 from urlparse import urlparse
 
-version     = '1.1.2'
+version     = '1.1.3'
 addon_id    = 'plugin.video.megafilmesonlinehd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 
@@ -81,7 +82,7 @@ def getFilmes(url):
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.a.getText().encode('utf-8')
+                titF = filme.a.h3.getText().encode('utf-8')
                 titF = titF.replace('&#8211;','-')
                 urlF = filme.a["href"].encode('utf-8')
                 imgF = filme.img["src"].encode('utf-8')
@@ -109,7 +110,7 @@ def getSeries(url):
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.a.getText().encode('utf-8')
+                titF = filme.a.h3.getText().encode('utf-8')
                 titF = titF.replace('&#8211;','-')
                 urlF = filme.a["href"].encode('utf-8')
                 try:
