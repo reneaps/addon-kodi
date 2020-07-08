@@ -8,6 +8,7 @@
 # Atualizado (1.0.2) - 08/02/2020
 # Atualizado (1.0.3) - 17/02/2020
 # Atualizado (1.0.4) - 13/03/2020
+# Atualizado (1.0.5) - 08/07/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -20,7 +21,7 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version	  = '1.0.4'
+version	  = '1.0.5'
 addon_id  = 'plugin.video.filmesonlineplus'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -69,7 +70,7 @@ def getCategorias(url):
 		setViewMenu()
 
 def getFilmes(url):
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L75 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L72 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'replace')
 		soup = BeautifulSoup(link, 'html.parser')
@@ -96,7 +97,7 @@ def getFilmes(url):
 		setViewFilmes()
 
 def getSeries(url):
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L96 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L99 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		   
 		soup = BeautifulSoup(link, 'html.parser')
@@ -122,7 +123,7 @@ def getSeries(url):
 		xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
 def getTemporadas(name,url,iconimage):
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L122 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L125 - ' + str(url), xbmc.LOGNOTICE)
 		html = openURL(url)
 		soup = BeautifulSoup(html,'html.parser')
 		sname = soup.title.text.replace('-','|').split('|')[0]
@@ -148,7 +149,7 @@ def getTemporadas(name,url,iconimage):
 		xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L150 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L151 - ' + str(url), xbmc.LOGNOTICE)
 		n = re.findall(r'(.+?)ª Temporada.+', name)[0]
 		html = openURL(url)
 		soup = BeautifulSoup(html,'html.parser')
@@ -231,7 +232,7 @@ def doPesquisaSeries():
 				data = '' #urllib.urlencode({'term':pesquisa})
 				url = sbase + '?s=' + pesquisa
 
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L231 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L234 - ' + str(url), xbmc.LOGNOTICE)
 		link = openURL(url)
 		link = unicode(link, 'utf-8', 'ignore')		   
 		soup = BeautifulSoup(link, 'html.parser')
@@ -268,12 +269,12 @@ def player(name,url,iconimage):
 		idsT = []
 		
 		urlF = url
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L269 - ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L271 + str(urlF), xbmc.LOGNOTICE)
 		link = openURL(urlF)
 		soup = BeautifulSoup(link, 'html.parser')
 		data = soup('div', {'id':'opcoes-player'})
 		btn = data[0]('a',{'class':'nome-server'})
-		#xbmc.log('[plugin.video.FilmesOnlinePlus] L246 - ' + str(btn), xbmc.LOGNOTICE)
+		#xbmc.log('[plugin.video.FilmesOnlinePlus] L276 - ' + str(btn), xbmc.LOGNOTICE)
 
 		for s in btn:
 			hname = s.text
@@ -292,7 +293,7 @@ def player(name,url,iconimage):
 		players = conteudo[0]('iframe')
 		urlF = players[i]['data-src']
 		urlF = 'http:%s' % urlF if urlF.startswith("//") else urlF
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L294 - ' + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L295 - ' + str(urlF), xbmc.LOGNOTICE)
 
 		urlVideo = ''
 
@@ -312,15 +313,15 @@ def player(name,url,iconimage):
 			r = requests.post(url=urlVideo, data=data, headers=headers)
 			html = r.content
 			'''
-			xbmc.log('[plugin.video.FilmesOnlinePlus] L307 - ' + str(html), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.FilmesOnlinePlus] L315 - ' + str(html), xbmc.LOGNOTICE)
 			url2Play = re.findall(r'\"data\"\:\[\{\"file\"\:"(.+?)"', html)[0]
 			url2Play = url2Play.replace('\\','')
-			xbmc.log('[plugin.video.FilmesOnlinePlus] L311 - ' + str(url2Play), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.FilmesOnlinePlus] L318 - ' + str(url2Play), xbmc.LOGNOTICE)
 			'''
 			if html:
 				source_info = json.loads(html)
 				url2Play = source_info["data"][0]["file"]
-				xbmc.log('[plugin.video.FilmesOnlinePlus] L322 - ' + str(url2Play), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.FilmesOnlinePlus] L323 - ' + str(url2Play), xbmc.LOGNOTICE)
 				
 			OK = False
 				
@@ -330,7 +331,7 @@ def player(name,url,iconimage):
 			sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 			aMatches = re.compile(sPattern).findall(data)
 			sUnpacked = jsunpack.unpack(aMatches[0])
-			xbmc.log('[plugin.video.FilmesOnlinePlus] L332 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.FilmesOnlinePlus] L333 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 			url2Play = re.findall('MDCore.wurl="(.*?)"', sUnpacked)
 			url = str(url2Play[0])
 			url2Play = 'http:%s' % url if url.startswith("//") else url
@@ -348,7 +349,7 @@ def player(name,url,iconimage):
 			link = re.findall(r'sources: \[(.*?)\]\,', html)[0]
 			b = json.loads('['+link+']')
 			url2Play = b[0]
-			xbmc.log('[plugin.video.FilmesOnlinePlus] L350 - ' + str(url2Play), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.FilmesOnlinePlus] L351 - ' + str(url2Play), xbmc.LOGNOTICE)
 			
 			OK = False
 
@@ -361,7 +362,7 @@ def player(name,url,iconimage):
 			url2Play = urlF
 			OK = False
 
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L362 - ' + str(urlVideo), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L364 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
 		if OK :
 			try:
@@ -375,7 +376,7 @@ def player(name,url,iconimage):
 
 		if not url2Play : return
 
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L376 - ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L378 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		legendas = '-'
 
@@ -432,7 +433,7 @@ def player_series(name,url,iconimage):
 		titsT = []
 		idsT = []
 
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L346 - ' + str(url), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L435 - ' + str(url), xbmc.LOGNOTICE)
 
 
 		if 'campanha.php' in url :
@@ -440,9 +441,18 @@ def player_series(name,url,iconimage):
 			st = urlF.split('&')[0]
 			urlF = ''.join( reversed(st) )
 			urlF = base64.b64decode(urlF)
-			xbmc.log('[plugin.video.FilmesOnlinePlus] L354 - ' + str(urlF), xbmc.LOGNOTICE) 
+			xbmc.log('[plugin.video.FilmesOnlinePlus] L443 - ' + str(urlF), xbmc.LOGNOTICE) 
 			#ss = btn.split('/?&')[1].split('&')
-		
+
+
+		if 'idd=' in url :
+			urlF = url.split('idd=')[1]
+			st = urlF.split('&')[0]
+			urlF = ''.join( reversed(st) )
+			urlF = base64.b64decode(urlF)
+			xbmc.log('[plugin.video.FilmesOnlinePlus] L452 - ' + str(urlF), xbmc.LOGNOTICE) 
+			#ss = btn.split('/?&')[1].split('&')
+			
 		try:
 			ss = urlF.split('/?&')[1].split('&')
 		except:
@@ -481,7 +491,7 @@ def player_series(name,url,iconimage):
 					sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
 					aMatches = re.compile(sPattern).findall(data)
 					sUnpacked = jsunpack.unpack(aMatches[0])
-					xbmc.log('[plugin.video.FilmesOnlinePlus] L379 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+					xbmc.log('[plugin.video.FilmesOnlinePlus] L493 - ' + str(sUnpacked), xbmc.LOGNOTICE)
 					url2Play = re.findall('MDCore.vsrc="(.*?)"', sUnpacked)
 					url = str(url2Play[0])
 					url2Play = 'http:%s' % url if url.startswith("//") else url
@@ -497,11 +507,11 @@ def player_series(name,url,iconimage):
 					'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
 					'Connection':'keep-alive',
 					'upgrade-insecure-requests': '1'}
-				xbmc.log('[plugin.video.FilmesOnlinePlus] L301 - ' + str(urlvideo), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.FilmesOnlinePlus] L509 - ' + str(urlvideo), xbmc.LOGNOTICE)
 				r = requests.get(url=urlVideo, headers=headers)
 				data = r.content
 				url2Play = re.findall('sources\:\s*\[{file\:"([^"]+)",', data)[0]
-				xbmc.log('[plugin.video.FilmesOnlinePlus] L474 - ' + str(url2Play), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.FilmesOnlinePlus] L513 - ' + str(url2Play), xbmc.LOGNOTICE)
 				OK = False
 				'''
 				
@@ -513,7 +523,7 @@ def player_series(name,url,iconimage):
 				fxID = str(idsT[i])
 				urlVideo = 'http://vidto.me/embed-%s.html' % fxID
 
-			elif 'ok=' in urlVideo :
+			elif 'ok' in urlVideo :
 				fxID = str(idsT[i])
 				urlVideo = 'https://ok.ru/videoembed/%s' % fxID
 
@@ -558,7 +568,7 @@ def player_series(name,url,iconimage):
 				fxID = str(idsT[i+1])
 				urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
 				
-			xbmc.log('[plugin.video.FilmesOnlinePlus] L440 - ' + str(urlVideo), xbmc.LOGNOTICE)
+			xbmc.log('[plugin.video.FilmesOnlinePlus] L570 - ' + str(urlVideo), xbmc.LOGNOTICE)
 				
 		except:
 			pass
@@ -574,7 +584,7 @@ def player_series(name,url,iconimage):
 
 		if not url2Play : return
 
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L487 - ' + str(url2Play), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L586 - ' + str(url2Play), xbmc.LOGNOTICE)
 
 		legendas = '-'
 
@@ -587,7 +597,7 @@ def player_series(name,url,iconimage):
 		if "m3u8" in url2Play:
 				#ip = addon.getSetting("inputstream")
 				url2Play = url2Play.split('|')[0]
-				xbmc.log('[plugin.video.FilmesOnlinePlus] L500 - ' + str(url2Play), xbmc.LOGNOTICE)
+				xbmc.log('[plugin.video.FilmesOnlinePlus] L599 - ' + str(url2Play), xbmc.LOGNOTICE)
 				listitem = xbmcgui.ListItem(name, path=url2Play)
 				listitem.setArt({"thumb": iconimage, "icon": iconimage})
 				listitem.setProperty('IsPlayable', 'true')
