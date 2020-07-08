@@ -17,7 +17,7 @@ except:
     import simplejson as json
 h = HTMLParser.HTMLParser()
 
-versao = '1.0.4'
+versao = '1.0.5'
 addon_id = 'plugin.video.filmesonlinex'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
@@ -25,7 +25,7 @@ artfolder = addonfolder + '/resources/img/'
 fanart = addonfolder + '/fanart.jpg'
 fav = addonfolder + '/fav'
 upnp = addonfolder + '/upnp'
-url_base = 'http://www.filmesonlinex.ch'
+url_base = 'http://filmesonlinex.ch'
 url_base2 = 'https://ibb.co/'
 
 ############################################################################################################
@@ -38,7 +38,8 @@ def menu():
     xbmcplugin.setContent(int(sys.argv[1]), 'movies')
     xbmc.executebuiltin('Container.SetViewMode(502)')
     
-def todas_categorias(url):    
+def todas_categorias(url):
+    xbmc.log('[plugin.video.filmesonlinex] L42 - ' + str(url), xbmc.LOGNOTICE)
     html = gethtml(url)
     soup = html.find("ul",{"class":"clearfix"})
     categorias = soup.findAll("li")
@@ -57,7 +58,8 @@ def menu_filme(name,url,iconimage):
     xbmc.executebuiltin('Container.SetViewMode(502)')    
     
 def listar_filmes(url):
-    print url
+    if "lancamentos" in url : url = url.replace('lancamentos','lancamentoss')
+    xbmc.log('[plugin.video.filmesonlinex] L61 - ' + str(url), xbmc.LOGNOTICE)
     addDir("[B][COLOR red]PESQUISAR FILMES[/B][/COLOR]",'-',11,url_base2+'kUn2Hk')
     html = gethtml(url)
     arquivo = html("ul",{"id":"category-thumbs"})[0]
@@ -159,7 +161,7 @@ def pesquisar_filmes():
 def player(name,url,iconimage):
     imgF = False
     html = abrir_url(url)
-    #xbmc.log('[plugin.video.filmesonlinex] L169 - ' + str(html), xbmc.LOGNOTICE)
+    xbmc.log('[plugin.video.filmesonlinex] L162 - ' + str(url), xbmc.LOGNOTICE)
     imgF = re.compile(r'<img class="poster" src="(.*?)" alt=".+?" title=".+.?">')
     try:
         link_houst = re.compile(r'<div class=\'web\'><a class=\'video\' id=\'video\' rel=\'nofollow\' href=\'(.*?)\'>.+?</a></div>').findall(html)
@@ -266,9 +268,9 @@ def player(name,url,iconimage):
                         link_video = urlVideo
                         
                     urlF = link_video
-                    sfile = ['720p']
+                    sfile = ['-']
                     xbmc.log('[plugin.video.filmesonlinex] L239 - ' + str(link_video), xbmc.LOGNOTICE)
-                    addLink(name.replace('Assistir Agora: ','') + ' ' + str(sfile),urlF,imgF,sfile)
+                    addLink(name.replace('Assistir Agora: ',''),urlF,imgF,sfile)
                 except:
                     pass
     xbmc.log('[plugin.video.filmesonlinex] L244 - ' + str(link_video), xbmc.LOGNOTICE)
