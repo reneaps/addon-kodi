@@ -10,7 +10,6 @@
 # Atualizado (1.0.4) - 13/03/2020
 # Atualizado (1.0.5) - 08/07/2020
 #####################################################################
-
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import json
 import urlresolver
@@ -269,7 +268,7 @@ def player(name,url,iconimage):
 		idsT = []
 		
 		urlF = url
-		xbmc.log('[plugin.video.FilmesOnlinePlus] L271 + str(urlF), xbmc.LOGNOTICE)
+		xbmc.log('[plugin.video.FilmesOnlinePlus] L272 '+ str(urlF), xbmc.LOGNOTICE)
 		link = openURL(urlF)
 		soup = BeautifulSoup(link, 'html.parser')
 		data = soup('div', {'id':'opcoes-player'})
