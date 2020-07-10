@@ -14,6 +14,7 @@
 # Atualizado (1.2.3) - 10/04/2020
 # Atualizado (1.2.4) - 26/04/2020
 # Atualizado (1.2.5) - 27/04/2020
+# Atualizado (1.2.6) - 10/07/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -26,7 +27,7 @@ from urlparse import urlparse
 from resources.lib.BeautifulSoup        import BeautifulSoup
 from resources.lib                      import jsunpack
 
-version   = '1.2.5'
+version   = '1.2.6'
 addon_id  = 'plugin.video.hdfilmesonline'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -348,7 +349,27 @@ def player(name,url,iconimage):
                 xbmc.log('[plugin.video.hdfilmesonline] L344 ' + str(url2Play), xbmc.LOGNOTICE)
 
                 OK = False
-                 
+
+        elif 'csst.online' in urlVideo :
+                link = openURL(urlVideo)
+                #xbmc.log('[plugin.video.hdfilmesonline] L387 - ' + str(link), xbmc.LOGNOTICE)
+                link = unicode(link, 'utf-8', 'ignore')
+                ref = re.findall(r'file\:\s*\"(.+?)\"',link)[-1]
+                fxID = ref.split(',')[-1]
+                fxID = fxID.split(']')[-1]
+                url2Play = fxID
+                OK = False
+
+        elif 'fsst.online' in urlVideo :
+                link = openURL(urlVideo)
+                #xbmc.log('[plugin.video.hdfilmesonline] L387 - ' + str(link), xbmc.LOGNOTICE)
+                link = unicode(link, 'utf-8', 'ignore')
+                ref = re.findall(r'file\:\s*\"(.+?)\"',link)[-1]
+                fxID = ref.split(',')[-1]
+                fxID = fxID.split(']')[-1]
+                url2Play = fxID
+                OK = False
+
         if 'playerhd.xyz' in urlVideo :
                 fxID = urlVideo.split('/v/')[1]
                 urlVideo = 'https://playerhd.xyz/api/source/%s' % (fxID)
