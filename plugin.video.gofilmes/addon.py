@@ -13,6 +13,7 @@
 # Atualizado (1.0.5) - 08/02/2020
 # Atualizado (1.0.6) - 27/02/2020
 # Atualizado (1.0.7) - 29/05/2020
+# Atualizado (1.0.8) - 10/07/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -28,7 +29,7 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version      = '1.0.7'
+version      = '1.0.8'
 addon_id     = 'plugin.video.gofilmes'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
@@ -277,7 +278,7 @@ def player(name,url,iconimage):
         xbmc.log('[plugin.video.gofilmes] L275 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
-        mensagemprogresso.create('FilmesESeriesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+        mensagemprogresso.create('GoFilmes', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
         mensagemprogresso.update(0)
 
         titsT = []
@@ -487,7 +488,7 @@ def player_series(name,url,iconimage):
         xbmc.log('[plugin.video.gofilmes] L472 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
-        mensagemprogresso.create('FilmesESeriesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
+        mensagemprogresso.create('GoFilmes', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
         mensagemprogresso.update(0)
 
         titsT = []
