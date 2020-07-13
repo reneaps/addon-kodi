@@ -448,7 +448,7 @@ def player(name,url,iconimage):
                         OK = True
 
                 elif 'actelecup.com' in urlVideo :
-                        xbmc.log('[plugin.video.midiaflixhd] L451' - ' + str(urlVideo), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.midiaflixhd] L451 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         urlVideo = moonwalk.get_playlist(urlVideo)
                         urlVideo = urlVideo[0]
                         qual = []
