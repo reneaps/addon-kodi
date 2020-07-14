@@ -1,0 +1,32 @@
+ <playercorefactory>
+  <players>
+    <player name="Firefox" type="ExternalPlayer" audio="false" video="true">
+      <filename>C:\Program Files\Mozilla Firefox\firefox.exe</filename>
+      <args>--kiosk -private-window "{1}"</args>
+      <hidexbmc>false</hidexbmc>
+      <hideconsole>false</hideconsole>
+      <warpcursor>none</warpcursor>
+    </player>
+    <player name="MPC" type="ExternalPlayer" audio="false" video="true">
+      <filename>C:\Program Files (x86)\K-Lite Codec Pack\MPC-HC64\mpc-hc64.exe</filename>
+      <args>"{1}" /play /fullscreen /close</args>
+      <hidexbmc>false</hidexbmc>
+      <hideconsole>false</hideconsole>
+      <warpcursor>none</warpcursor>
+    </player>
+	<player name="FFP" type="ExternalPlayer" audio="false" video="true">
+	  <filename>C:\FFmpeg\bin\ffplay.exe</filename>
+      <args>-fs -fflags nobuffer "{1}"</args>
+      <hidexbmc>false</hidexbmc>
+      <hideconsole>false</hideconsole>
+      <warpcursor>none</warpcursor>
+    </player>
+  </players>
+  <rules action="prepend">
+    <!--rule filetypes="html" filename=".*sfplayer.*" player="MPC-HC"/-->
+	<rule filename=".*trembed*.|.*blogger*." player="Firefox"/>
+	<rule filetypes="html" player="Firefox"/>
+	<rule filetypes="mp5" player="MPC"/>
+	<rule filetypes="mp6" player="FFP"/>
+  </rules>
+ </playercorefactory>
