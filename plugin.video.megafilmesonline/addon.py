@@ -14,6 +14,7 @@
 # Atualizado (2.1.4) - 01/04/2020
 # Atualizado (2.1.5) - 22/04/2020
 # Atualizado (2.1.6) - 09/05/2020
+# Atualizado (2.1.7) - 16/07/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -82,7 +83,7 @@ def getFilmes(url):
                 addDirF(titF, urlF, 100, imgF, False, totF)
 
         try :
-                proxima = re.findall('126</a><a class="item click" href="(.*?)">&gt;</a>', link)[0]
+                proxima = re.findall('193</a><a class="item click" href="(.*?)">&gt;</a>', link)[0]
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
                 pass
@@ -180,7 +181,7 @@ def getEpisodios(name, url, iconimage):
         headers = {'Referer': url,
                    'content-type': 'application/json; charset=UTF-8',
                    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
-        urlV = 'https://megahdfilmes.tv/wp-json/api/tvshows?what=epsodes&tmdb=%s&season=%s&version=4.6' % (tmdb,season)
+        urlV = 'https://megahdfilmes.tv/wp-json/api/tvshows?what=epsodes&tmdb=%s&season=%s&version=5' % (tmdb,season)
         r = requests.get(urlV,headers)
         js = json.loads(r.text)
         js = js['episodes']
@@ -275,18 +276,26 @@ def player(name,url,iconimage):
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link)
-        conteudo = soup('div',{'class':'playerBtn fembed'})
+        conteudo = soup('div',{'class':'playerBtn stream'})
         len(conteudo)
         b = conteudo[0]['onclick']
         c = re.findall('getPlayer\(\'(.*?)\',.+\)', b)[0]
+        url2 = 'https://megahdfilmes.tv/api-embed/?action=modal&what=iframe&type=stream&id=%s' % c
         urlF = base64.b64decode(c)
-        fxID = urlF.split('/v/')[-1]
-        urlF = 'https://player-megahdfilmes.com/api/source/%s' % fxID
-        r = requests.post(urlF)
-        dados = {}
-        dados = r.text
-        js = json.loads(dados)
-        js = js['data']   
+        fxID = urlF.split('/e/')[-1]
+        #urlF = 'https://player-megahdfilmes.com/api/source/%s' % fxID
+        urlF = 'https://streamtape.com/e/%s' % fxID
+        headers = {'Referer': url2,
+                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
+        }
+        r = requests.get(urlF,headers)
+        urlF = re.findall(r'<div id="videolink" style="display:none;">(.*?)</div>', r.text)[0]
+        urlF = 'http:%s' % urlF if urlF.startswith("//") else urlF
+        xbmc.log('[plugin.video.megafilmesonline] L286 - ' + str(urlF), xbmc.LOGNOTICE)
+        #dados = {}
+        #dados = r.text
+        #js = json.loads(dados)
+        #js = js['data']   
         try:
             lg = json.loads(dados)
             lg['captions']
@@ -299,10 +308,14 @@ def player(name,url,iconimage):
             pass
         qual = []
         urlVideo = []
+        '''
         for i in js:
                 urlVideo.append(i['file'])
                 qual.append(str(i['label']))
         if qual == None : return
+        '''
+        qual = ['Player 1']
+        urlVideo = urlF
 
         index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
 
@@ -310,7 +323,8 @@ def player(name,url,iconimage):
 
         i = index
 
-        url2Play = urlVideo[i]
+        #url2Play = urlVideo[i]
+        url2Play = urlVideo
         
         OK = False
     
