@@ -14,6 +14,7 @@
 # Atualizado (1.0.6) - 27/02/2020
 # Atualizado (1.0.7) - 29/05/2020
 # Atualizado (1.0.8) - 10/07/2020
+# Atualizado (1.0.9) - 17/07/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -23,13 +24,12 @@ import json
 import resources.lib.moonwalk as moonwalk
 
 from bs4 import BeautifulSoup
-#from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 
 import socket
 socket.setdefaulttimeout(60)
 
-version      = '1.0.8'
+version      = '1.0.9'
 addon_id     = 'plugin.video.gofilmes'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
@@ -368,7 +368,7 @@ def player(name,url,iconimage):
                 xbmc.log('[plugin.video.gofilmes] L365 - ' + str(url2Play), xbmc.LOGNOTICE)
                 OK = False
 
-        elif 'gofilmes.me/play/h.php' in urlVideo:
+        elif 'gofilmes.me/play/s.php' in urlVideo:
                 r = requests.get(urlVideo)
                 html = r.content
                 #js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
@@ -383,12 +383,8 @@ def player(name,url,iconimage):
                 urlVideo = 'http://videoland.xyz/embed/%s' % fxID
                 r = requests.get(urlVideo)
                 html = r.content
-                xbmc.log('[plugin.video.gofilmes] L372 - ' + str(html), xbmc.LOGNOTICE)
-                #js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
-                #b = json.loads(js)
-                #url2Play = b['g']
                 url2Play = re.findall('file\:\s*\'(.+?)\',', html)[0]
-                xbmc.log('[plugin.video.gofilmes] L375 - ' + str(url2Play), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.gofilmes] L387 - ' + str(url2Play), xbmc.LOGNOTICE)
                 OK = False
 
         elif 'openvid.xyz' in urlVideo:
@@ -396,7 +392,6 @@ def player(name,url,iconimage):
                 urlVideo = 'https://openvid.xyz/api/source/%s' % fxID
                 r = requests.post(urlVideo)
                 html = r.content
-                #js = re.findall("ata\s*=\s*JSON.parse\(\'(.+)\'\);", html)[0]
                 js = json.loads(html)
                 s = js['data']
                 qual = []
@@ -438,7 +433,7 @@ def player(name,url,iconimage):
                 url2Play = urlVideo[i]
                 OK = False
 
-        xbmc.log('[plugin.video.gofilmes] L425 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.gofilmes] L436 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         if OK :
             try:
