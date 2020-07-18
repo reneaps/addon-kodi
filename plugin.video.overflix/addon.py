@@ -14,6 +14,7 @@
 # Atualizado (1.0.9) - 05/02/2020
 # Atualizado (1.1.0) - 09/02/2020
 # Atualizado (1.1.1) - 28/02/2020
+# Atualizado (1.1.2) - 18/07/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -26,7 +27,7 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version   = '1.1.0'
+version   = '1.1.2'
 addon_id  = 'plugin.video.overflix'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -341,7 +342,6 @@ def player(name,url,iconimage):
             elif 'mix' in urlVideo :
                     fxID = str(idsT[i])
                     urlVideo = 'https://mixdrop.co/e/%s' % fxID
-                    '''
                     data = openURL(urlVideo)
                     #url2Play = re.findall('MDCore.vsrc = "(.*?)";', data)[0]
                     #url2Play = 'http:%s' % url2Play if url2Play.startswith("//") else url2Play
@@ -352,7 +352,7 @@ def player(name,url,iconimage):
                     url2Play = re.findall('MDCore.wurl="(.*?)"', sUnpacked)
                     url = str(url2Play[0])
                     url2Play = 'http:%s' % url if url.startswith("//") else url
-                    OK = False'''
+                    OK = False
 
             elif 'jetload' in urlVideo :
                     fxID = str(idsT[i])
@@ -459,24 +459,29 @@ def player_series(name,url,iconimage):
             i = int(index)
             urlVideo = titsT[i]
 
+            xbmc.log('[plugin.video.overflix] L462 - ' + str(urlVideo), xbmc.LOGNOTICE)
+
             if 'verystream' in urlVideo:
                 fxID = str(idsT[i])
                 urlVideo = 'https://verystream.com/e/%s' % fxID
                     
             elif 'mix' in urlVideo :
-                    fxID = str(idsT[i])
-                    urlVideo = 'https://mixdrop.co/e/%s' % fxID
-                    data = openURL(urlVideo)
-                    #url2Play = re.findall('MDCore.vsrc = "(.*?)";', data)[0]
-                    #url2Play = 'http:%s' % url2Play if url2Play.startswith("//") else url2Play
-                    sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
-                    aMatches = re.compile(sPattern).findall(data)
-                    sUnpacked = jsunpack.unpack(aMatches[0])
-                    xbmc.log('[plugin.video.overflix] L435 - ' + str(sUnpacked), xbmc.LOGNOTICE)
-                    url2Play = re.findall('MDCore.wurl="(.*?)"', sUnpacked)
-                    url = str(url2Play[0])
-                    url2Play = 'http:%s' % url if url.startswith("//") else url
-                    OK = False
+                fxID = str(idsT[i])
+                urlF = 'https://mixdrop.co/e/%s' % fxID
+                #xbmc.log('[plugin.video.overflix] L470 - ' + str(urlF), xbmc.LOGNOTICE)
+                data = openURL(urlF)
+                url2 = re.findall(r'<script>window.location = "(.*?)";</script>', data)[0]
+                url2 = 'http://mixdrop.co%s' % url2 if url2.startswith("/e/") else url2Play
+                data = openURL(url2)
+                #xbmc.log('[plugin.video.overflix] L475 - ' + str(data), xbmc.LOGNOTICE)
+                sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
+                aMatches = re.compile(sPattern).findall(data)
+                sUnpacked = jsunpack.unpack(aMatches[0])
+                #xbmc.log('[plugin.video.overflix] L476 - ' + str(sUnpacked), xbmc.LOGNOTICE)
+                url2Play = re.findall('MDCore.wurl="(.*?)"', sUnpacked)
+                url = str(url2Play[0])
+                url2Play = 'http:%s' % url if url.startswith("//") else url
+                OK = False
                  
             elif 'go' in urlVideo :
                 fxID = str(idsT[i])
@@ -485,21 +490,7 @@ def player_series(name,url,iconimage):
             elif 'onlystream' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://onlystream.tv/e/%s' % fxID
-                '''
-                headers = {
-                    'Referer': urlvideo,
-                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                    'Connection':'keep-alive',
-                    'upgrade-insecure-requests': '1'}
-                xbmc.log('[plugin.video.overflix] L301 - ' + str(urlvideo), xbmc.LOGNOTICE)
-                r = requests.get(url=urlVideo, headers=headers)
-                data = r.content
-                url2Play = re.findall('sources\:\s*\[{file\:"([^"]+)",', data)[0]
-                xbmc.log('[plugin.video.overflix] L474 - ' + str(url2Play), xbmc.LOGNOTICE)
-                OK = False
-                '''
-                
+
             elif 'streamango' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://streamango.com/embed/%s' % fxID
@@ -511,12 +502,12 @@ def player_series(name,url,iconimage):
             elif 'mystream' in urlVideo :
                 fxID = str(idsT[i])
                 urlVideo = 'https://mstream.fun/%s' % fxID
-                html = openURL(urlVideo)
-                urlF = re.findall(r'<meta name="og:image" content="(.*?)">', html)[0]
-                url = urlF.split('/snapshot.jpg')[0] + ".mp4"
-                url2Play = 'http:%s' % url if url.startswith("//") else url
-                xbmc.log('[plugin.video.overflix] L326 - ' + str(url2Play), xbmc.LOGNOTICE)
-                OK = False
+                #html = openURL(urlVideo)
+                #urlF = re.findall(r'<meta name="og:image" content="(.*?)">', html)[0]
+                #url = urlF.split('/snapshot.jpg')[0] + ".mp4"
+                #url2Play = 'http:%s' % url if url.startswith("//") else url
+                #xbmc.log('[plugin.video.overflix] L326 - ' + str(url2Play), xbmc.LOGNOTICE)
+                #OK = False
                
             elif 'thevid' in urlVideo :
                 fxID = str(idsT[i])
