@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<advancedsettings>
+	<cache>
+		<buffermode>1</buffermode>
+		<memorysize>209715200</memorysize>
+		<readfactor>4.0</readfactor>
+	</cache>
+	<videolibrary>
+		<importwatchedstate>true</importwatchedstate>
+		<importresumepoint>true</importresumepoint>
+	</videolibrary>
+</advancedsettings>
