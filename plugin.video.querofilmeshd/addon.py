@@ -29,7 +29,7 @@ base        = base64.b64decode('aHR0cHM6Ly9xdWVyb2ZpbG1lc2hkLm9ubGluZS8=')
 
 def menuPrincipal():
         addDir('Categorias'                 , base + ''                     ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + 'genero/lancamentoss/' ,   20, artfolder + 'lancamentos.png')
+        addDir('Lançamentos'                , base + 'filme/'               ,   20, artfolder + 'lancamentos.png')
         addDir('Filmes Dublados'            , base + '?s=dublado'           ,   20, artfolder + 'pesquisa.png')
         addDir('Seriados'                   , base + 'genero/series/'       ,   25, artfolder + 'legendados.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
@@ -59,7 +59,7 @@ def getCategorias(url):
         setViewMenu()
 
 def getFilmes(url):
-        xbmc.log('[plugin.video.querofilmeshd] L74 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L62 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html5lib")
@@ -86,7 +86,7 @@ def getFilmes(url):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.querofilmeshd] L88 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L88 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html5lib")
@@ -114,7 +114,7 @@ def getSeries(url):
         setViewFilmes()
 
 def getTemporadas(name,url,iconimage):
-        xbmc.log('[plugin.video.querofilmeshd] L155 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L155 - ' + str(url), xbmc.LOGNOTICE)
         html = openURL(url)
         soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', {'id':'seasons'})
@@ -134,7 +134,7 @@ def getTemporadas(name,url,iconimage):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
-        xbmc.log('[plugin.video.querofilmeshd] L175 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L137 - ' + str(url), xbmc.LOGNOTICE)
         n = name.replace('ª Temporada', '')
         n = int(n)
         n = (n-1)
@@ -627,6 +627,7 @@ def player_series(name,url,iconimage):
                 try:
                     match = re.findall('<button class="btn btn-lg" idS="(.*?)" id="btn-(.*?)" auth="0"><i id=".*?" class="glyphicon glyphicon-play-circle"></i> Iframe</button>', html)
                     for x,y in match:
+                        y = 'Player ' + y
                         titsT.append(y)
                         idsT.append(x)
                 except:
