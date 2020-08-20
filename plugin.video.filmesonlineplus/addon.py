@@ -4,11 +4,11 @@
 # Addon : FilmesOnlinePlus
 # By AddonBrasil - 22/11/2019
 # Atualizado (1.0.0) - 22/11/2019
-# Atualizado (1.0.1) - 27/12/2019
 # Atualizado (1.0.2) - 08/02/2020
 # Atualizado (1.0.3) - 17/02/2020
 # Atualizado (1.0.4) - 13/03/2020
 # Atualizado (1.0.5) - 08/07/2020
+# Atualizado (1.0.6) - 08/07/2020
 #####################################################################
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import json
@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 from resources.lib import jsunpack
 from time import time
 
-version	  = '1.0.5'
+version	  = '1.0.6'
 addon_id  = 'plugin.video.filmesonlineplus'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -113,8 +113,9 @@ def getSeries(url):
 				addDir(titF, urlF, 26, imgF)
 
 		try :
-				next_page = soup('li', attrs={'class':'ipsPagination_next'})[0]
-				proxima = next_page.a['href']
+				next_page = soup('div', attrs={'class':'wp-pagenavi'})[0]
+				proxima = next_page('a', attrs={'class':'next page-numbers'})[0]
+				proxima = proxima['href']
 				addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
 		except :
 				pass
