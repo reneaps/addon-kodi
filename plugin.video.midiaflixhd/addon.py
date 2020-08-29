@@ -4,17 +4,13 @@
 # Addon : MidiaFlixHD
 # By AddonBrasil - 11/12/2015
 # Atualizado (1.0.0) - 29/06/2018
-# Atualizado (1.0.1) - 22/07/2018
-# Atualizado (1.0.2) - 23/04/2019
-# Atualizado (1.0.3) - 07/05/2019
-# Atualizado (1.0.4) - 13/05/2019
-# Atualizado (1.0.5) - 03/08/2019
 # Atualizado (1.0.6) - 18/03/2020
 # Atualizado (1.0.7) - 30/03/2020
 # Atualizado (1.0.8) - 31/03/2020
 # Atualizado (1.0.9) - 05/04/2020
 # Atualizado (1.1.0) - 11/07/2020
 # Atualizado (1.1.1) - 13/07/2020
+# Atualizado (1.1.2) - 29/08/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -28,7 +24,7 @@ from bs4 import BeautifulSoup
 from resources.lib               import jsunpack
 from time                        import time
 
-version   = '1.1.1'
+version   = '1.1.2'
 addon_id  = 'plugin.video.midiaflixhd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -362,7 +358,8 @@ def player(name,url,iconimage):
                 r = requests.get(urlVideo)
                 html = r.content
                 soup = BeautifulSoup(html, 'html.parser')
-                match = re.findall('\tidS:\s*"(.+?)"\r', html)
+                #xbmc.log('[plugin.video.midiaflixhd] L365 - ' + str(html), xbmc.LOGNOTICE)
+                match = re.findall(r'\("SvplayerID",{\r\n\t\t\t\t\t\t\tidS: "(.*?)"\r\n\t\t\t\t\t\t}\);', html)
                 for x in match:
                     idsT.append(x)
                 match = re.findall('\t<button id="Servidores" class="button-xlarge pure-button" svid=".+?">(.+?)</button>\r', html)
@@ -597,6 +594,12 @@ def player_series(name,url,iconimage):
                 b = json.loads(_html.decode('hex'))
                 c = b['video']
                 urlF = c[0]['file']
+                headers = {'referer': urlVideo,
+                            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'}
+                r = requests.get(url=urlF,allow_redirects=False,headers=headers)
+                urlF = r.headers['Location']
+                r = requests.get(url=urlF,allow_redirects=False,headers=headers)
+                urlF = r.headers['Location']
                 urlVideo = urlF
 
                 xbmc.log('[plugin.video.midiaflixhd] L602 - ' + str(urlVideo), xbmc.LOGNOTICE)
@@ -608,19 +611,23 @@ def player_series(name,url,iconimage):
                         url2Play = re.findall(r'file: "(.+?)",', r.text)[0]
                         OK = False
                 
-                if 'videok7.online' in urlVideo :
+                elif 'videok7.online' in urlVideo :
                         url2Play = urlVideo
                         OK = False
                 
-                if 'saborcaseiro' in urlVideo :
+                elif 'saborcaseiro' in urlVideo :
                         url2Play = urlVideo
                         OK = False
                 
-                if 'apiblogger.xyz' in urlVideo :
+                elif 'apiblogger.xyz' in urlVideo :
                         headers = {'Referer': urlF2,
                                    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                         }
                         url2Play = urlVideo + "|" + urllib.urlencode(headers)
+                        OK = False
+
+                elif 'googlevideo.com' in urlVideo :
+                        url2Play = urlVideo
                         OK = False
 
                 elif 'video.php' in urlVideo :
