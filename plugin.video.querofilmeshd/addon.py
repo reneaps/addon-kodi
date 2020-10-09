@@ -4,7 +4,6 @@
 # Addon : QueroFilmesHD
 # By AddonBrasil - 08/08/2020
 # Atualizado (1.0.0) - 08/08/2020
-# Atualizado (1.0.1) - 08/08/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -27,6 +26,7 @@ fanart      = addonfolder + '/fanart.png'
 base        = base64.b64decode('aHR0cHM6Ly9xdWVyb2ZpbG1lc2hkLm9ubGluZS8=')
 
 ############################################################################################################
+
 def menuPrincipal():
         addDir('Categorias'                 , base + ''                     ,   10, artfolder + 'categorias.png')
         addDir('Lançamentos'                , base + 'filme/'               ,   20, artfolder + 'lancamentos.png')
