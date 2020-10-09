@@ -4,6 +4,7 @@
 # Addon : QueroFilmesHD
 # By AddonBrasil - 08/08/2020
 # Atualizado (1.0.0) - 08/08/2020
+# Atualizado (1.0.1) - 08/08/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -26,7 +27,6 @@ fanart      = addonfolder + '/fanart.png'
 base        = base64.b64decode('aHR0cHM6Ly9xdWVyb2ZpbG1lc2hkLm9ubGluZS8=')
 
 ############################################################################################################
-
 def menuPrincipal():
         addDir('Categorias'                 , base + ''                     ,   10, artfolder + 'categorias.png')
         addDir('Lançamentos'                , base + 'filme/'               ,   20, artfolder + 'lancamentos.png')
@@ -63,8 +63,17 @@ def getFilmes(url):
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html5lib")
-        conteudo = soup('div',{'class':'abaViewerContainer active'})
-        filmes=conteudo[0]('article',{'class':'LancasterAbasItem'})
+        try:
+            conteudo = soup('div',{'class':'abaViewerContainer active'})
+            filmes=conteudo[0]('article',{'class':'LancasterAbasItem'})
+        except:
+            pass
+        try:
+            conteudo = soup('div',{'class':'animation-2 items'})
+            filmes=conteudo[0]('article',{'class':'item movies'})
+        except:
+            return
+            pass
         totF = len(filmes)
 
         for filme in filmes:
@@ -86,12 +95,22 @@ def getFilmes(url):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.querofilmeshd] L89 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L98 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html5lib")
-        conteudo = soup('div',{'class':'abaViewerContainer active'})
-        filmes=conteudo[0]('article',{'class':'LancasterAbasItem'})
+        try:
+            conteudo = soup('div',{'class':'abaViewerContainer active'})
+            filmes=conteudo[0]('article',{'class':'LancasterAbasItem'})
+        except:
+            pass
+        try:
+            conteudo = soup('div',{'class':'items'})
+            filmes=conteudo[0]('article',{'class':'item tvshows'})
+        except:
+            return
+            pass
+
         totF = len(filmes)
 
         for filme in filmes:
@@ -114,7 +133,7 @@ def getSeries(url):
         setViewFilmes()
 
 def getTemporadas(name,url,iconimage):
-        xbmc.log('[plugin.video.querofilmeshd] L117 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L136 - ' + str(url), xbmc.LOGNOTICE)
         html = openURL(url)
         soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', {'id':'seasons'})
@@ -134,7 +153,7 @@ def getTemporadas(name,url,iconimage):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
-        xbmc.log('[plugin.video.querofilmeshd] L137 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L156 - ' + str(url), xbmc.LOGNOTICE)
         n = name.replace('ª Temporada', '')
         n = int(n)
         n = (n-1)
@@ -158,7 +177,7 @@ def getEpisodios(name, url):
             imgF = imgF.replace('w154', 'w300')
             imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
             imgF = base + imgF if imgF.startswith("/wp-content") else imgF
-            xbmc.log('[plugin.video.querofilmeshd] L161 - ' + str(imgF), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.querofilmeshd] L180 - ' + str(imgF), xbmc.LOGNOTICE)
             titA = i(class_='numerando')[0].text.encode('utf-8').replace('-','x')
             titB = i(class_='episodiotitle')[0].a.text.encode('utf-8')
             titF = titA + ' - ' + titB
@@ -221,7 +240,7 @@ def doPesquisaFilmes():
         setViewFilmes()
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.querofilmeshd] L224 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L243 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('QueroFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -248,7 +267,7 @@ def player(name,url,iconimage):
                         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                 }
                 urlF = 'https://querofilmeshd.online/wp-admin/admin-ajax.php'
-                xbmc.log('[plugin.video.querofilmeshd] L251 - ' + str(dooplay), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L270 - ' + str(dooplay), xbmc.LOGNOTICE)
                 data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
@@ -282,17 +301,17 @@ def player(name,url,iconimage):
                 b = json.loads(_html.decode('hex'))
                 urlF = b['url']
                 '''
-                xbmc.log('[plugin.video.querofilmeshd] L285 - ' + str(urlF), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L304 - ' + str(urlF), xbmc.LOGNOTICE)
                 urlVideo = urlF
         except:
             pass
         '''
-        xbmc.log('[plugin.video.querofilmeshd] L290 - ' + str(urlF), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L309 - ' + str(urlF), xbmc.LOGNOTICE)
         html = openURL(urlF)
         urlVideo = urlF
         try:
             urlVideo = re.findall(r'var JWp = \{[\'"]mp4file[\'"]: [\'"](.+?)[\'"],', html)[0]
-            xbmc.log('[plugin.video.querofilmeshd] L295 - ' + str(html), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.querofilmeshd] L314 - ' + str(html), xbmc.LOGNOTICE)
             url2Play = urlVideo
             OK = False
             print urlVideo
@@ -305,18 +324,18 @@ def player(name,url,iconimage):
             r = urllib2.urlopen(url2Play)
             url2Play = r.geturl()
             OK = False
-            xbmc.log('[plugin.video.querofilmeshd] L308 - ' + str(url2Play), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.querofilmeshd] L327 - ' + str(url2Play), xbmc.LOGNOTICE)
         except:
             pass
         try:
             urlVideo = re.findall(r'file: "(.+?)",', html)[2]
             url2Play = urlVideo
             OK = False
-            xbmc.log('[plugin.video.querofilmeshd] L315 - ' + str(url2Play), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.querofilmeshd] L334 - ' + str(url2Play), xbmc.LOGNOTICE)
         except:
             pass
         '''
-        xbmc.log('[plugin.video.querofilmeshd] L319 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L338 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -325,14 +344,14 @@ def player(name,url,iconimage):
                 soup = BeautifulSoup(html, 'html.parser')
                 urlF = soup.iframe["src"]
                 urlVideo = urlF
-                xbmc.log('[plugin.video.querofilmeshd] L328 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L347 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         elif 'embed.mystream.to' in urlVideo:
                 html = openURL(urlVideo)
                 soup = BeautifulSoup(html, 'html.parser')
                 urlF = soup.source["src"]
                 url2Play = urlF
-                xbmc.log('[plugin.video.querofilmeshd] L335 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L354 - ' + str(urlVideo), xbmc.LOGNOTICE)
                 OK = False
 
         elif 'playercdn.net' in urlVideo:
@@ -340,14 +359,15 @@ def player(name,url,iconimage):
                 soup = BeautifulSoup(html, 'html.parser')
                 urlF = soup.source["src"]
                 url2Play = urlF
-                xbmc.log('[plugin.video.querofilmeshd] L343- ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L362- ' + str(urlVideo), xbmc.LOGNOTICE)
                 OK = False
 
         elif 'player.querofilmeshd.online' in urlVideo:
                 r = requests.get(urlVideo)
                 html = r.content
                 soup = BeautifulSoup(html, 'html.parser')
-                match = re.findall(r'\("SvplayerID",{\n\t\t\t\t\t\t\tidS: "(.*?)"\n\t\t\t\t\t\t}\)', html)
+                match = re.findall(r'idS: "(.*?)"', html)
+                xbmc.log('[plugin.video.querofilmeshd] L370 - ' + str(match), xbmc.LOGNOTICE)
                 for x in match:
                     idsT.append(x)
                 match = re.findall(r'\(SvID ==\s*(.*?)\) \{', html)
@@ -371,14 +391,14 @@ def player(name,url,iconimage):
                            'Connection': 'keep-alive',
                            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                 }
-                xbmc.log('[plugin.video.querofilmeshd] L374 - ' + str(idS), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L394 - ' + str(idS), xbmc.LOGNOTICE)
                 urlF ='https://player.querofilmeshd.online/CallPlayer'
                 data = urllib.urlencode({'id': idS})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
                 _html = str(html)
                 b = json.loads(_html.decode('hex'))
-                xbmc.log('[plugin.video.querofilmeshd] L381 - ' + str(_html), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L401 - ' + str(_html), xbmc.LOGNOTICE)
                 try:
                         urlF = b['url']
                         url2Play = urlF
@@ -393,7 +413,7 @@ def player(name,url,iconimage):
                 except:
                         pass
 
-                xbmc.log('[plugin.video.querofilmeshd] L396 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L416 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
                 if 'letsupload.co' in urlVideo:
                         nowID = urlVideo.split("=")[1]
@@ -406,7 +426,7 @@ def player(name,url,iconimage):
                         html = openURL(urlVideo)
                         e = re.findall('<meta name="twitter:image" content="(.+?)">', html)[0]
                         url2Play = e.replace('/img', '').replace('jpg','mp4')
-                        xbmc.log('[plugin.video.querofilmeshd] L409 - ' + str(url2Play), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.querofilmeshd] L429 - ' + str(url2Play), xbmc.LOGNOTICE)
                         OK = False
 
                 elif 'gofilmes.me' in urlVideo:
@@ -436,11 +456,11 @@ def player(name,url,iconimage):
                 elif 'video.php' in urlVideo :
                         fxID = urlVideo.split('u=')[1]
                         urlVideo = base64.b64decode(fxID)
-                        xbmc.log('[plugin.video.querofilmeshd] L439 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.querofilmeshd] L459 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         OK = True
 
                 elif 'actelecup.com' in urlVideo :
-                        xbmc.log('[plugin.video.querofilmeshd] L443 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.querofilmeshd] L463 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         urlVideo = moonwalk.get_playlist(urlVideo)
                         urlVideo = urlVideo[0]
                         qual = []
@@ -452,21 +472,25 @@ def player(name,url,iconimage):
                         url2Play = urlVideo[i]
                         OK = False
 
-        elif 'index.html' in urlVideo :
-                host = urlVideo.split('/public')[0]
-                fxID = urlVideo.split('id=')[1]
-                t = int(round(time() * 1000))
-                headers = {'Referer': urlVideo,
-                           'Accept-Encoding': 'gzip, deflate, br',
-                           'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0',
-                        }
-                dados = urllib.urlencode(headers)
-                urlF = host + '/playlist/' + fxID + '/' + str(t) + '.m3u8'
-                r = requests.get(urlF)
-                idsT = re.findall('RESOLUTION=.*?\n(.*?)\n',r.text)[0]
-                #url2Play = host + idsT + '|' + dados
-                url2Play = urlVideo
-                OK = False
+                elif 'index.html' in url2Play :
+                        host = url2Play.split('/public')[0]
+                        fxID = url2Play.split('id=')[1]
+                        t = int(round(time() * 1000))
+                        headers = {'Referer': url2Play,
+                                   'Accept-Encoding': 'gzip, deflate, br',
+                                   'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0',
+                                }
+                        dados = urllib.urlencode(headers)
+                        urlF = host + '/playlist/' + fxID + '/' + str(t) + '.m3u8'
+                        r = requests.get(urlF)
+                        xbmc.log('[plugin.video.querofilmeshd] L486 - ' + str(r.text), xbmc.LOGNOTICE)
+                        idsT = re.findall('RESOLUTION=.*?\n(.*?)\n',r.text)
+                        if len(idsT) > 0:
+                            url2Play = host + idsT[1] #+ '|' + dados
+                        else:
+                            url2Play = host + idsT[0] #+ '|' + dados
+                        #url2Play = urlF
+                        OK = False
 
         if OK :
             try:
@@ -477,7 +501,7 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        xbmc.log('[plugin.video.querofilmeshd] L480 - ' + str(url2Play), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L504 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         if not url2Play : return
 
@@ -529,7 +553,7 @@ def player(name,url,iconimage):
 
 
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.querofilmeshd] L532 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L556 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('QueroFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -544,7 +568,7 @@ def player_series(name,url,iconimage):
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, 'html.parser')
         dados = soup('li',{'id':'player-option-1'})
-        xbmc.log('[plugin.video.querofilmeshd] L547 - ' + str(dados), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L571 - ' + str(dados), xbmc.LOGNOTICE)
         if not dados :
                 dialog = xbmcgui.Dialog()
                 dialog.ok(name, " ainda não liberado, aguarde... ")
@@ -567,7 +591,7 @@ def player_series(name,url,iconimage):
                         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                 }
                 urlF = 'https://querofilmeshd.online/wp-admin/admin-ajax.php'
-                xbmc.log('[plugin.video.querofilmeshd] L570 - ' + str(dooplay), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L594 - ' + str(dooplay), xbmc.LOGNOTICE)
                 data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
@@ -583,17 +607,17 @@ def player_series(name,url,iconimage):
                     urlVideo = urlF
                 except:
                     pass
-                xbmc.log('[plugin.video.querofilmeshd] L586 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L610 - ' + str(urlVideo), xbmc.LOGNOTICE)
         except:
             pass
         try:
             b = json.loads(html)
             urlF = b['embed_url']
             html = requests.get(urlF).content
-            xbmc.log('[plugin.video.querofilmeshd] L593 - ' + str(urlF), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.querofilmeshd] L617 - ' + str(urlF), xbmc.LOGNOTICE)
             match = re.findall(r'<button class="btn btn-lg" idS="(.*?)" id=".*?" auth="0"><i id=".*?" class="glyphicon glyphicon-play-circle"></i> Iframe</button>', html)
             idS = match[0]
-            xbmc.log('[plugin.video.querofilmeshd] L596 - ' + str(idS), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.querofilmeshd] L620 - ' + str(idS), xbmc.LOGNOTICE)
             headers = {'Referer': urlF,
                        'Accept': '*/*',
                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -604,11 +628,11 @@ def player_series(name,url,iconimage):
             urlB = 'https://player.querofilmeshd.online//CallEpi'
             data = urllib.urlencode({'id': idS})
             r = requests.post(url=urlB, data=data, headers=headers)
-            xbmc.log('[plugin.video.querofilmeshd] L607 - ' + str(r.text), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.querofilmeshd] L631 - ' + str(r.text), xbmc.LOGNOTICE)
             _html = str(html)
             b = json.loads(_html.decode('hex'))
             urlF = b['url']
-            xbmc.log('[plugin.video.querofilmeshd] L611 - ' + str(urlF), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.querofilmeshd] L635 - ' + str(urlF), xbmc.LOGNOTICE)
             urlVideo = urlF
         except:
             pass
@@ -616,7 +640,7 @@ def player_series(name,url,iconimage):
         if 'querofilmeshd.online' in urlVideo:
                 r = requests.get(urlVideo)
                 html = r.content
-                #xbmc.log('[plugin.video.querofilmeshd] L619 - ' + str(html), xbmc.LOGNOTICE)
+                #xbmc.log('[plugin.video.querofilmeshd] L643 - ' + str(html), xbmc.LOGNOTICE)
                 soup = BeautifulSoup(html, 'html.parser')
                 try:
                     match = re.findall(r'\("SvplayerID",{\n\t\t\t\t\t\t\tidS: "(.*?)"\n\t\t\t\t\t\t}\)', html)
@@ -652,7 +676,7 @@ def player_series(name,url,iconimage):
                 urlF ='https://player.querofilmeshd.online/CallEpi'
                 data = urllib.urlencode({'idS': idS})
                 r = requests.post(url=urlF, data=data, headers=headers)
-                xbmc.log('[plugin.video.querofilmeshd] L655 - ' + str(data), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L679 - ' + str(data), xbmc.LOGNOTICE)
                 html = r.content
                 _html = str(html)
                 b = json.loads(_html.decode('hex'))
@@ -670,21 +694,21 @@ def player_series(name,url,iconimage):
                 except:
                         pass
 
-                xbmc.log('[plugin.video.querofilmeshd] L673 - ' + str(urlF), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L697 - ' + str(urlF), xbmc.LOGNOTICE)
                 '''
                 idF = urlF.split('id=')[-1]
                 urlF = 'https://player.filmesonlinetv.org/hls/%s/%s.m3u8' % (idF,idF)
-                xbmc.log('[plugin.video.querofilmeshd] L677 - ' + str(urlF), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L701 - ' + str(urlF), xbmc.LOGNOTICE)
                 r = requests.get(urlF)
                 html = r.text
                 html = html.replace('redirect/','')
-                #xbmc.log('[plugin.video.querofilmeshd] L681 - ' + str(html), xbmc.LOGNOTICE)
+                #xbmc.log('[plugin.video.querofilmeshd] L705 - ' + str(html), xbmc.LOGNOTICE)
                 '''
                 urlVideo = urlF
                 url2Play = urlVideo
                 OK = False
 
-                xbmc.log('[plugin.video.querofilmeshd] L687 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.querofilmeshd] L711 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
                 if 'letsupload.co' in urlVideo:
                         nowID = urlVideo.split("=")[1]
@@ -711,12 +735,12 @@ def player_series(name,url,iconimage):
                 elif 'video.php' in urlVideo :
                         fxID = urlVideo.split('=')[1]
                         urlVideo = base64.b64decode(fxID)
-                        xbmc.log('[plugin.video.querofilmeshd] L714 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.querofilmeshd] L738 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         OK = True
 
                         if 'alfastream.cc' in urlVideo:
                                 if 'actelecup.com' in urlVideo:
-                                        xbmc.log('[plugin.video.querofilmeshd] L719 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                                        xbmc.log('[plugin.video.querofilmeshd] L743 - ' + str(urlVideo), xbmc.LOGNOTICE)
                                         urlVideo = moonwalk.get_playlist(urlVideo)
                                         urlVideo = urlVideo[0]
                                         qual = []
@@ -728,7 +752,7 @@ def player_series(name,url,iconimage):
                                         url2Play = urlVideo[i]
                                         OK = False
 
-        xbmc.log('[plugin.video.querofilmeshd] L731 ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L755 ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 

@@ -2,7 +2,14 @@
   <players>
     <player name="Firefox" type="ExternalPlayer" audio="false" video="true">
       <filename>C:\Program Files\Mozilla Firefox\firefox.exe</filename>
-      <args>--kiosk -private-window "{1}"</args>
+      <args>--kiosk moz-extension://6a6d135f-3660-4bd7-a3f1-cb26ba66b348/player.html#{1}</args>
+      <hidexbmc>false</hidexbmc>
+      <hideconsole>false</hideconsole>
+      <warpcursor>none</warpcursor>
+    </player>
+    <player name="Chrome" type="ExternalPlayer" audio="false" video="true">
+      <filename>C:\Program Files (x86)\Google\Chrome\Application\chrome.exe</filename>
+      <args>--kiosk chrome-extension://ckblfoghkjhaclegefojbgllenffajdc/player.html#{1}</args>
       <hidexbmc>false</hidexbmc>
       <hideconsole>false</hideconsole>
       <warpcursor>none</warpcursor>
@@ -24,8 +31,9 @@
   </players>
   <rules action="prepend">
     <!--rule filetypes="html" filename=".*sfplayer.*" player="MPC-HC"/-->
-	<rule filename=".*trembed*.|.*blogger*." player="Firefox"/>
+	<rule filename=".*trembed*.|.blogger." player="Firefox"/>
 	<rule filetypes="html" player="Firefox"/>
+	<rule filetypes="m3u8" player="Chrome"/>
 	<rule filetypes="mp5" player="MPC"/>
 	<rule filetypes="mp6" player="FFP"/>
   </rules>
