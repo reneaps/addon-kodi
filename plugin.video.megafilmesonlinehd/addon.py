@@ -4,18 +4,11 @@
 # Addon : MegaFilmesOnlineHD
 # By AddonReneSilva - 11/12/2015
 # Atualizado (1.0.1) - 02/11/2016
-# Atualizado (1.0.2) - 01/03/2017
-# Atualizado (1.0.3) - 14/06/2017
-# Atualizado (1.0.4) - 22/06/2017
-# Atualizado (1.0.5) - 30/08/2017
-# Atualizado (1.0.6) - 08/09/2017
-# Atualizado (1.0.7) - 03/05/2018
-# Atualizado (1.0.8) - 08/06/2018
-# Atualizado (1.0.9) - 09/06/2018
 # Atualizado (1.1.0) - 14/06/2018
 # Atualizado (1.1.1) - 01/09/2019
 # Atualizado (1.1.2) - 27/03/2020
 # Atualizado (1.1.3) - 07/07/2020
+# Atualizado (1.1.4) - 20/10/2020
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -26,7 +19,7 @@ from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 from urlparse import urlparse
 
-version     = '1.1.3'
+version     = '1.1.4'
 addon_id    = 'plugin.video.megafilmesonlinehd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 
@@ -71,7 +64,7 @@ def getCategorias(url):
         setViewMenu()
 
 def getFilmes(url):
-        xbmc.log('[plugin.video.megafilmesonlinehd] L71 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L67 - ' + str(url), xbmc.LOGNOTICE)
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup     = BeautifulSoup(link)
@@ -86,12 +79,12 @@ def getFilmes(url):
                 titF = titF.replace('&#8211;','-')
                 urlF = filme.a["href"].encode('utf-8')
                 imgF = filme.img["src"].encode('utf-8')
-                imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
                 addDirF(titF, urlF, 100, imgF, False, totF)
 
         try :
                 proxima = re.findall('<a class="next page-numbers" href="(.*?)"', link)[0]
-                xbmc.log('[plugin.video.megafilmesonlinehd] L90 - ' + str(proxima), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.megafilmesonlinehd] L87 - ' + str(proxima), xbmc.LOGNOTICE)
                 #getFilmes(proxima)
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
@@ -115,7 +108,7 @@ def getSeries(url):
                 urlF = filme.a["href"].encode('utf-8')
                 try:
                     imgF = filme.img["src"].encode('utf-8')
-                    imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                    imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
                 except:
                     imgF = ""
                     pass
@@ -136,7 +129,7 @@ def getTemporadas(url):
         dados = conteudo[0]('article', attrs={'class':'TPost Single'})
         figure = dados[0]('div', {'class':'Image'})
         imgF = figure[0].img['src']
-        imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+        imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
         seasons = soup('div',{'class':'Wdgt AABox'})
         totF = len(seasons)
         i = 0
@@ -171,12 +164,12 @@ def getEpisodios(name, url):
                 imgF = i.img['src']
             except:
                 pass
-            imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-            xbmc.log('[plugin.video.MegaFilmesOnlineHD] L173 - ' + str(imgF), xbmc.LOGNOTICE)
+            imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
+            xbmc.log('[plugin.video.MegaFilmesOnlineHD] L168 - ' + str(imgF), xbmc.LOGNOTICE)
             addDirF(titF, urlF, 110, imgF, False, totF)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
-        
+
 def pesquisa():
         keyb = xbmc.Keyboard('', 'Pesquisar Filmes/Series')
         keyb.doModal()
@@ -202,7 +195,7 @@ def pesquisa():
                         titF = filme.a.h3.getText().encode('utf-8')
                         urlF = filme.a["href"].encode('utf-8')
                         imgF = filme.img["src"].encode('utf-8')
-                        imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                        imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
@@ -227,7 +220,7 @@ def doPesquisaFilmes():
         setViewFilmes()
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.megafilmesonlinehd] L326 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L223 ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('MegaFilmesOnline', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -247,19 +240,19 @@ def player(name,url,iconimage):
         shex = auth.split('=')[1]
         urlF = shex.decode('hex')
         urlF = urlF.replace('#038;','')
-        xbmc.log('[plugin.video.megafilmesonlinehd] L346 - ' + str(urlF), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L243 - ' + str(urlF), xbmc.LOGNOTICE)
         '''
         r = requests.get(urlF)
         urlF = re.findall(r'<iframe width=".*?" height=".*?" src="(.*?)".+</iframe>', r.text)[0]
-        if '&amp;' in urlF : 
+        if '&amp;' in urlF :
                 idS = re.findall('id=(.*?)&amp;', urlF)[0]
         else:
                 idS = urlF.split('=')[-1]
-        xbmc.log('[plugin.video.megafilmesonlinehd] L353 - ' + str(urlF), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L251 - ' + str(urlF), xbmc.LOGNOTICE)
         d = urlparse(urlF)
         host = d.scheme + "://" + d.netloc
         ntime = str(time.time()).split('.')[0]
-        uri = host + "/playlist/" + idS + "/" + str(ntime) + ".m3u8" 
+        uri = host + "/playlist/" + idS + "/" + str(ntime) + ".m3u8"
         headers = {'Referer': urlF,
                    'x-requested-with': 'XMLHttpRequest',
                    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0',
@@ -280,7 +273,7 @@ def player(name,url,iconimage):
         '''
         urlVideo = urlF
 
-        xbmc.log('[plugin.video.megafilmesonlinehd] L367 ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L276 ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -289,10 +282,10 @@ def player(name,url,iconimage):
                 urlVideo = 'http://embed.nowvideo.sx/embed.php?v=%s' % nowID
 
         elif 'verystream' in urlVideo:
-                if '/e/' in urlVideo : 
+                if '/e/' in urlVideo :
                         fxID = urlVideo.split("/e/")[1]
                         urlVideo = 'https://verystream.com/e/%s' % fxID
-                elif 'stream' in urlVideo : 
+                elif 'stream' in urlVideo :
                         fxID = urlVideo.split("/stream/")[1]
                         urlVideo = 'https://verystream.com/stream/%s' % fxID
 
@@ -337,10 +330,10 @@ def player(name,url,iconimage):
                 urlVideo = 'https://thevid.tv/v/%s/' % fxID
 
         elif 'trembed' in urlVideo :
-                url2Play = urlVideo 
+                url2Play = urlVideo
                 OK = False
 
-        xbmc.log('[plugin.video.megafilmesonlinehd] L422 ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L336 ' + str(urlVideo), xbmc.LOGNOTICE)
 
         if OK : url2Play = urlresolver.resolve(urlVideo)
 
@@ -368,9 +361,9 @@ def player(name,url,iconimage):
                 listitem.setProperty('IsPlayable', 'true')
                 listitem.setMimeType('video/mp4')
                 playlist.add(url2Play,listitem)
-                
+
         xbmcPlayer = xbmc.Player()
-        
+
         while xbmcPlayer.play(playlist) :
             xbmc.sleep(20000)
             if not xbmcPlayer.isPlaying():
@@ -403,7 +396,7 @@ def player_series(name,url,iconimage):
 
         matriz = []
 
-        xbmc.log('[plugin.video.megafilmesonlinehd] L402 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L399 ' + str(url), xbmc.LOGNOTICE)
         link     = openURL(url)
         link     = unicode(link, 'utf-8', 'ignore')
         soup     = BeautifulSoup(link)
@@ -413,7 +406,7 @@ def player_series(name,url,iconimage):
         shex = auth.split('=')[1]
         urlF = shex.decode('hex')
         urlF = urlF.replace('#038;','')
-        xbmc.log('[plugin.video.megafilmesonlinehd] L346 - ' + str(urlF), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L409 - ' + str(urlF), xbmc.LOGNOTICE)
         '''
         try:
             conteudo = soup("div",{"class":"list_play"})
@@ -445,7 +438,7 @@ def player_series(name,url,iconimage):
         '''
         urlVideo = urlF
 
-        xbmc.log('[plugin.video.megafilmesonlinehd] L444 ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L441 ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -494,7 +487,7 @@ def player_series(name,url,iconimage):
                 urlVideo = 'http://thevid.net/v/%s' % fxID
 
         elif 'trembed' in urlVideo :
-                url2Play = urlVideo 
+                url2Play = urlVideo
                 OK = False
 
         if OK : url2Play = urlresolver.resolve(urlVideo)
