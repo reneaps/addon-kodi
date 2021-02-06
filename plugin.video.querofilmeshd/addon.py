@@ -5,6 +5,7 @@
 # By AddonBrasil - 08/08/2020
 # Atualizado (1.0.0) - 08/08/2020
 # Atualizado (1.0.2) - 11/11/2020
+# Atualizado (1.0.3) - 06/02/2021
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -597,6 +598,7 @@ def player_series(name,url,iconimage):
                 data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
+                xbmc.log('[plugin.video.querofilmeshd] L600 - ' + str(r.url), xbmc.LOGNOTICE)
                 try:
                     soup = BeautifulSoup(html, "html5lib")
                     urlF = soup.iframe['src']
