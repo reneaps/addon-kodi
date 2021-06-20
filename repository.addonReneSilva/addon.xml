@@ -1,14 +1,23 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.addonReneSilva" name="AddonReneSilva Repository" version="0.0.3" provider-name="AddonReneSilva">
+<addon id="repository.addonReneSilva" name="AddonReneSilva Repository" version="0.0.4" provider-name="AddonReneSilva">
 	<extension point="xbmc.addon.repository" name="AddonReneSilva Repository">
-		<info compressed="false">https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml</info>
-		<checksum>https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml.md5</checksum>
-		<datadir zip="true">https://github.com/reneaps/addon-kodi/raw/master/repo/</datadir>
+        <dir>
+		    <info compressed="false">https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml</info>
+		    <checksum>https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml.md5</checksum>
+		    <datadir zip="true">https://github.com/reneaps/addon-kodi/raw/master/repo/</datadir>
+        </dir>
 	</extension>
 	<extension point="xbmc.addon.metadata">
+		<platform>all</platform>
 		<summary>Repositório AddonReneSilva</summary>
 		<description>Repositório de addons brasileiros AddonReneSilva</description>
-		<disclaimer></disclaimer>
-		<platform>all</platform>
+        <license></license>
+        <language></language>
+        <website></website>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets> 
 	</extension>
 </addon>
