@@ -68,15 +68,15 @@ def getFilmes(url):
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html.parser")
         try:
-            conteudo = soup('div',{'class':'abaViewerContainer active'})
-            filmes=conteudo[0]('article',{'class':'LancasterAbasItem'})
+            conteudo = soup('div',{'class':'items normal'})
+            filmes=conteudo[0]('article',{'class':'item movies'})
         except:
             pass
         try:
             conteudo = soup('div',{'class':'animation-2 items normal'})
             filmes=conteudo[0]('article',{'class':'item movies'})
         except:
-            return
+            #return
             pass
         totF = len(filmes)
 
