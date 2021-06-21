@@ -52,7 +52,7 @@ def menuPrincipal():
 def getCategorias(url):
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link, 'html5lib')
+        soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup("div",{"class":"Rght BgA"})
         menu   = conteudo[0]("nav",{"class":"Menu"})
         if 'filmes' in url :
@@ -77,7 +77,7 @@ def getFilmes(url):
         xbmc.log('[plugin.video.SuperFlix] L77 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link, "html5lib")
+        soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('main')
         dados = conteudo[0]('ul')
         a = len(dados)
@@ -114,7 +114,7 @@ def getSeries(url):
         xbmc.log('[plugin.video.SuperFlix] L114 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link, "html5lib")
+        soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('main')
         dados = conteudo[0]('ul')
         lista = dados[0]('li')
@@ -142,7 +142,7 @@ def getSeries(url):
 
 def getTemporadas(name,url,iconimage):
         link = openURL(url)
-        soup = BeautifulSoup(link, "html5lib")
+        soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('section')
         dados = conteudo[0]('header',{'class':'section-header'})
         seasons = conteudo[0]('a')
@@ -166,7 +166,7 @@ def getEpisodios(name, url):
         n = int(n)
         n = n - 1
         link = openURL(url)
-        soup = BeautifulSoup(link, "html5lib")
+        soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('section')
         dados = conteudo[0]('ul')
         episodes = conteudo[0]('li')
@@ -209,7 +209,7 @@ def pesquisa():
                 r = requests.post(url=url, data=data, headers=headers)
                 link = r.content
                 link = unicode(link, 'utf-8', 'replace')
-                soup = BeautifulSoup(link, "html5lib")
+                soup = BeautifulSoup(link, "html.parser")
                 conteudo = soup('main')
                 dados = conteudo[0]('ul')
                 lista = dados[1]('li')
@@ -255,7 +255,7 @@ def player(name,url,iconimage):
 
         r = requests.get(url)
         html = r.content
-        soup = BeautifulSoup(html, "html5lib")
+        soup = BeautifulSoup(html, "html.parser")
         conteudo = soup('aside')
         srvs = conteudo[2]('span', {'class':'server'})
 
@@ -298,7 +298,7 @@ def player(name,url,iconimage):
         '''
         r = requests.get(filme)
         html = r.content
-        soup = BeautifulSoup(html, "html5lib")
+        soup = BeautifulSoup(html, "html.parser")
         urlF = soup('iframe')[0]['src']
 
         xbmc.log('[plugin.video.SuperFlix] L304 - ' + str(urlF), xbmc.LOGNOTICE)
@@ -418,7 +418,7 @@ def player_series(name,url,iconimage):
 
         r = requests.get(url)
         html = r.content
-        soup = BeautifulSoup(html, "html5lib")
+        soup = BeautifulSoup(html, "html.parser")
         conteudo = soup('aside')
         srvs = conteudo[2]('span', {'class':'server'})
 
