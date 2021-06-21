@@ -4,6 +4,8 @@
 # Addon : QueroFilmesHD
 # By AddonBrasil - 08/08/2020
 # Atualizado (1.0.0) - 08/08/2020
+# Atualizado (1.0.2) - 11/11/2020
+# Atualizado (1.0.3) - 06/02/2021
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -23,7 +25,8 @@ selfAddon = xbmcaddon.Addon(id=addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = base64.b64decode('aHR0cHM6Ly9xdWVyb2ZpbG1lc2hkLm9ubGluZS8=')
+base        = 'https://querofilmeshd.co/'
+#base64.b64decode('aHR0cHM6Ly9xdWVyb2ZpbG1lc2hkLm9ubGluZS8=')
 
 ############################################################################################################
 
@@ -263,14 +266,15 @@ def player(name,url,iconimage):
         try:
                 headers = {'Referer': url,
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                        'Host': 'www.querofilmeshd.online',
+                        'origin': base,
                         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                 }
-                urlF = 'https://querofilmeshd.online/wp-admin/admin-ajax.php'
+                urlF = base + 'wp-admin/admin-ajax.php'
                 xbmc.log('[plugin.video.querofilmeshd] L270 - ' + str(dooplay), xbmc.LOGNOTICE)
                 data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
+                xbmc.log('[plugin.video.querofilmeshd] L275 - ' + str(html), xbmc.LOGNOTICE)
                 try:
                     soup = BeautifulSoup(html, "html5lib")
                     urlF = soup.iframe['src']
@@ -290,11 +294,11 @@ def player(name,url,iconimage):
                 headers = {'Referer': urlF,
                            'Accept': '*/*',
                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                           'origin': 'https://player.querofilmeshd.online',
+                           'origin': 'https://player.querofilmeshd.co',
                            'Connection': 'keep-alive',
                            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                 }
-                urlF = 'https://player.querofilmeshd.online/CallPlayer'
+                urlF = 'https://player.querofilmeshd.co/CallPlayer'
                 data = urllib.urlencode({'id': idS})
                 html = requests.post(url=urlF, data=data, headers=headers).content
                 _html = str(html)
@@ -362,7 +366,7 @@ def player(name,url,iconimage):
                 xbmc.log('[plugin.video.querofilmeshd] L362- ' + str(urlVideo), xbmc.LOGNOTICE)
                 OK = False
 
-        elif 'player.querofilmeshd.online' in urlVideo:
+        elif 'player.querofilmeshd.co' in urlVideo:
                 r = requests.get(urlVideo)
                 html = r.content
                 soup = BeautifulSoup(html, 'html.parser')
@@ -385,20 +389,19 @@ def player(name,url,iconimage):
                 idS = idsT[i]
 
                 headers = {'Referer': url,
-                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                           'Host': 'player.querofilmeshd.online',
-                           'Connection': 'keep-alive',
+                           'origin': 'https://player.querofilmeshd.co',
+                           'x-requested-with': 'XMLHttpRequest',
                            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                 }
                 xbmc.log('[plugin.video.querofilmeshd] L394 - ' + str(idS), xbmc.LOGNOTICE)
-                urlF ='https://player.querofilmeshd.online/CallPlayer'
+                urlF = 'https://player.querofilmeshd.co//CallPlayer'
                 data = urllib.urlencode({'id': idS})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
                 _html = str(html)
-                b = json.loads(_html.decode('hex'))
                 xbmc.log('[plugin.video.querofilmeshd] L401 - ' + str(_html), xbmc.LOGNOTICE)
+                b = json.loads(_html.decode('hex'))
                 try:
                         urlF = b['url']
                         url2Play = urlF
@@ -587,14 +590,15 @@ def player_series(name,url,iconimage):
         try:
                 headers = {'Referer': url,
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                        'Host': 'www.querofilmeshd.online',
+                        'Host': 'www.querofilmeshd.co',
                         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                 }
-                urlF = 'https://querofilmeshd.online/wp-admin/admin-ajax.php'
+                urlF = 'https://querofilmeshd.co/wp-admin/admin-ajax.php'
                 xbmc.log('[plugin.video.querofilmeshd] L594 - ' + str(dooplay), xbmc.LOGNOTICE)
                 data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
+                xbmc.log('[plugin.video.querofilmeshd] L600 - ' + str(r.url), xbmc.LOGNOTICE)
                 try:
                     soup = BeautifulSoup(html, "html5lib")
                     urlF = soup.iframe['src']
@@ -615,17 +619,17 @@ def player_series(name,url,iconimage):
             urlF = b['embed_url']
             html = requests.get(urlF).content
             xbmc.log('[plugin.video.querofilmeshd] L617 - ' + str(urlF), xbmc.LOGNOTICE)
-            match = re.findall(r'<button class="btn btn-lg" idS="(.*?)" id=".*?" auth="0"><i id=".*?" class="glyphicon glyphicon-play-circle"></i> Iframe</button>', html)
+            match = re.findall(r'idS="(.*?)"', html)
             idS = match[0]
             xbmc.log('[plugin.video.querofilmeshd] L620 - ' + str(idS), xbmc.LOGNOTICE)
             headers = {'Referer': urlF,
                        'Accept': '*/*',
                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                       'Host': 'player.querofilmeshd.online',
+                       'Host': 'player.querofilmeshd.co',
                        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0',
                         'x-requested-with': 'XMLHttpRequest'
             }
-            urlB = 'https://player.querofilmeshd.online//CallEpi'
+            urlB = 'https://player.querofilmeshd.co//CallEpi'
             data = urllib.urlencode({'id': idS})
             r = requests.post(url=urlB, data=data, headers=headers)
             xbmc.log('[plugin.video.querofilmeshd] L631 - ' + str(r.text), xbmc.LOGNOTICE)
@@ -637,7 +641,7 @@ def player_series(name,url,iconimage):
         except:
             pass
 
-        if 'querofilmeshd.online' in urlVideo:
+        if 'querofilmeshd.co' in urlVideo:
                 r = requests.get(urlVideo)
                 html = r.content
                 #xbmc.log('[plugin.video.querofilmeshd] L643 - ' + str(html), xbmc.LOGNOTICE)
@@ -669,11 +673,11 @@ def player_series(name,url,iconimage):
                 headers = {'Referer': url,
                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                           'Host': 'player.querofilmeshd.online',
+                           'Host': 'player.querofilmeshd.co',
                            'Connection': 'keep-alive',
                            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                 }
-                urlF ='https://player.querofilmeshd.online/CallEpi'
+                urlF ='https://player.querofilmeshd.co/CallEpi'
                 data = urllib.urlencode({'idS': idS})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 xbmc.log('[plugin.video.querofilmeshd] L679 - ' + str(data), xbmc.LOGNOTICE)
@@ -695,15 +699,15 @@ def player_series(name,url,iconimage):
                         pass
 
                 xbmc.log('[plugin.video.querofilmeshd] L697 - ' + str(urlF), xbmc.LOGNOTICE)
-                '''
+                
                 idF = urlF.split('id=')[-1]
                 urlF = 'https://player.filmesonlinetv.org/hls/%s/%s.m3u8' % (idF,idF)
                 xbmc.log('[plugin.video.querofilmeshd] L701 - ' + str(urlF), xbmc.LOGNOTICE)
                 r = requests.get(urlF)
                 html = r.text
                 html = html.replace('redirect/','')
-                #xbmc.log('[plugin.video.querofilmeshd] L705 - ' + str(html), xbmc.LOGNOTICE)
-                '''
+                xbmc.log('[plugin.video.querofilmeshd] L705 - ' + str(html), xbmc.LOGNOTICE)
+                
                 urlVideo = urlF
                 url2Play = urlVideo
                 OK = False
