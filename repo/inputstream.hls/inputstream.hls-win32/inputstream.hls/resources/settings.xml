@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <category label="30100">
+    <setting id="MINBANDWIDTH" type="number" default="1000" label="30101" />
+    <setting id="MAXBANDWIDTH" type="number" default="0" label="30102" />
+    <setting id="STREAMSELECTION" type="enum" label="30111" default = "0" values="Auto|Manual" />
+  </category>
+</settings>
