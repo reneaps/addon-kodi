@@ -339,6 +339,26 @@
   </extension>
 </addon>
 
+<addon id="plugin.video.olhardigital" name="Olhar Digital" version="2.0.1" provider-name="ReneSilvabyAddonBrasil">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.addon.common" version="2.0.0"/>
+    <import addon="plugin.video.youtube" version="5.0.0"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">Olhar Digital</summary>
+    <description lang="en">Acompanhe na integra ao programa semanal do Olhar Digital Plus.</description>
+    <platform>all</platform>
+    <forum></forum>
+    <website></website>
+  </extension>
+</addon>
+
 <addon id="plugin.video.overflix" name="OverFlix" version="1.1.2" provider-name="AddonReneSilva">
   <requires>
         <import addon="xbmc.python" version="2.1.0"/>
