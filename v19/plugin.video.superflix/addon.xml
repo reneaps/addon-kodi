@@ -19,5 +19,9 @@
             No addon SuperFlix você assiste filmes separados por categorias, lançamentos,filmes HD, etc. 
             Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
         </description>
+	<assets>
+		<icon>resources/icon.png</icon>
+		<fanart>resources/fanart.jpg</fanart>
+	</assets>
   </extension>
 </addon>
