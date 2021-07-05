@@ -47,19 +47,16 @@ def menuPrincipal():
 
 def getCategorias(url):
         link = openURL(url)
-        #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, 'html.parser')
-        conteudo = soup("div",{"class":"Rght BgA"})
-        menu   = conteudo[0]("nav",{"class":"Menu"})
+        conteudo = soup.findAll('ul', attrs={'class':'sub-menu'})
+
         if 'filmes' in url :
-                filmes = menu[0]("li",{'id':'menu-item-485'})
-                categorias = filmes[0]('li')
+                categorias   = conteudo[1]('li')
         elif 'series' in url:
-                series = menu[0]("li",{'id':'menu-item-876'})
-                categorias = series[0]('li')
+                categorias   = conteudo[2]('li')
 
         for categoria in categorias:
-                titC = categoria.a.h3.text.encode('utf-8','')
+                titC = categoria.a.text   #.encode('utf-8','')
                 urlC = categoria.a["href"]
                 imgC = artfolder + limpa(titC) + '.png'
                 if 'filmes' in url:
@@ -111,7 +108,7 @@ def getSeries(url):
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('main')
-        dados = conteudo[0]('ul')
+        dados = conteudo[0]('ul',attrs={'class':'post-lst rw sm rcl2 rcl3a rcl4b rcl3c rcl4d rcl6e'})
         lista = dados[0]('li')
         totF = len(lista)
 
@@ -500,7 +497,7 @@ def player_series(name,url,iconimage):
             OK =False
             r = requests.get(filme)
             html = r.content
-            soup = BeautifulSoup(html, "html5lib")
+            soup = BeautifulSoup(html, "html.parser")
             urlF = soup('iframe')[0]['src']
 
             if 'index.html' in urlF :
