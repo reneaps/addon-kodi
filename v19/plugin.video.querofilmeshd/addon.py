@@ -21,7 +21,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.1.0'
+version   = '1.1.2'
 addon_id  = 'plugin.video.querofilmeshd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -194,7 +194,6 @@ def pesquisa():
         if (keyb.isConfirmed()):
                 texto    = keyb.getText()
                 pesquisa = urllib.parse.quote(texto)
-                base     = 'https://querofilmehd.org/'
                 url      = base + '?s=%s' % str(pesquisa)
 
                 xbmc.log('[plugin.video.querofilmeshd] L198 - ' + str(url), xbmc.LOGINFO)
@@ -209,8 +208,8 @@ def pesquisa():
                         urlF = filme.a["href"]
                         urlF = base + urlF if urlF.startswith("/filmes") else urlF
                         urlF = base + urlF if urlF.startswith("filmes") else urlF
-                        urlF = base + urlF if urlF.startswith("/series") else urlF
-                        urlF = base + urlF if urlF.startswith("series") else urlF
+                        urlF = base + urlF if urlF.startswith("/tvshows") else urlF
+                        urlF = base + urlF if urlF.startswith("tvshows") else urlF
                         urlF = base + "filmes/" + urlF if urlF.startswith("assistir") else urlF
                         imgF = filme.img["src"]
                         if 'url=' in imgF : imgF = imgF.split('=')[3]
@@ -235,7 +234,10 @@ def doPesquisaSeries():
         total = len(a)
         for url2, titulo, img in a:
             xbmc.log('[plugin.video.querofilmeshd] L237 - ' + str(url2), xbmc.LOGINFO)
-            addDir(titulo, url2, 26, img, False, total)
+            if 'tvshows' in url2 :
+                addDir(titulo, url2, 26, img, False, total)
+            elif 'filmes' in url2 :
+                addDir(titulo, url2, 100, img, False, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
@@ -244,7 +246,13 @@ def doPesquisaFilmes():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            addDir(titulo, url2, 100, img, False, total)
+            xbmc.log('[plugin.video.querofilmeshd] L249 - ' + str(url2), xbmc.LOGINFO)
+            if 'tvshows' in url2 :
+                addDir(titulo, url2, 26, img, False, total)
+            elif 'filmes' in url2 :
+                addDir(titulo, url2, 100, img, False, total)
+
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='movies')
 
 def player(name,url,iconimage):
         xbmc.log('[plugin.video.querofilmeshd] L249 - ' + str(url), xbmc.LOGINFO)

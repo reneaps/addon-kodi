@@ -128,4 +128,4 @@ class UnpackingError(Exception):
 
 if __name__ == "__main__":
     test='''eval(function(p,a,c,k,e,d){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--){d[e(c)]=k[c]||e(c)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('a(\'c\').q({\'p\':\'0://c.9.1/o.8.n\',\'r\':\'0://m.3-6.1/3/v.u\',\'t\':\'0://d.3-6.1/7/w/j/3/h.g\',\'f\':\'0://i.9.1/7/l/e/5/e.k\',\'s\':\'H\',\'M\':\'0\',\'0.L\':\'x\',\'J\':\'O\',\'Q\':\'R\',\'P\':\'N\',\'I\':{\'B-2\':{}}});A 4=b;a().z(y(){C(4==b)$.D(\'/G.F\',{E:\'0://d.3-6.1\'});4=K});',54,54,'http|com||2gb|played||hosting|files||longtailvideo|jwplayer|false|player|gb3|bekle|skin|flv|af91fdbb64843b3|www|5186ad24|zip|skins|images|swf|player5|flashplayer|setup|image|stretching|file|jpg|4980e8c81d49a6b|20a43863f0fdac56f8fa6733484a0bde|start|function|onPlay|var|timeslidertooltipplugin|if|post|server|php|track|exactfit|plugins|controlbar|true|startparam|provider|350|bottom|height|width|620'.split('|'),0,{}))'''
-    print(unpack(test))
+    print unpack(test)
