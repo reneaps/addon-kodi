@@ -33,7 +33,8 @@ addonfolder     = selfAddon.getAddonInfo('path')
 artfolder       = addonfolder + '/resources/img/'
 fanart          = addonfolder + '/fanart.png'
 addon_handle    = int(sys.argv[1])
-base            = base64.b64decode('aHR0cHM6Ly9maWxtZXNvbmxpbmUuY2Mv')
+#base            = base64.b64decode('aHR0cHM6Ly9maWxtZXNvbmxpbmUuY2Mv')
+base = 'https://hdfilmesonlinegratis.pro/'
 
 ############################################################################################################
 
@@ -46,7 +47,7 @@ def menuPrincipal():
         addDir('Pesquisa Series'            , '--'                            ,    30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                            ,    35, artfolder + 'pesquisa.png')
         addDir('Configurações'              , base                            ,  999, artfolder + 'config.png', 1, False)
-        addDir('Configurações ExtendedInfo' , base                            , 1000, artfolder + 'config.png', 1, False)
+        #addDir('Configurações ExtendedInfo' , base                            , 1000, artfolder + 'config.png', 1, False)
 
         setViewMenu()
 
