@@ -479,6 +479,72 @@ def player(name,url,iconimage):
                         i = int(qual[index])
                         url2Play = urlVideo[i]
                         OK = False
+                        
+                elif 'mrdhan.com' in urlVideo or 'vfilmesonline' in urlVideo :
+                        pu = urllib.parse.urlparse(urlVideo)
+                        p = r'(?://|\.)((mrdhan|vfilmesonline)\.(com|net))/(?:f|e|v)/(.+)'
+                        match = re.search(p, urlVideo)
+                        ul = match.group()
+                        fxID = ul.split('/v/')[-1]
+                        urlF = pu.scheme + '://' + pu.netloc + '/api/source/%s' % fxID
+                        headers = {
+                                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0",
+                                "Accept": "*/*",
+                                "Accept-Language": "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3",
+                                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                                "X-Requested-With": "XMLHttpRequest",
+                                "Alt-Used": "mrdhan.com"
+                            }
+                        payload = "r=&d=mrdhan.com"
+                        r = requests.post(url=urlF, data=payload)
+                        js = json.loads(r.text)
+                        links = js['data']
+                        qual = []
+                        for link in links:
+                            qual.append(link['label'])
+                        index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', qual)
+                        if index == -1 : return
+                        i = int(index)
+                        url2Play = links[i]['file']
+                        OK = False
+
+                elif 'megafilmeshd50' in urlVideo:
+                        link = openURL(urlVideo)
+                        soup = BeautifulSoup(link, 'html.parser')
+                        filme = soup('video')
+                        url2Play = filme[0].source['src']
+                        xbmc.log('[plugin.video.midiaflixhd] L417 - ' + str(url2Play), xbmc.LOGINFO)
+                        OK = False
+                        
+                elif 'filmesmp4' in url or 'pandafiles' in urlVideo :
+                        if 'pandafiles' in urlVideo :
+                                u = re.findall('https://pandafiles.com/embed-(.*?).html', urlVideo)[0]
+                                urlF = 'https://filmesmp4.com/03/?dub=%s' % u
+                                print('1 ->',urlF)
+                        if 'filmesmp4' in urlVideo :
+                                u = urlVideo.split('=')[-1]
+                                urlF = 'https://filmesmp4.com/03/?dub=%s' % u
+                                print('2 -> ',urlF)
+                        link = openURL(urlF)
+                        try:
+                                soup = BeautifulSoup(link, 'html.parser')
+                                urlF = soup.iframe['src']
+                                url2Play = urlF
+                                print(url2Play)
+                        except:
+                                pass
+                        try:
+                                soup = BeautifulSoup(link, 'html.parser')
+                                urlF = soup.iframe['src']
+                                link = openURL(urlF)
+                                soup = BeautifulSoup(link, 'html.parser')
+                                video = soup.body('source')
+                                urlV = video[0]['src']
+                                url2Play = urlV
+                                print(url2Play)
+                        except:
+                                pass
+                        OK = False
 
         if OK :
             try:
