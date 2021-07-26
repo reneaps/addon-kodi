@@ -13,6 +13,7 @@
 # Atualizado (1.2.5) - 27/04/2020
 # Atualizado (1.2.6) - 10/07/2020
 # Atualizado (1.2.7) - 05/09/2020
+# Atualizado (1.2.8) - 26/07/2021
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -35,19 +36,18 @@ fanart          = addonfolder + '/fanart.png'
 addon_handle    = int(sys.argv[1])
 #base            = base64.b64decode('aHR0cHM6Ly9maWxtZXNvbmxpbmUuY2Mv')
 base = 'https://hdfilmesonlinegratis.pro/'
-
 ############################################################################################################
 
 def menuPrincipal():
         addDir('Categorias'                 , base                            ,    10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + 'filme/'                 ,    20, artfolder + 'new.png')
+        addDir('Lançamentos'                , base + 'genero/lancamentos/'    ,    20, artfolder + 'new.png')
         addDir('Filmes Dublados'            , base + '?s=dublado'             ,    20, artfolder + 'filmes.png')
         addDir('Filmes 2019'                , base + 'ano/2019/'              ,    20, artfolder + 'filmes.png')
         addDir('Series'                     , base + 'serie/'                 ,    25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                            ,    30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                            ,    35, artfolder + 'pesquisa.png')
         addDir('Configurações'              , base                            ,  999, artfolder + 'config.png', 1, False)
-        #addDir('Configurações ExtendedInfo' , base                            , 1000, artfolder + 'config.png', 1, False)
+        addDir('Configurações ExtendedInfo' , base                            , 1000, artfolder + 'config.png', 1, False)
 
         setViewMenu()
 
@@ -92,10 +92,10 @@ def getFilmes(url):
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link)
-        filmes = soup.findAll("div", {"class":"item"})
+        filmes = soup.findAll("article", {"class":"item movies"})
         totF = len(filmes)
         for databox in filmes:
-                imgF = databox.img['src']
+                imgF = databox.img['data-src']
                 titF = databox.img['alt'].encode('utf-8','replace')
                 urlF = databox.a['href']
                 pltF = ""
@@ -241,6 +241,7 @@ def player(name,url,iconimage):
         mensagemprogresso.update(0)
 
         titsT = []
+        idsT = []
         matriz = []
         urlF = []
 
@@ -248,22 +249,46 @@ def player(name,url,iconimage):
         link  = openURL(url)
         link  = unicode(link, 'utf-8', 'ignore')
         soup  = BeautifulSoup(link)
-        conteudo  = soup.findAll('div', {'class':'opcoes'})
-        links = conteudo[0]('a')
-        #xbmc.log('[plugin.video.hdfilmesonline] L252 - ' + str(links), xbmc.LOGNOTICE)
+        dooplay = re.findall(r'<li id=[\'"]player-option-1[\'"] class=[\'"]dooplay_player_option[\'"] data-type=[\'"](.+?)[\'"] data-post=[\'"](.+?)[\'"] data-nume=[\'"](.+?)[\'"]>', link)
 
-        for i in  range (0,len(links)):
-                link = links[i].text
-                urll = re.findall(r'src=\'.+token=(.*?)\'\;', str(links[i]))[0]
-                urllink = 'http:%s' % urll if urll.startswith("//") else urll
-                domain = urlparse(urllink)
-                domain = domain.netloc.split('.')[0]
-                nsrv = 'Servidor_%s' % str(i)
-                urlF.append(urllink)
-                titsT.append(nsrv)
+        for dtype, dpost, dnume in dooplay:
+                print(dtype, dpost, dnume)
+        try:
+            p = soup('p', limit=5)[0]
+            plot = p.text.replace('kk-star-ratings','')
+        except:
+            plot = 'Sem Sinopse'
+            pass
+        try:
+                headers = {'Referer': url,
+                        'Accept': '*/*',
+                        'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Alt-Used': 'hdfilmesonlinegratis.pro',
+                        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                }
+                urlF = base + 'wp-admin/admin-ajax.php'
+                data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
+                r = requests.post(url=urlF, data=data, headers=headers)
+                xbmc.log('[plugin.video.hdfilmesonline] L273 - ' + str(r.content), xbmc.LOGNOTICE)
+                html = r.content
+                b = json.loads(html)
+                urlF = b['embed_url']
+                xbmc.log('[plugin.video.hdfilmesonline] L277 - ' + str(urlF), xbmc.LOGNOTICE)
+        except:
+            pass
 
-        xbmc.log('[plugin.video.hdfilmesonline] L264 ' + str(urlF), xbmc.LOGNOTICE)
-
+        xbmc.log('[plugin.video.hdfilmesonline] L281 - ' + str(urlF), xbmc.LOGNOTICE)
+        
+        html = openURL(urlF)
+        links = re.findall("addiframe\('(.*?)'\);", html)
+        
+        for i in links:
+            titsT.append(i)
+            idsT.append(i)
+            xbmc.log('[plugin.video.hdfilmesonline] L289 - ' + str(i), xbmc.LOGNOTICE)
+            
         if not titsT : return
 
         index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
@@ -271,177 +296,55 @@ def player(name,url,iconimage):
         if index == -1 : return
 
         i = int(index)
-
-        urlVideo = urlF[i]
-
-        mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
-
-        xbmc.log('[plugin.video.hdfilmesonline] L278 ' + str(urlVideo), xbmc.LOGNOTICE)
-
-        if 'openload2' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                urlVideo = 'https://openload.co/embed/%s' % fxID
-
-        elif 'ok.ru' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                urlVideo = 'http://ok.ru/videoembed%s' % fxID
-
-        elif 'vfilmesonline.com' in urlVideo :
+        link = idsT[i]
+           
+        urlVideo = link
+ 
+        if 'evoload' in urlVideo:
+                code = urlVideo.split('e/')[-1]
+                urlC = 'https://csrv.evosrv.com/captcha?m412548'
+                captcha = openURL(urlC)
+                urlF = 'https://evoload.io/SecurePlayer'
+                data = {"code":code,"token":"ok","csrv_token":captcha,"pass":"7dczpuzsmak","reff":""}
+                headers = {
+                        "referrer": urlVideo,
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0",
+                        "Accept": "application/json, text/plain, */*",
+                        "Accept-Language": "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3",
+                        "Content-Type": "application/json;charset=utf-8",
+                        "X-XSRF-TOKEN": ""
+                    }
+                link = requests.post(url=urlF, data=json.dumps(data), headers=headers)
+                r = json.loads(link.text).get('stream')
+                urlF = r.get('backup') if r.get('backup') else r.get('src')
+                url2Play = urlF
+                xbmc.log('[plugin.video.midiaflixhd] L447 - ' + str(url2Play), xbmc.LOGNOTICE)
+                OK = False 
+                
+        elif 'onifile' in urlVideo:
                 html = openURL(urlVideo)
-                html = unicode(html, 'utf-8', 'ignore')
                 soup = BeautifulSoup(html)
-                data = soup.iframe
-                urlVideo = data['src']
-                if 'woof.tube' in urlVideo :
-                        fxID = urlVideo.split('/e/')[1]
-                        urlVideo = 'https://verystream.com/e/%s' % fxID
-
-        elif 'filmesonline.cc' in urlVideo :
-                html = openURL(urlVideo)
-                html = unicode(html, 'utf-8', 'ignore')
+                urlF= soup.iframe['src']
+                html = openURL(urlF)
                 soup = BeautifulSoup(html)
-                try:
-                    conteudo = soup('iframe')
-                    urlVideo = conteudo[0]['src']
-                except:
-                    pass
-                try:
-                    url2Play = re.compile(r'\{\"file\":"(.*?)",\"type\":".*?",\"label\":".+?"', re.DOTALL).findall(html)[0]
-                    OK = False
-                except:
-                    pass
-                xbmc.log('[plugin.video.hdfilmesonline] L312 ' + str(urlVideo), xbmc.LOGNOTICE)
+                urlF = re.findall('const source = "(.*?)";', html)[0]
+                html = openURL(urlF)
+                host = urlF.split('/playlist')[0]
+                titsT = re.findall('RESOLUTION=(.*?)\n/hls.+', html)
+                idsT = re.findall('RESOLUTION=.*?\n/(.*?)\n', html)
 
-        elif 'vfilmesonline.net' in urlVideo :
-                fxID = urlVideo.split('/')[4]
-                urlF = 'https://vfilmesonline.net/api/source/%s' % fxID
-                data = 'r=&d=vfilmesonline.net'
-                headers = {
-                'referer': urlF,
-                'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36',
-                'content-type': 'application/json'
-                }
-                r = requests.post(url=urlF, data=data, headers=headers)
-                b = json.loads(r.text)
-                xbmc.log('[plugin.video.hdfilmesonline] L325 ' + str(urlF), xbmc.LOGNOTICE)
-                url2Play = b['data'][0]['file']
+                if not titsT : return
+
+                index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
+
+                if index == -1 : return
+                i = int(index)
+                urlF  = host + '/' + idsT[i]
+                url2Play = urlF
+                xbmc.log('[plugin.video.hdfilmesonline] L327 - ' + str(urlF), xbmc.LOGNOTICE)
                 OK = False
-
-        elif 'hqq.tv' in urlVideo :
-                url2Play = str(urlVideo)
-                OK = False
-
-        elif 'thevid' in urlVideo :
-                fxID = urlVideo.split('e/')[1]
-                urlVideo = 'http://thevid.net/e/%s' % fxID
-                linkTV  = openURL(urlVideo)
-                sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
-                aMatches = re.compile(sPattern).findall(linkTV)
-                sUnpacked = jsunpack.unpack(aMatches[1])
-                #xbmc.log('[plugin.video.hdfilmesonline] L340 ' + str(sUnpacked), xbmc.LOGNOTICE)
-                url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
-                url2Play = "http:" + str(url2Play[0])
-                xbmc.log('[plugin.video.hdfilmesonline] L343 ' + str(url2Play), xbmc.LOGNOTICE)
-
-                OK = False
-
-        elif 'csst.online' in urlVideo :
-                link = openURL(urlVideo)
-                #xbmc.log('[plugin.video.hdfilmesonline] L349 - ' + str(link), xbmc.LOGNOTICE)
-                link = unicode(link, 'utf-8', 'ignore')
-                ref = re.findall(r'file\:\s*\"(.+?)\"',link)[-1]
-                fxID = ref.split(',')[-1]
-                fxID = fxID.split(']')[-1]
-                url2Play = fxID
-                OK = False
-
-        elif 'fsst.online' in urlVideo :
-                link = openURL(urlVideo)
-                #xbmc.log('[plugin.video.hdfilmesonline] L359 - ' + str(link), xbmc.LOGNOTICE)
-                link = unicode(link, 'utf-8', 'ignore')
-                ref = re.findall(r'file\:\s*\"(.+?)\"',link)[-1]
-                fxID = ref.split(',')[-1]
-                fxID = fxID.split(']')[-1]
-                url2Play = fxID
-                OK = False
-
-        if 'playerhd.xyz' in urlVideo :
-                fxID = urlVideo.split('/v/')[1]
-                urlVideo = 'https://playerhd.xyz/api/source/%s' % (fxID)
-                data = urllib.urlencode({'r':urlF[i],'d':'playerhd.xyz'})
-                headers = {
-                    'Referer': urlVideo,
-                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                    'content-type':'application/x-www-form-urlencoded; charset=UTF-8'}
-                html = requests.post(url=urlVideo, data=data, headers=headers).content
-                if html:
-                    source_info = json.loads(html)
-                    url2Play = source_info["data"][0]["file"]
-                    #xbmc.log('[plugin.video.HDFilmesOnline] L380- ' + str(url2Play), xbmc.LOGNOTICE)
-                    js = json.loads(html)
-                    js = js['data']
-                    try:
-                        lg = json.loads(html)
-                        lg['captions']
-                        lgID = lg['captions'][0]['id']
-                        lgHA = lg['captions'][0]['hash']
-                        legendas = 'https://www.playerhd.xyz/asset/userdata/229304/caption/%s/%s.srt' % (lgHA,lgID)
-                        xbmc.log('[plugin.video.HDFilmesOnline] L389 - ' + str(legendas), xbmc.LOGNOTICE)
-                    except:
-                        legendas = False
-                        pass
-                    qual = []
-                    urlVideo = []
-                    for i in js:
-                            urlVideo.append(i['file'])
-                            qual.append(str(i['label']))
-                    if qual == None : return
-                    index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
-                    if index == -1 : return
-                    i = index
-                    url2Play = urlVideo[i]
-                    OK = False
-
-        if 'playersmartflixhd.xyz' in urlVideo :
-                fxID = urlVideo.split('/v/')[1]
-                urlVideo = 'https://playersmartflixhd.xyz/api/source/%s' % (fxID)
-                data = urllib.urlencode({'r':urlF[i],'d':'playersmartflixhd.xyz'})
-                headers = {
-                    'Referer': urlVideo,
-                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                    'content-type':'application/x-www-form-urlencoded; charset=UTF-8'}
-                html = requests.post(url=urlVideo, data=data, headers=headers).content
-                if html:
-                    source_info = json.loads(html)
-                    url2Play = source_info["data"][0]["file"]
-                    #xbmc.log('[plugin.video.HDFilmesOnline] L418- ' + str(url2Play), xbmc.LOGNOTICE)
-                    js = json.loads(html)
-                    js = js['data']
-                    try:
-                        lg = json.loads(html)
-                        lg['captions']
-                        lgID = lg['captions'][0]['id']
-                        lgHA = lg['captions'][0]['hash']
-                        legendas = 'https://www.playersmartflixhd.xyz/asset/userdata/229304/caption/%s/%s.srt' % (lgHA,lgID)
-                        xbmc.log('[plugin.video.HDFilmesOnline] L427 - ' + str(legendas), xbmc.LOGNOTICE)
-                    except:
-                        legendas = False
-                        pass
-                    qual = []
-                    urlVideo = []
-                    for i in js:
-                            urlVideo.append(i['file'])
-                            qual.append(str(i['label']))
-                    if qual == None : return
-                    index = xbmcgui.Dialog().select('Selecione uma das qualidades suportadas :', qual)
-                    if index == -1 : return
-                    i = index
-                    url2Play = urlVideo[i]
-                    OK = False
-
-        xbmc.log('[plugin.video.hdfilmesonline] L443 ' + str(urlVideo), xbmc.LOGNOTICE)
+                
+        xbmc.log('[plugin.video.hdfilmesonline] L330 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         if OK :
             try:
@@ -454,7 +357,7 @@ def player(name,url,iconimage):
 
         if not url2Play : return
 
-        xbmc.log('[plugin.video.hdfilmesonline] L456 ' + str(url2Play), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.hdfilmesonline] L343 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         legendas = '-'
 
@@ -468,9 +371,9 @@ def player(name,url,iconimage):
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
-                listitem.setMimeType('application/vnd.apple.mpegurl')
-                listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
-                listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
+                listitem.setMimeType('application/x-mpegURL')
+                listitem.setProperty('inputstreamaddon', 'inputstream.hls')
+                listitem.setContentLookup(False)
                 playlist.add(url2Play,listitem)
         else:
                 listitem = xbmcgui.ListItem(name, path=url2Play)
