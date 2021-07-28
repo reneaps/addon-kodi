@@ -27,7 +27,7 @@ base = base64.b64decode('aHR0cHM6Ly91bHRyYWNpbmUuYXBwLw==')
 def menuPrincipal():
         addDir('Categorias'                 , base                              ,    10, artfolder + 'categorias.png')
         addDir('Lançamentos'                , base + 'filmes/'                  ,    20, artfolder + 'lancamentos.png')
-        addDir('Filmes Dublados'            , base + 'search.php?s=dublado'     ,    20, artfolder + 'pesquisa.png')
+        addDir('Filmes Dublados'            , base + 'busca?q=dublado'          ,    20, artfolder + 'pesquisa.png')
         addDir('Series'                     , base + 'categoria/series/'        ,    25, artfolder + 'legendados.png')
         addDir('Pesquisa Series'            , '--'                              ,    30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                              ,    35, artfolder + 'pesquisa.png')
@@ -53,19 +53,21 @@ def getCategorias(url):
         setViewMenu()
 
 def getFilmes(url):
+        xbmc.log('[plugin.video.ultracine] L56 ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         soup = BeautifulSoup(link)
-        filmes = soup.select('.grid-item')
+        filmes = soup('div', attrs={'class':'grid-item'})
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.img['alt']
+                titF = filme.img['alt'].encode('utf-8')
+                titF = titF.replace('Assistir', '')
                 imgF = filme.img['data-src']
                 urlF = filme.a['href']
                 pltF = "" #sinopse(urlF)
                 addDirF(titF, urlF, 100, imgF, False, totF, pltF)
         try :
-                proximo = soup("a", attrs={"rel":"next"})[0]['href']
+                proxima = soup("a", attrs={"rel":"next"})[0]['href']
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
                 pass
@@ -76,25 +78,18 @@ def getSeries(url):
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link)
-        conteudo = soup("div", {"id": "postagem"})
-        filmes = conteudo[0]("div",{"class":"capa"})
-        urls = conteudo[0]("a")
+        filmes = soup('div', attrs={'class':'grid-item'})
         totF = len(filmes)
 
-        for x in range(0, totF):
-                titF = filmes[x].img["title"].encode('utf-8','replace')
-                urlF = urls[x].get("href").encode('utf-8','replace')
+        for filme in filmes:
+                titF = filme.img['alt'].encode('utf-8')
+                titF = titF.replace('Assistir', '')
+                imgF = filme.img['data-src']
+                urlF = filme.a['href']
                 pltF = "" #sinopse(urlF)
-                imgF = filmes[x].img["src"].encode('utf-8', 'ignore')
-                imgF = imgF.split('src=')[1]
-                imgF = imgF.split('&h=')[0]
                 addDirF(titF, urlF, 26, imgF, True, totF, pltF)
         try :
-                prox = re.findall('<a href="(.*?)/page/(.*?)">.*?</a>', link)
-                i = len(prox)
-                i = int(i)
-                i = (i-1)
-                proxima = prox[i][0] + "/page/" + prox[i][1]
+                proxima = soup("a", attrs={"rel":"next"})[0]['href']
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
@@ -105,16 +100,10 @@ def getTemporadas(url):
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link)
-        conteudo = soup("div", {"class": "conteudo"})
-        linhas = conteudo[0]("ul", {"class": "itens"})
-        temporadas = linhas[0]("li",{"id":"tempnresponsive"})
-        totF = len(temporadas)
-        imgF = []
-        img = soup.find("div", {"class": "playingconteudo"})
-        imgF = img.img['src']
-        imgF = imgF.split('src=')[1]
-        imgF = imgF.split('&h=')[0]
+        conteudo = soup('div', attrs={'class':'ac-item'})
+        totF = len(conteudo)
         urlF = url
+        imgF = soup('div', {'class':'product-image-page'})[0].img['data-src']
         i = 0
 
         for i in range(totF):
@@ -133,65 +122,33 @@ def getEpisodios(name, url):
         episodios = []
 
         link  = openURL(url)
-        #link = unicode(link, 'utf-8', 'ignore')
-
         soup = BeautifulSoup(link,)
-        conteudo = soup("div", {"class": "videos"})
-        arquivo = conteudo[0]("li", {"class": "video" + str(n) + "-code"})
-        perfil = soup('div',{'id':'perfil_conteudo'})
-        sname = perfil[0].h1.text.encode('utf-8')
-
-        sname = sname.split('-')[0].strip()
-
+        imgF = soup('div', {'class':'product-image-page'})[0].img['data-src']
+        sea = soup('div', {'class':'ac-item'})
+        epi = soup('div', {'class':'lista-episodios'})
+        t1 = n * 2
+        i = int(t1 - 2)
+        xbmc.log('[plugin.video.ultracineBiz] L128 - ' + str(epi), xbmc.LOGNOTICE)
+        ul = epi[i]('ul')
+        filmes = ul[0]('li')
+        
         try:
-            temporadas = arquivo[0]('table')
-            filmes = temporadas[0]('a')
-            audio = str(arquivo[0].span.text)
             totF = len(filmes)
 
             for filme in filmes:
-                    titF = filme.text.encode('utf-8')
-                    titF = titF.replace('Assistir ','').replace('â&euro;&ldquo;','').replace('Ã³', 'o') + " " +audio #" Dublado"
-                    titF = sname + " "+str(n) + "T " + titF
-                    urlF = filme.get("href").encode('utf-8', 'ignore')
-                    urlF = base + urlF
+                    titF = filme.a.span.text.encode('utf-8')
+                    urlF = filme.a['href']
                     temp = (titF, urlF)
                     episodios.append(temp)
         except:
             pass
-
-        try:
-            temporadas = arquivo[0]('table')
-            filmes = temporadas[1]('a')
-            audio = str(temporadas[1].span.text)
-
-            totF = len(filmes)
-
-            for filme in filmes:
-                    titF = filme.text.encode('utf-8')
-                    titF = titF.replace('Assistir ','').replace('Filme ','').replace('Episdio', 'Episodio') + " " +audio #" Legendado"
-                    titF = sname + " "+str(n) + "T " + titF
-                    urlF = filme.get("href").encode('utf-8', 'ignore')
-                    urlF = base + urlF
-                    temp = (titF, urlF)
-                    episodios.append(temp)
-        except:
-            pass
-
-        audio = []
-        imgF = []
-        img = soup.find("div", {"class": "playingconteudo"})
-        imgF = img.img['src']
-        imgF = imgF.split('src=')[1]
-        imgF = imgF.split('&h=')[0]
 
         total = len(episodios)
 
         for titF, urlF in episodios:
                 addDirF(titF, urlF, 110, imgF, False, totF)
 
-        #xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
-        xbmcplugin.setContent( int(sys.argv[1]) ,"episodes" )
+        xbmcplugin.setContent(int(sys.argv[1]) ,"episodes")
 
 def pesquisa():
         keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -200,25 +157,22 @@ def pesquisa():
         if (keyb.isConfirmed()):
                 texto    = keyb.getText()
                 pesquisa = urllib.quote(texto)
-                url      = base + 'search.php?s=%s' % str(pesquisa)
+                url      = base + 'busca?q=%s' % str(pesquisa)
                 hosts = []
 
                 link = openURL(url)
-                #link = unicode(link, 'utf-8', 'ignore')
                 soup     = BeautifulSoup(link)
-
-                conteudo = soup("div", {"id": "postagem"})
-                filmes = conteudo[0]("div", {"class":"capa"})
-                urls = conteudo[0]("a")
+                filmes = soup('div', attrs={'class':'grid-item'})
                 totF = len(filmes)
 
-                for x in range(0, totF):
-                    titF = filmes[x].img["title"].encode('utf-8','replace')
-                    urlF = urls[x].get("href").encode('utf-8','replace')
-                    pltF = sinopse(urlF)
-                    imgF = filmes[x].img["src"].encode('utf-8', 'ignore')
-                    temp = [urlF, titF, imgF]
-                    hosts.append(temp)
+                for filme in filmes:
+                        titF = filme.img['alt'].encode('utf-8')
+                        titF = titF.replace('Assistir', '')
+                        imgF = filme.img['data-src']
+                        urlF = filme.a['href']
+                        pltF = "" #sinopse(urlF)
+                        temp = [urlF, titF, imgF]
+                        hosts.append(temp)
 
                 a = []
                 for url, titulo, img in hosts:
@@ -242,9 +196,9 @@ def doPesquisaFilmes():
             return
         total = len(a)
         for url2, titulo, img in a:
-            addDir(titulo, url2, 100, img, False, total)
-
-        xbmcplugin.setContent(int(sys.argv[1]), 'movies')
+            addDirF(titulo, url2, 100, img, False)
+            
+        setViewFilmes()
 
 def player(name,url,iconimage):
         OK = True
@@ -254,45 +208,45 @@ def player(name,url,iconimage):
         xbmc.log('[plugin.video.ultracine] L264 ' + str(url), xbmc.LOGNOTICE)
 
         titsT = []
+        idsT = []
         matriz = []
 
         link = openURL(url)
         soup  = BeautifulSoup(link)
-        conteudo = soup("div", {"class":"opcoes"})
-        srvsdub = conteudo[0]('a')
-        totD = len(srvsdub)
-        titsT = []
-        for i in range(totD) :
-                        titS = srvsdub[i].text
-                        titsT.append(titS)
-                        print titsT
-
-        if not titsT : return
-
-        index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-
-        if index == -1 : return
-
-        i = int(index)
-
-        links  = conteudo[0]('a')
-
-        if len(links) == 0 : links = conteudo[0]("a")
-
-        urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
-
-        link = openURL(urlVideo)
+        try:
+            urlF = re.findall('<div id="Link" Class="Link"> <a href="(.*?)" target="_blanck">', link)[0]
+        except:
+            pass
+        try:
+            urlF = re.findall('<option value=".*?" data-targetiframe=".*?" data-iframe="(.*?)">', link)[0]
+        except:
+            pass
+        print(urlF)
+        link = openURL(urlF)
         soup  = BeautifulSoup(link)
-        conteudo = soup.findAll("iframe")
-        urlVideo = conteudo[2].get('src')
+        urlF = soup.iframe['src']
+        print(urlF)
+        if '//public' in urlF : urlF = urlF.replace('//public','/public')
+        fxID = urlF.split('id=')[1]
+        if "&" in fxID: fxID = fxID.split('&')[0]
+        host = urlF.split('/public')[0]
+        t = int(round(time.time() * 1000))
+        urlF = host + '/playlist/' + fxID + '/' + str(t)
+        print(urlF)
+        r = requests.get(url=urlF)
+        titsT = []
+        idsT = []
+        titsT = re.findall('RESOLUTION=(.*?)\n/hls.+', r.text)
+        idsT = re.findall('RESOLUTION=.*?\n/(.*?)\n', r.text)
+        urlVideo = host + '/' + idsT[0]
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
         xbmc.log('[plugin.video.ultracine] L297 ' + str(urlVideo), xbmc.LOGNOTICE)
 
-        if 'openload2' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                urlVideo = 'https://openload.co/embed/%s' % fxID
+        if 'bolsonaro' in urlVideo :
+                url2Play = urlVideo
+                OK = False
 
         elif 'ok' in urlVideo :
                 fxID = urlVideo.split('ed/')[1]
@@ -309,7 +263,6 @@ def player(name,url,iconimage):
                 url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
                 url = str(url2Play[0])
                 url2Play = 'http:%s' % url if url.startswith("//") else url
-
                 OK = False
 
         if OK :
@@ -330,14 +283,28 @@ def player(name,url,iconimage):
         playlist = xbmc.PlayList(1)
         playlist.clear()
 
-        listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
-        listitem.setPath(url2Play)
-        listitem.setProperty('mimetype','video/mp4')
-        listitem.setProperty('IsPlayable', 'true')
-        playlist.add(url2Play,listitem)
+        if "m3u8" in url2Play:
+                #ip = addon.getSetting("inputstream")
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('application/x-mpegURL')
+                listitem.setProperty('inputstreamaddon', 'inputstream.hls')
+                listitem.setContentLookup(False)
+                playlist.add(url2Play,listitem)
+        else:
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('video/mp4')
+                playlist.add(url2Play,listitem)
 
         xbmcPlayer = xbmc.Player()
-        xbmcPlayer.play(playlist)
+
+        while xbmcPlayer.play(playlist) :
+            xbmc.sleep(5000)
+            if not xbmcPlayer.isPlaying():
+                xbmc.stop()
 
         mensagemprogresso.update(100)
         mensagemprogresso.close()
@@ -354,6 +321,7 @@ def player(name,url,iconimage):
                     xbmcPlayer.setSubtitles(sfile)
             else:
                 xbmcPlayer.setSubtitles(legendas)
+                
 
 def player_series(name,url,iconimage):
         xbmc.log('[plugin.video.ultracine] L375 ' + str(url), xbmc.LOGNOTICE)
@@ -366,53 +334,45 @@ def player_series(name,url,iconimage):
         links = []
         hosts = []
         hostid = []
-        '''
-        matriz = []
+        
         link = openURL(url)
         soup  = BeautifulSoup(link)
-        conteudo = soup("div", {"class":"itens"})
-        srvsdub = conteudo[0]('a')
-        totD = len(srvsdub)
-
+        try:
+            urlF = re.findall('<div id="Link" Class="Link"> <a href="(.*?)" target="_blanck">', link)[0]
+        except:
+            pass
+        try:
+            urlF = re.findall('<option value=".*?" data-targetiframe=".*?" data-iframe="(.*?)">', link)[0]
+        except:
+            pass
+        print(urlF)
+        link = openURL(urlF)
+        soup  = BeautifulSoup(link)
+        urlF = soup.iframe['src']
+        print(urlF)
+        if '//public' in urlF : urlF = urlF.replace('//public','/public')
+        fxID = urlF.split('id=')[1]
+        if "&" in fxID: fxID = fxID.split('&')[0]
+        host = urlF.split('/public')[0]
+        t = int(round(time.time() * 1000))
+        urlF = host + '/playlist/' + fxID + '/' + str(t)
+        print(urlF)
+        r = requests.get(url=urlF)
         titsT = []
+        idsT = []
+        titsT = re.findall('RESOLUTION=(.*?)\n/hls.+', r.text)
+        idsT = re.findall('RESOLUTION=.*?\n/(.*?)\n', r.text)
+        urlVideo = host + '/' + idsT[0]
 
-        for i in range(totD) :
-                titS = srvsdub[i].text
-                titS = titS.replace('Assistir no', '')
-                titsT.append(titS)
-                print titsT
-        '''
-        url2 = url.replace('?','&')
-        url3 = url2.split('eps/&')[1]
-        srvs = url3.split('&')
-
-        for i in srvs :
-                if '=' in i :
-                        n = i.split('=')[0]
-                        if 'verystream' not in n :
-                                titsT.append(n)
-                                hostid.append(i)
-
-        if not titsT : return
-
-        index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-
-        if index == -1 : return
-
-        i = int(index)
-
-        #links  = conteudo[0]('a')
-
-        #if len(links) == 0 : links = conteudo[0]("a")
-
-        #urlVideo = re.findall(r'href=[\'"]?([^\'" >]+)', str(links))[i]
-        urlVideo = hostid[i]
-   
         xbmc.log('[plugin.video.ultracineBiz - player_series - L423 ] ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
-        if 'opload2' in urlVideo :
+        if 'bolsonaro' in urlVideo :
+                url2Play = urlVideo
+                OK = False
+
+        elif 'opload2' in urlVideo :
                 fxID = urlVideo.split('=')[1]
                 fxID = fxID.split('/')[0]
                 urlVideo = 'https://openload.co/embed/%s' % fxID
@@ -504,14 +464,28 @@ def player_series(name,url,iconimage):
         playlist = xbmc.PlayList(1)
         playlist.clear()
 
-        listItem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
-        listItem.setPath(url2Play)
-        listItem.setProperty('mimetype','video/mp4')
-        listItem.setProperty('IsPlayable', 'true')
-        playlist.add(url2Play,listItem)
+        if "m3u8" in url2Play:
+                #ip = addon.getSetting("inputstream")
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('application/x-mpegURL')
+                listitem.setProperty('inputstreamaddon', 'inputstream.hls')
+                listitem.setContentLookup(False)
+                playlist.add(url2Play,listitem)
+        else:
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('video/mp4')
+                playlist.add(url2Play,listitem)
 
         xbmcPlayer = xbmc.Player()
-        xbmcPlayer.play(playlist)
+
+        while xbmcPlayer.play(playlist) :
+            xbmc.sleep(5000)
+            if not xbmcPlayer.isPlaying():
+                xbmc.stop()
 
         mensagemprogresso.update(100)
         mensagemprogresso.close()
@@ -557,6 +531,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
         liz.setArt({ 'icon': iconimage, 'thumb': iconimage })
 
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
+        
         return ok
 
 def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
