@@ -835,6 +835,5 @@ elif mode == 99   : playTrailer(name,url,iconimage)
 elif mode == 100  : player(name,url,iconimage)
 elif mode == 110  : player_series(name,url,iconimage)
 elif mode == 999  : openConfig()
-#elif mode == 1000 : openConfigEI()
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))
