@@ -28,10 +28,9 @@ base        = 'https://ultracine.app/'
 ############################################################################################################
 
 def menuPrincipal():
-        addDir('Categorias'       , base                          ,   10, artfolder + 'categorias.png')
+        addDir('Categorias'       , base + 'filmes/'              ,   10, artfolder + 'categorias.png')
         addDir('Lançamentos'      , base + 'filmes/'              ,   20, artfolder + 'new.png')
-        addDir('Filmes Dublados'  , base + 'busca?q=dublado'      ,   20, artfolder + 'pesquisa.png')
-        addDir('Series'           , base + 'categoria/series/'    ,   25, artfolder + 'series.png')
+        addDir('Series'           , base + 'series/'              ,   25, artfolder + 'series.png')
         addDir('Pesquisa Filmes'  , '--'                          ,   35, artfolder + 'pesquisa.png')
         addDir('Configurações'    , base                          ,  999, artfolder + 'config.png', 1, False)
 
@@ -40,8 +39,8 @@ def menuPrincipal():
 def getCategorias(url):
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
-        conteudo   = soup("ul",{"class":"sub-menu"})
-        categorias = conteudo[0]("li")
+        conteudo = soup('ul', {'class':'list-icon'})
+        categorias = conteudo[0]('li')
 
         totC = len(categorias)
 
@@ -64,7 +63,7 @@ def getFilmes(name,url,iconimage):
 
         for filme in filmes:
                 titF = filme.img['alt']
-                titF = titF.replace('Assistir', '')
+                titF = titF.replace('Assistir', '').replace('Online', '')
                 imgF = filme.img['data-src']
                 urlF = filme.a['href']
                 addDirF(titF, urlF, 100, imgF, False, totF)
@@ -85,7 +84,7 @@ def getSeries(url):
 
         for filme in filmes:
                 titF = filme.img['alt']
-                titF = titF.replace('Assistir', '')
+                titF = titF.replace('Assistir', '').replace('Online', '')
                 imgF = filme.img['data-src']
                 urlF = filme.a['href']
                 addDirF(titF, urlF, 26, imgF, True, totF)
@@ -127,8 +126,11 @@ def getEpisodios(name, url,iconimage):
         imgF = soup('div', {'class':'product-image-page'})[0].img['data-src']
         sea = soup('div', {'class':'ac-item'})
         epi = soup('div', {'class':'lista-episodios'})
-        t1 = n * 2
-        i = int(t1 - 2)
+        s = len(sea)
+        e = len(epi)
+        t2 = (e / s)
+        t1 = n * t2
+        i = int(t1 - t2)
         ul = epi[i]('ul')
         filmes = ul[0]('li')
         totF = len(filmes)
@@ -160,7 +162,7 @@ def pesquisa():
 
                 for filme in filmes:
                         titF = filme.img['alt']
-                        titF = titF.replace('Assistir', '')
+                        titF = titF.replace('Assistir', '').replace('Online', '')
                         imgF = filme.img['data-src']
                         urlF = filme.a['href']
                         pltF = "" #sinopse(urlF)
@@ -208,7 +210,7 @@ def player(name,url,iconimage):
         sub = None
 
         link = openURL(url)
-        soup  = BeautifulSoup(link)
+        soup  = BeautifulSoup(link, 'html.parser')
         try:
             urlF = re.findall('<div id="Link" Class="Link"> <a href="(.*?)" target="_blanck">', link)[0]
         except:
@@ -275,6 +277,7 @@ def player(name,url,iconimage):
                 listitem.setProperty('IsPlayable', 'true')
                 listitem.setMimeType('application/x-mpegURL')
                 listitem.setProperty('inputstream','inputstream.hls')
+                #listitem.setProperty('inputstream','inputstream.adaptive')
                 #listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
                 #listitem.setMimeType('application/dash+xml')
                 listitem.setContentLookup(False)
@@ -308,7 +311,8 @@ def player(name,url,iconimage):
                     xbmcPlayer.setSubtitles(sfile)
             else:
                 xbmcPlayer.setSubtitles(legendas)
-
+        
+        return OK
 
 def player_series(name,url,iconimage):
         xbmc.log('[plugin.video.ultracine] L421 - ' + str(url), xbmc.LOGINFO)
@@ -388,7 +392,6 @@ def player_series(name,url,iconimage):
         playlist.clear()
 
         if "m3u8" in url2Play:
-                #ip = addon.getSetting("inputstream")
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
@@ -442,7 +445,7 @@ def openURL(url):
                 'Upgrade-Insecure-Requests': '1',
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36'
         }
-        link = requests.get(url).text
+        link = requests.get(url, headers=headers).text
         return link
 
 def postURL(url):
@@ -467,7 +470,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
         #dialog = xbmcgui.Dialog()
         #dialog.ok("addDir Erro:", str(u))
 
-        xbmc.log('[plugin.video.ultracine] L644 ' + str(u), xbmc.LOGINFO)
+        #xbmc.log('[plugin.video.ultracine] L473 -  ' + str(u), xbmc.LOGINFO)
 
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 
@@ -489,7 +492,8 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
         cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.parse.quote(name), url, urllib.parse.quote(iconimage))))
 
-        liz.addContextMenuItems(cmItems, replaceItems=False)
+        xbmc.log('[plugin.video.ultracine] L495 -  ' + str(cmItems), xbmc.LOGINFO)
+        liz.addContextMenuItems(cmItems)
 
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 
@@ -502,11 +506,15 @@ def getInfo(url):
         xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
+        xbmc.log('[plugin.video.ultracine] L512 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
-        #ytID = re.findall('<a id="open-trailer" class="btn iconized trailer" data-trailer="https://www.youtube.com/embed/(.*?)rel=0&amp;controls=1&amp;showinfo=0&autoplay=0"><b>Trailler</b> <i class="icon fa fa-play"></i></a>', link)[0]
-        ytID = '' #SytID.replace('?','')
+        uri = soup('a', {'id':'openTrailer'})[0]['data-iframe']
+        ytID = uri.split('embed/')[-1]
 
-        xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
+        dialog = xbmcgui.Dialog()
+        dialog.ok("addDir Erro:", str(ytID))
+
+        xbmc.executebuiltin('XBMC.RunPlugin("plugin://plugin.video.youtube/play/?video_id=%s")' % ytID)
 
 def setViewMenu() :
         xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
