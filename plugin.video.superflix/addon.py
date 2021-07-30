@@ -4,7 +4,7 @@
 # Addon : SuperFlix
 # By AddonBrasil - 06/12/2019
 # Atualizado (1.0.0) - 24/06/2021
-# Atualizado (2.0.0) - 12/0/2021
+# Atualizado (2.0.0) - 12/07/2021
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64

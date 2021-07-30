@@ -4,6 +4,8 @@
 #####################################################################
 # Addon : Ultracine
 # By AddonReneSilva - 28/07/2021
+# Atualizado (1.0.0) - 24/06/2021
+# 
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -17,7 +19,7 @@ addon_id = 'plugin.video.ultracine'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
 addonfolder = selfAddon.getAddonInfo('path')
-artfolder = addonfolder + '/resources/img/'
+artfolder = addonfolder + '/resources/media/'
 fanart = addonfolder + '/fanart.png'
 addon_handle = int(sys.argv[1])
 base = base64.b64decode('aHR0cHM6Ly91bHRyYWNpbmUuYXBwLw==')
@@ -25,10 +27,9 @@ base = base64.b64decode('aHR0cHM6Ly91bHRyYWNpbmUuYXBwLw==')
 ############################################################################################################
 
 def menuPrincipal():
-        addDir('Categorias'                 , base                              ,    10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + 'filmes/'                  ,    20, artfolder + 'lancamentos.png')
-        addDir('Filmes Dublados'            , base + 'busca?q=dublado'          ,    20, artfolder + 'pesquisa.png')
-        addDir('Series'                     , base + 'categoria/series/'        ,    25, artfolder + 'legendados.png')
+        addDir('Categorias'                 , base + 'filmes/'                  ,    10, artfolder + 'categorias.png')
+        addDir('Lançamentos'                , base + 'filmes/'                  ,    20, artfolder + 'new.png')
+        addDir('Series'                     , base + 'series/'                  ,    25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                              ,    30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                              ,    35, artfolder + 'pesquisa.png')
         addDir('Configurações'              , base                              ,   999, artfolder + 'config.png', 1, False)
@@ -40,32 +41,33 @@ def getCategorias(url):
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link)
-        conteudo   = soup("div", {"id": "sidebar"})
-        categorias = conteudo[0]("li")
+        conteudo = soup('ul', {'class':'list-icon'})
+        categorias = conteudo[0]('li')
+
         totC = len(categorias)
+
         for categoria in categorias:
-                titC = categoria.text.encode('utf-8', 'ignore')
-                if not 'Lançamento' in titC :
-                                urlC = categoria.a["href"]
-                                imgC = artfolder + limpa(titC) + '.png'
-                                addDir(titC,urlC,20,imgC)
+                titC = categoria.a.text
+                urlC = categoria.a["href"]
+                urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
+                urlC = base + urlC if urlC.startswith("categoria") else urlC
+                imgC = artfolder + limpa(titC) + '.png'
+                addDir(titC,urlC,20,imgC)
 
         setViewMenu()
 
 def getFilmes(url):
         xbmc.log('[plugin.video.ultracine] L56 ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
-        soup = BeautifulSoup(link)
         filmes = soup('div', attrs={'class':'grid-item'})
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.img['alt'].encode('utf-8')
-                titF = titF.replace('Assistir', '')
+                titF = filme.img['alt']
+                titF = titF.replace('Assistir', '').replace('Online', '')
                 imgF = filme.img['data-src']
                 urlF = filme.a['href']
-                pltF = "" #sinopse(urlF)
-                addDirF(titF, urlF, 100, imgF, False, totF, pltF)
+                addDirF(titF, urlF, 100, imgF, False, totF)
         try :
                 proxima = soup("a", attrs={"rel":"next"})[0]['href']
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
@@ -82,12 +84,11 @@ def getSeries(url):
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.img['alt'].encode('utf-8')
-                titF = titF.replace('Assistir', '')
+                titF = filme.img['alt']
+                titF = titF.replace('Assistir', '').replace('Online', '')
                 imgF = filme.img['data-src']
                 urlF = filme.a['href']
-                pltF = "" #sinopse(urlF)
-                addDirF(titF, urlF, 26, imgF, True, totF, pltF)
+                addDirF(titF, urlF, 26, imgF, True, totF)
         try :
                 proxima = soup("a", attrs={"rel":"next"})[0]['href']
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
@@ -97,9 +98,9 @@ def getSeries(url):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
 def getTemporadas(url):
-        link  = openURL(url)
-        link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link)
+        xbmc.log('[plugin.video.ultracine] L136 - ' + str(url), xbmc.LOGINFO)
+        html = openURL(url)
+        soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', attrs={'class':'ac-item'})
         totF = len(conteudo)
         urlF = url
@@ -109,7 +110,7 @@ def getTemporadas(url):
         for i in range(totF):
             i = i + 1
             titF = str(i) + "ª Temporada"
-            xbmc.log('[plugin.video.ultracine] L138 ' + str(imgF), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.ultracine] L138 ' + str(imgF), xbmc.LOGINFO)
             addDir(titF, urlF, 27, imgF, False, totF)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
@@ -122,31 +123,24 @@ def getEpisodios(name, url):
         episodios = []
 
         link  = openURL(url)
-        soup = BeautifulSoup(link,)
+        soup = BeautifulSoup(link)
         imgF = soup('div', {'class':'product-image-page'})[0].img['data-src']
         sea = soup('div', {'class':'ac-item'})
         epi = soup('div', {'class':'lista-episodios'})
-        t1 = n * 2
-        i = int(t1 - 2)
-        xbmc.log('[plugin.video.ultracineBiz] L128 - ' + str(epi), xbmc.LOGNOTICE)
+        s = len(sea)
+        e = len(epi)
+        t2 = (e / s)
+        t1 = n * t2
+        i = int(t1 - t2)
         ul = epi[i]('ul')
         filmes = ul[0]('li')
-        
-        try:
-            totF = len(filmes)
+        totF = len(filmes)
+        xbmc.log('[plugin.video.ultracineBiz] L128 - ' + str(totF), xbmc.LOGINFO)
 
-            for filme in filmes:
-                    titF = filme.a.span.text.encode('utf-8')
-                    urlF = filme.a['href']
-                    temp = (titF, urlF)
-                    episodios.append(temp)
-        except:
-            pass
-
-        total = len(episodios)
-
-        for titF, urlF in episodios:
-                addDirF(titF, urlF, 110, imgF, False, totF)
+        for filme in filmes:
+            titF = filme.a.span.text.encode('utf-8')
+            urlF = filme.a['href']
+            addDirF(titF, urlF, 100, imgF, False, totF)
 
         xbmcplugin.setContent(int(sys.argv[1]) ,"episodes")
 
@@ -167,7 +161,7 @@ def pesquisa():
 
                 for filme in filmes:
                         titF = filme.img['alt'].encode('utf-8')
-                        titF = titF.replace('Assistir', '')
+                        titF = titF.replace('Assistir', '').replace('Online', '')
                         imgF = filme.img['data-src']
                         urlF = filme.a['href']
                         pltF = "" #sinopse(urlF)
@@ -182,22 +176,28 @@ def pesquisa():
 
 def doPesquisaSeries():
         a = pesquisa()
-        total = len(a)
-        for url2, titulo, img in a:
-            addDir(titulo, url2, 26, img, False, total)
-
-        xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
-
-def doPesquisaFilmes():
         a = pesquisa()
-        xbmc.log('[plugin.video.ultracine] L248 - ' + str(a), xbmc.LOGNOTICE)
-        if a is None:
-            xbmcgui.Dialog().ok('UltraCine', 'Conteudo temporariamente indisponivel,desculpe o transtorno.')
-            return
+        if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            addDirF(titulo, url2, 100, img, False)
-            
+            xbmc.log('[plugin.video.ultracine] L189 - ' + str(url2), xbmc.LOGINFO)
+            if 'serie' in url2 :
+                addDir(titulo, url2, 26, img, False, total)
+            else :
+                addDir(titulo, url2, 100, img, False, total)
+
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
+        
+quisaFilmes():
+        a = pesquisa()
+        if a is None : return
+        total = len(a)
+        for url2, titulo, img in a:
+            if 'serie' in url2 :
+                addDir(titulo, url2, 26, img, False, total)
+            else :
+                addDir(titulo, url2, 100, img, False, total)
+
         setViewFilmes()
 
 def player(name,url,iconimage):
@@ -372,77 +372,6 @@ def player_series(name,url,iconimage):
                 url2Play = urlVideo
                 OK = False
 
-        elif 'opload2' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                fxID = fxID.split('/')[0]
-                urlVideo = 'https://openload.co/embed/%s' % fxID
-
-        elif 'mango2=' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                urlVideo = 'http://streamango.com/embed/%s' % fxID
-
-        elif 'oload.fun' in urlVideo :
-                fxID = urlVideo.split('/')[4]
-                xbmc.log('[plugin.video.ultracineBiz - player_series - L432] ' + str(fxID), xbmc.LOGNOTICE)
-                urlVideo = 'https://oload.fun/embed/%s' % fxID
-
-        elif 'ok2' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                urlVideo = 'http://ok.ru/videoembed%s' % fxID
-
-        elif 'vidto2' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                urlVideo = 'http://vidto.me/embed-%s-850x550.html' % fxID
-
-        elif 'vidzi' in urlVideo :
-                fxID = urlVideo.split('-')[1]
-                urlVideo = 'http://vidzi.tv/%s.html' % fxID
-
-        elif 'rv.opensv.biz' in urlVideo :
-                fxID = urlVideo.split('e/')[1]
-                fxID = fxID.replace('html','')
-                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
-
-        elif 'tvid=' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                fxID = fxID.split('&')[0]
-                fxID = fxID.replace('html','')
-                urlVideo = 'https://thevid.net/e/%s' % fxID
-
-        elif 'verystream=' in urlVideo:
-                fxID = urlVideo.split('=')[1]
-                urlVideo = 'https://verystream.com/e/%s' % fxID
-
-        elif 'vcdn=' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                urlVideo = 'https://www.fembed.com/v/%s' % fxID
-
-        elif 'rvid2=' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                fxID = fxID.split('&')[0]
-                fxID = fxID.replace('html','')
-                urlVideo = 'https://www.rapidvideo.com/e/%s' % fxID
-
-        elif 'vcstream=' in urlVideo :
-                fxID = urlVideo.split('=')[1]
-                fxID = fxID.split('&')[0]
-                urlVideo = 'https://vcstream.to/embed/%s' % fxID
-
-        elif 'thevid' in urlVideo :
-                fxID = urlVideo.split('e/')[1]
-                urlVideo = 'https://thevid.net/e/%s' % fxID
-                '''
-                linkTV  = openURL(urlVideo)
-                sPattern = "(\s*eval\s*\(\s*function(?:.|\s)+?)<\/script>"
-                aMatches = re.compile(sPattern).findall(linkTV)
-                #xbmc.log('[plugin.video.ultracineBiz - player_series -L438] ' + str(linkTV), xbmc.LOGNOTICE)
-                sUnpacked = jsunpack.unpack(aMatches[1])
-                url2Play = re.findall('var ldAb="(.*?)"', sUnpacked)
-                url = str(url2Play[0])
-                url2Play = 'http:%s' % url if url.startswith("//") else url
-
-                OK = False
-                '''
         xbmc.log('[plugin.video.ultracineBiz - player_series - L498 ] ' + str(urlVideo), xbmc.LOGNOTICE)
 
         if OK :
@@ -563,9 +492,10 @@ def getInfo(url)    :
         xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
+        xbmc.log('[plugin.video.ultracine] L512 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
-        ytID = re.findall('<a href="https://www.youtube.com/embed/(.+?)?autoplay=1" rel="nofollow" class="trailer" target="\_blank" title=".+?"><img src="img/trailer.png" /></a>', link)[0]
-        ytID = ytID.replace('?','')
+        uri = soup('a', {'id':'openTrailer'})[0]['data-iframe']
+        ytID = uri.split('embed/')[-1]
 
         if not ytID :
             addon = xbmcaddon.Addon()
