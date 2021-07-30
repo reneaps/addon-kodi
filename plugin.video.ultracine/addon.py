@@ -12,8 +12,8 @@ import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base
 import urlresolver
 import requests
 
-from resources.lib.BeautifulSoup import BeautifulSoup
-from resources.lib               import jsunpack
+from bs4                import BeautifulSoup
+from resources.lib      import jsunpack
 
 addon_id = 'plugin.video.ultracine'
 selfAddon = xbmcaddon.Addon(id=addon_id)
@@ -22,7 +22,7 @@ addonfolder = selfAddon.getAddonInfo('path')
 artfolder = addonfolder + '/resources/media/'
 fanart = addonfolder + '/fanart.png'
 addon_handle = int(sys.argv[1])
-base = base64.b64decode('aHR0cHM6Ly91bHRyYWNpbmUuYXBwLw==')
+base = 'https://ultracine.app/'
 
 ############################################################################################################
 
@@ -40,14 +40,14 @@ def menuPrincipal():
 def getCategorias(url):
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link)
+        soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup('ul', {'class':'list-icon'})
         categorias = conteudo[0]('li')
 
         totC = len(categorias)
 
         for categoria in categorias:
-                titC = categoria.a.text
+                titC = categoria.a.text.encode('utf-8')
                 urlC = categoria.a["href"]
                 urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
                 urlC = base + urlC if urlC.startswith("categoria") else urlC
@@ -59,11 +59,12 @@ def getCategorias(url):
 def getFilmes(url):
         xbmc.log('[plugin.video.ultracine] L56 ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
+        soup = BeautifulSoup(link, 'html.parser')
         filmes = soup('div', attrs={'class':'grid-item'})
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.img['alt']
+                titF = filme.img['alt'].encode('utf-8')
                 titF = titF.replace('Assistir', '').replace('Online', '')
                 imgF = filme.img['data-src']
                 urlF = filme.a['href']
@@ -79,12 +80,12 @@ def getFilmes(url):
 def getSeries(url):
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link)
+        soup = BeautifulSoup(link, 'html.parser')
         filmes = soup('div', attrs={'class':'grid-item'})
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.img['alt']
+                titF = filme.img['alt'].encode('utf-8')
                 titF = titF.replace('Assistir', '').replace('Online', '')
                 imgF = filme.img['data-src']
                 urlF = filme.a['href']
@@ -123,7 +124,7 @@ def getEpisodios(name, url):
         episodios = []
 
         link  = openURL(url)
-        soup = BeautifulSoup(link)
+        soup = BeautifulSoup(link, 'html.parser')
         imgF = soup('div', {'class':'product-image-page'})[0].img['data-src']
         sea = soup('div', {'class':'ac-item'})
         epi = soup('div', {'class':'lista-episodios'})
@@ -155,7 +156,7 @@ def pesquisa():
                 hosts = []
 
                 link = openURL(url)
-                soup     = BeautifulSoup(link)
+                soup     = BeautifulSoup(link, 'html.parser')
                 filmes = soup('div', attrs={'class':'grid-item'})
                 totF = len(filmes)
 
@@ -188,7 +189,7 @@ def doPesquisaSeries():
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         
-quisaFilmes():
+def doPesquisaFilmes():
         a = pesquisa()
         if a is None : return
         total = len(a)
@@ -212,7 +213,7 @@ def player(name,url,iconimage):
         matriz = []
 
         link = openURL(url)
-        soup  = BeautifulSoup(link)
+        soup  = BeautifulSoup(link, 'html.parser')
         try:
             urlF = re.findall('<div id="Link" Class="Link"> <a href="(.*?)" target="_blanck">', link)[0]
         except:
@@ -223,7 +224,7 @@ def player(name,url,iconimage):
             pass
         print(urlF)
         link = openURL(urlF)
-        soup  = BeautifulSoup(link)
+        soup  = BeautifulSoup(link, 'html.parser')
         urlF = soup.iframe['src']
         print(urlF)
         if '//public' in urlF : urlF = urlF.replace('//public','/public')
@@ -336,7 +337,7 @@ def player_series(name,url,iconimage):
         hostid = []
         
         link = openURL(url)
-        soup  = BeautifulSoup(link)
+        soup  = BeautifulSoup(link, 'html.parser')
         try:
             urlF = re.findall('<div id="Link" Class="Link"> <a href="(.*?)" target="_blanck">', link)[0]
         except:
@@ -347,7 +348,7 @@ def player_series(name,url,iconimage):
             pass
         print(urlF)
         link = openURL(urlF)
-        soup  = BeautifulSoup(link)
+        soup  = BeautifulSoup(link, 'html.parser')
         urlF = soup.iframe['src']
         print(urlF)
         if '//public' in urlF : urlF = urlF.replace('//public','/public')
@@ -543,7 +544,7 @@ def limpa(texto):
 def sinopse(urlF):
         link = openURL(urlF)
         #link = unicode(link, 'utf-8', 'ignore')
-        soup = BeautifulSoup(link)
+        soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup("div", {"class": "perfil_sinopse"})
         #print conteudo
         plot = conteudo[0].span.text
