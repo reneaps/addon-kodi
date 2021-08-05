@@ -1,7 +1,7 @@
 #####################################################################
 # -*- coding: utf-8 -*-
 #####################################################################
-# Addon : QueroFilmesHD
+# Addon : FilmestorrentBrasil
 # By AddonBrasil - 08/08/2020
 # Atualizado (1.0.0) - 01/08/2021
 #####################################################################
@@ -127,16 +127,26 @@ def getEpisodios(name, url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L127 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
-        conteudo = soup('div', attrs={'class':'content'})
-        links = re.findall('<p style="text-align: center;"><strong>(.*?)<a target="_blank" rel="nofollow" href="(.*?)"\s*>(.*?)</a>', link)
+        links = soup('p')
         totF = len(links)
+        imgF = ''
 
-        for titF, urlF, imgF in links:
-                fxID = urlF.split('?id=')[-1]
+        for link in links:
+            if 'tulo Traduzido:' in str(link):
+                titF = link.strong.text
+            elif 'tulo Original:' in str(link):
+                titF = link.strong.text            
+            elif 'emporada' in str(link):
+                titF = link.strong.text
+            elif 'Epis' in str(link):
+                titF = link.strong.text
+            if 'campanha' in str(link):
+                if titF is '' : titF = 'Epis'
+                u = link.a['href']
+                fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
-                titF = titF + imgF
-                imgF = ''
                 addDirF(titF, urlF, 110, imgF)
+
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
 
@@ -147,7 +157,6 @@ def pesquisa():
         if (keyb.isConfirmed()):
                 texto    = keyb.getText()
                 pesquisa = urllib.parse.quote(texto)
-                base     = 'https://querofilmehd.org/'
                 url      = base + '?s=%s' % str(pesquisa)
 
                 xbmc.log('[plugin.video.filmestorrentbrasil] L198 - ' + str(url), xbmc.LOGINFO)
@@ -155,32 +164,19 @@ def pesquisa():
                 temp = []
                 link = openURL(url)
                 soup = BeautifulSoup(link, 'html.parser')
-                filmes = soup.findAll('div', {'class':'image'})
+                conteudo = soup('div', attrs={'class':'listPost'})
+                filmes = conteudo[0]('div', {'class':'post green'})
+
                 totF = len(filmes)
+
                 for filme in filmes:
-                        titF = filme.img["alt"]
-                        urlF = filme.a["href"]
-                        urlF = base + urlF if urlF.startswith("/filmes") else urlF
-                        urlF = base + urlF if urlF.startswith("filmes") else urlF
-                        urlF = base + urlF if urlF.startswith("/series") else urlF
-                        urlF = base + urlF if urlF.startswith("series") else urlF
-                        urlF = base + "filmes/" + urlF if urlF.startswith("assistir") else urlF
-                        imgF = filme.img["src"]
-                        if 'url=' in imgF : imgF = imgF.split('=')[3]
-                        imgF = imgF.replace('w92', 'w400')
-                        imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                        imgF = base + imgF if imgF.startswith("/wp-content") else imgF
-                        imgF = base + imgF if imgF.startswith("wp-content") else imgF
+                        titF = filme.a['title']
+                        imgF = filme.img['src']
+                        urlF = filme.a['href']
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
                 return hosts
-                '''a = []
-                for url, titulo, img in hosts:
-                    temp = [url, titulo, img]
-                    a.append(temp);
-                    xbmc.log('[plugin.video.filmestorrentbrasil] L228 - ' + str(a), xbmc.LOGINFO)
-                return a'''
 
 def doPesquisaSeries():
         a = pesquisa()
@@ -188,7 +184,7 @@ def doPesquisaSeries():
         total = len(a)
         for url2, titulo, img in a:
             xbmc.log('[plugin.video.filmestorrentbrasil] L237 - ' + str(url2), xbmc.LOGINFO)
-            addDir(titulo, url2, 26, img, False, total)
+            addDir(titulo, url2, 27, img, False, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
@@ -203,7 +199,7 @@ def player(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L249 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
-        mensagemprogresso.create('QueroFilmesHD', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
+        mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
         mensagemprogresso.update(0)
 
         sub = None
@@ -300,7 +296,7 @@ def player_series(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L421 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
-        mensagemprogresso.create('QueroFilmesHD', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
+        mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
         mensagemprogresso.update(0)
 
         sub = None

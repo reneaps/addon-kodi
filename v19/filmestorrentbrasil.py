@@ -34,36 +34,40 @@ for filme in filmes:
 
 '''Lista Filmes'''
 
-
+'''
 # Player_Filmes
-url = 'https://filmestorrentbrasil.com.br/um-amor-apos-a-vida-2021-torrent-web-dl-1080p-dual-audio/'
-#url = 'https://filmestorrentbrasil.com.br/tempo-2021-torrent-camrip-720p-legendado/'
+#url = 'https://filmestorrentbrasil.com.br/um-amor-apos-a-vida-2021-torrent-web-dl-1080p-dual-audio/'
+url = 'https://filmestorrentbrasil.com.br/tempo-2021-torrent-camrip-720p-legendado/'
 link = openURL(url)
 soup = BeautifulSoup(link, "html.parser")
 conteudo = soup('div', attrs={'class':'right'})
 links = conteudo[0]('p')
 for link in links:
     if 'campanha' in str(link) :
-        urlF = link.a['href']
+        u = link.a['href']
         #print(urlF)
-        idS = urlF.split('id=')[-1]
-        urlF = base64.b64decode(idS).decode('utf-8')
+        fxID = u.split('id=')[-1]
+        urlF = base64.b64decode(fxID).decode('utf-8')
         print(urlF)
+    if 'tulo Traduzido:' in str(link):
+        titF = link.strong.text
+        print(titF)
+        
 '''
 #Lista Episodios
 url = 'https://filmestorrentbrasil.com.br/o-mandaloriano-star-wars-2a-temporada-torrent-2020-dual-audio-dublado-legendado-web-dl-720p-1080p-2160p-4k/'
-link = openURL(url)
-soup = BeautifulSoup(link, "html.parser")
-conteudo = soup('div', attrs={'class':'content'})
-links = links = conteudo[0]('p')
-
-for in links:
+html = openURL(url)
+soup = BeautifulSoup(html, "html.parser")
+#conteudo = soup('div', attrs={'class':'content'})
+links = soup('p')
+'''
+for link in links:
     fxID = urlF.split('?id=')[-1]
     urlF = base64.b64decode(fxID).decode('utf-8')
     print(titF)
     print(imgF)
     print(urlF)
-
+'''
 for link in links:
     if 'campanha' in str(link):
         #print(link.a['href'])
@@ -72,4 +76,4 @@ for link in links:
         fxID = u.split('?id=')[-1]
         urlF = base64.b64decode(fxID).decode('utf-8')
         print(titF,'\n', urlF)
-'''
+
