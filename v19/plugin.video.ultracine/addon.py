@@ -8,6 +8,7 @@
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import json
+import proxy
 import urlresolver
 import requests
 
@@ -55,7 +56,7 @@ def getCategorias(url):
         setViewMenu()
 
 def getFilmes(name,url,iconimage):
-        xbmc.log('[plugin.video.ultracine] L65 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L58 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         filmes = soup('div', attrs={'class':'grid-item'})
@@ -76,7 +77,7 @@ def getFilmes(name,url,iconimage):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.ultracine] L100- ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L79 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         filmes = soup('div', attrs={'class':'grid-item'})
@@ -97,7 +98,7 @@ def getSeries(url):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
 def getTemporadas(name,url,iconimage):
-        xbmc.log('[plugin.video.ultracine] L136 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L100 - ' + str(url), xbmc.LOGINFO)
         html = openURL(url)
         soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', attrs={'class':'ac-item'})
@@ -109,13 +110,13 @@ def getTemporadas(name,url,iconimage):
         for i in range(totF):
             i = i + 1
             titF = str(i) + "ª Temporada"
-            xbmc.log('[plugin.video.ultracine] L138 ' + str(imgF), xbmc.LOGINFO)
+            xbmc.log('[plugin.video.ultracine] L112 - ' + str(imgF), xbmc.LOGINFO)
             addDir(titF, urlF, 27, imgF, False, totF)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url,iconimage):
-        xbmc.log('[plugin.video.ultracine] L156 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L118 - ' + str(url), xbmc.LOGINFO)
         n = name.replace('ª Temporada', '')
         n = int(n)
         temp = []
@@ -134,12 +135,12 @@ def getEpisodios(name, url,iconimage):
         ul = epi[i]('ul')
         filmes = ul[0]('li')
         totF = len(filmes)
-        xbmc.log('[plugin.video.ultracineBiz] L128 - ' + str(totF), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L137 - ' + str(totF), xbmc.LOGINFO)
 
         for filme in filmes:
             titF = filme.a.span.text.encode('utf-8')
             urlF = filme.a['href']
-            addDirF(titF, urlF, 100, imgF, False, totF)
+            addDirF(titF, urlF, 110, imgF, False, totF)
 
         xbmcplugin.setContent(int(sys.argv[1]) ,"episodes")
 
@@ -152,7 +153,7 @@ def pesquisa():
                 pesquisa = urllib.parse.quote(texto)
                 url      = base + 'busca?q=%s' % str(pesquisa)
 
-                xbmc.log('[plugin.video.ultracine] L198 - ' + str(url), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.ultracine] L155 - ' + str(url), xbmc.LOGINFO)
                 hosts = []
                 temp = []
                 link = openURL(url)
@@ -180,11 +181,11 @@ def doPesquisaSeries():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            xbmc.log('[plugin.video.ultracine] L189 - ' + str(url2), xbmc.LOGINFO)
+            xbmc.log('[plugin.video.ultracine] L183 - ' + str(url2), xbmc.LOGINFO)
             if 'serie' in url2 :
                 addDir(titulo, url2, 26, img, False, total)
             else :
-                addDir(titulo, url2, 100, img, False, total)
+                addDir(titulo, url2, 110, img, False, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
@@ -199,7 +200,7 @@ def doPesquisaFilmes():
                 addDir(titulo, url2, 100, img, False, total)
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.ultracine] L249 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L202 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('ultracine', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -242,7 +243,9 @@ def player(name,url,iconimage):
         xbmc.log('[plugin.video.ultracine] L297 ' + str(urlVideo), xbmc.LOGINFO)
 
         if 'bolsonaro' in urlVideo :
-                url2Play = urlVideo
+                #url2Play = urlVideo
+                segment_url = urlVideo
+                url2Play = 'http://127.0.0.1:8964?u=' + urllib.parse.quote(segment_url)
                 OK = False
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name +' Por favor aguarde...')
@@ -256,7 +259,7 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        xbmc.log('[plugin.video.ultracine] L364 - ' + str(url2Play), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L259 - ' + str(url2Play), xbmc.LOGINFO)
 
         if not url2Play : return
 
@@ -270,16 +273,14 @@ def player(name,url,iconimage):
         playlist = xbmc.PlayList(1)
         playlist.clear()
 
-        if "m3u8" in url2Play:
+        if "2m3u8" in url2Play:
                 #ip = addon.getSetting("inputstream")
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
                 listitem.setMimeType('application/x-mpegURL')
                 listitem.setProperty('inputstream','inputstream.hls')
-                #listitem.setProperty('inputstream','inputstream.adaptive')
-                #listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
-                #listitem.setMimeType('application/dash+xml')
+                listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
                 listitem.setContentLookup(False)
                 playlist.add(url2Play,listitem)
         else:
@@ -315,7 +316,7 @@ def player(name,url,iconimage):
         return OK
 
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.ultracine] L421 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L316 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('ultracine', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -340,7 +341,7 @@ def player_series(name,url,iconimage):
             pass
         print(urlF)
         link = openURL(urlF)
-        soup  = BeautifulSoup(link)
+        soup  = BeautifulSoup(link, "html.parser")
         urlF = soup.iframe['src']
         print(urlF)
         if '//public' in urlF : urlF = urlF.replace('//public','/public')
@@ -357,15 +358,16 @@ def player_series(name,url,iconimage):
         idsT = re.findall('RESOLUTION=.*?\n/(.*?)\n', r.text)
         urlVideo = host + '/' + idsT[0]
 
-        xbmc.log('[plugin.video.ultracineBiz - player_series - L423 ] ' + str(urlVideo), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine - player_series - L358 ] ' + str(urlVideo), xbmc.LOGINFO)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'bolsonaro' in urlVideo :
-                url2Play = urlVideo
+                segment_url = urlVideo
+                url2Play = 'http://127.0.0.1:8964?u=' + urllib.parse.quote(segment_url)
                 OK = False
 
-        xbmc.log('[plugin.video.ultracine] L375 - ' + str(urlVideo), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L366 - ' + str(urlVideo), xbmc.LOGINFO)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
@@ -390,7 +392,7 @@ def player_series(name,url,iconimage):
 
         playlist = xbmc.PlayList(1)
         playlist.clear()
-
+        '''
         if "m3u8" in url2Play:
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
@@ -405,6 +407,22 @@ def player_series(name,url,iconimage):
                 listitem.setProperty('IsPlayable', 'true')
                 listitem.setMimeType('video/mp4')
                 playlist.add(url2Play,listitem)
+        '''
+        play_item = xbmcgui.ListItem(label=name, path=url2Play)
+        
+        # Setup Inputstream Adaptive
+        if kodi_version_major() >= 19:
+            play_item.setProperty('inputstream', 'inputstream.hls')
+        else:
+            play_item.setProperty('inputstreamaddon', 'inputstream.hls')
+            
+        play_item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+        play_item.setMimeType('application/x-mpegURL')
+        play_item.setContentLookup(False)
+        license_key = None
+        play_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
+        play_item.setProperty('inputstream.adaptive.license_key', license_key)
+        playlist.add(url2Play,play_item)
 
         xbmcPlayer = xbmc.Player()
 
@@ -470,7 +488,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
         #dialog = xbmcgui.Dialog()
         #dialog.ok("addDir Erro:", str(u))
 
-        #xbmc.log('[plugin.video.ultracine] L473 -  ' + str(u), xbmc.LOGINFO)
+        #xbmc.log('[plugin.video.ultracine] L489 -  ' + str(u), xbmc.LOGINFO)
 
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 
@@ -492,7 +510,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
         cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.parse.quote(name), url, urllib.parse.quote(iconimage))))
 
-        xbmc.log('[plugin.video.ultracine] L495 -  ' + str(cmItems), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L511 -  ' + str(cmItems), xbmc.LOGINFO)
         liz.addContextMenuItems(cmItems)
 
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
@@ -506,7 +524,7 @@ def getInfo(url):
         xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
-        xbmc.log('[plugin.video.ultracine] L512 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L525 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
         uri = soup('a', {'id':'openTrailer'})[0]['data-iframe']
         ytID = uri.split('embed/')[-1]
@@ -561,6 +579,15 @@ def sinopse(urlF):
             pass
         return plot
 
+def kodi_version():
+    """Returns full Kodi version as string"""
+    return xbmc.getInfoLabel('System.BuildVersion').split(' ')[0]
+
+
+def kodi_version_major():
+    """Returns major Kodi version as integer"""
+    return int(kodi_version().split('.')[0])
+    
 ############################################################################################################
 
 def get_params():
