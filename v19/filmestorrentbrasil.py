@@ -55,7 +55,7 @@ for link in links:
         
 '''
 #Lista Episodios
-url = 'https://filmestorrentbrasil.com.br/o-mandaloriano-star-wars-2a-temporada-torrent-2020-dual-audio-dublado-legendado-web-dl-720p-1080p-2160p-4k/'
+url = 'https://filmestorrentbrasil.com.br/krypton-2a-temporada-2019-torrent-web-dl-720p-1080p-dual-audio/'
 html = openURL(url)
 soup = BeautifulSoup(html, "html.parser")
 #conteudo = soup('div', attrs={'class':'content'})
@@ -69,11 +69,20 @@ for link in links:
     print(urlF)
 '''
 for link in links:
-    if 'campanha' in str(link):
-        #print(link.a['href'])
-        titF = link.strong.text
-        u = link.a['href']
-        fxID = u.split('?id=')[-1]
-        urlF = base64.b64decode(fxID).decode('utf-8')
-        print(titF,'\n', urlF)
+        if 'tulo Traduzido:' in str(link):
+            titF = link.strong.text
+        elif 'tulo Original:' in str(link):
+            titF = link.strong.text            
+        elif 'emporada' in str(link):
+            if 'strong' in str(link):
+                titF = link.strong.text
+            if 'img' in str(link):
+                titF = link.img['alt']
+        elif 'Epis' in str(link):
+            titF = link.strong.text
+        if 'campanha' in str(link):
+            u = link.a['href']
+            fxID = u.split('?id=')[-1]
+            urlF = base64.b64decode(fxID).decode('utf-8')
+            print(titF,'\n', urlF)
 
