@@ -22,7 +22,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         res = requests.get(url)
         ret = res.content[8:]
         self.send_header('Content-Length', len(ret))
-        self.send_header('Content-Type', 'video/MP2T')
+        self.send_header('Content-Type', 'application/vnd.apple.mpegurl')
         self.end_headers()
         self.wfile.write(ret)
 
