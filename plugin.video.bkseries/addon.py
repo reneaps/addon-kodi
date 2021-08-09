@@ -26,7 +26,7 @@ addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/resources/fanart.png'
 #base        = base64.b64decode('aHR0cHM6Ly9vdmVyZmxpeC5uZXQv')
-base        = 'https://www.bkseries.com/'
+base        = 'https://www.bkseries.online/'
 sbase       = 'navegar/series-2/?alphabet=all&sortby=v_started&sortdirection=desc'
 v_views     = 'navegar/filmes-1/?alphabet=all&sortby=v_views&sortdirection=desc'
 
@@ -38,7 +38,7 @@ def menuPrincipal():
         #addDir('Lançamentos'                , base + 'lancamento/'                  ,        20, artfolder + 'lancamentos.png')
         #addDir('Filmes Dublados'            , base + '?s=dublado'                   ,        20, artfolder + 'pesquisa.png')
         #addDir('Filmes Mais Assistidos'     , base + v_views                         ,        20, artfolder + 'pesquisa.png')
-        addDir('Series'                     , base                                  ,        25, artfolder + 'legendados.png')
+        addDir('Series'                     , base + 'series/'                      ,        25, artfolder + 'legendados.png')
         addDir('Pesquisa Series'            , '--'                                  ,        30, artfolder + 'pesquisa.png')
         #addDir('Pesquisa Filmes'           , '--'                                  ,        35, artfolder + 'pesquisa.png')
         addDir('Configurações'              , base                                  ,       999, artfolder + 'config.png', 1, False)
@@ -72,22 +72,20 @@ def getFilmes(url):
         link = openURL(url)
         link = unicode(link, 'utf-8', 'replace')
         soup = BeautifulSoup(link, 'html5lib')
-        conteudo = soup('div', attrs={'class':'galeria'})
-        filmes = conteudo[0]('div', attrs={'class':'box-filme'})
+        filmes = soup('article', attrs={'class':'item tvshows'})
         totF = len(filmes)
 
         for filme in filmes:
                 titF = filme.a['title'].encode("utf-8")
                 titF = titF.replace('Assistir','X').replace('Online','')
                 urlF = filme.a['href'].encode("utf-8")
-                imgF = filme.img['src'].encode("utf-8")
+                imgF = filme.img['data-src'].encode("utf-8")
                 #xbmc.log('[plugin.video.bkseries] L84 - ' + str(filme), xbmc.LOGNOTICE)
                 addDirF(titF, urlF, 100, imgF, False, totF)
 
         try :
-                next_page = soup('div', attrs={'class':'wp-pagenavi'})[0]
-                proxima = next_page('a', attrs={'class':'next page-numbers'})[0]
-                proxima = proxima['href']
+                pg = re.findall(r'<link rel="next" href="(.*?)" />', str(link))
+                proxima = pg[0]
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
                 pass
@@ -98,20 +96,18 @@ def getSeries(url):
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')        
         soup = BeautifulSoup(link, "html5lib")
-        conteudo = soup('ul', attrs={'class':'lista-filmes'})
-        filmes = conteudo[0]('li')
+        filmes = soup('article', attrs={'class':'item tvshows'})
         
         for filme in filmes:
-                filme = filme('div', attrs={'class':'capa'})
-                titF = filme[0].a.text.encode("utf-8")
+                filme = filme('div', attrs={'class':'poster'})
+                titF = filme[0].a['aria-label']
                 urlF = filme[0].a['href'].encode("utf-8")
-                imgF = filme[0].img['src'].encode("utf-8")
+                imgF = filme[0].img['data-src'].encode("utf-8")
                 addDirF(titF, urlF, 26, imgF)
 
         try :
-                next_page = soup('div', attrs={'class':'navigation open-sans'})
-                pg = next_page[0]('a', attrs={'class':'next page-numbers'})[0]
-                proxima = pg['href']
+                pg = re.findall(r'<link rel="next" href="(.*?)" />', str(link))
+                proxima = pg[0]
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
