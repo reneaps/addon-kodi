@@ -128,7 +128,7 @@ def categoria_favorito():
     
 def trailer(name,url,iconimage):  
     html = abrir_url(url)
-    link = re.compile(r'<a id="trailer" class="video" rel=\'nofollow\' href=\'https://www.youtube.com/embed/(.+?)\'>trailer</a>').findall(html)
+    link = re.compile(r'<div class="p"><strong><a href=" https://www.youtube.com/embed/(.*?)" data-lity>ASSISTIR O TRAILER</a></strong></div').findall(html)
     print link
     xbmc.log('[plugin.video.filmesonlinex] L130 - ' + str(link), xbmc.LOGNOTICE)
     link = link[0]
@@ -187,11 +187,11 @@ def player(name,url,iconimage):
 
         for i in srvsdub :
                 xbmc.log('[plugin.video.filmesonlinex] L186 - ' + str(i['href']), xbmc.LOGNOTICE)
-                idS = i["href"]
-                idS = idS.replace(' ','')
-                titS = idS
+                urlF = i["href"]
+                urlF = urlF.replace(' ','')
+                titS = i.text + ' - ' + urlparse(urlF).netloc.split('.')[0]
                 titsT.append(titS)
-                idsT.append(idS)
+                idsT.append(urlF)
 
         if not titsT : return
 
