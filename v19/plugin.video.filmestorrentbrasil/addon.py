@@ -137,11 +137,14 @@ def getEpisodios(name, url,iconimage):
             elif 'tulo Original:' in str(link):
                 titF = link.strong.text            
             elif 'emporada' in str(link):
-                titF = link.strong.text
+                if 'strong' in str(link):
+                    titF = link.strong.text
+                if 'img' in str(link):
+                    titF = link.img['alt']
             elif 'Epis' in str(link):
                 titF = link.strong.text
             if 'campanha' in str(link):
-                if titF is '' : titF = 'Epis'
+                #if titF: titF = 'Epis'
                 u = link.a['href']
                 fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
@@ -187,7 +190,7 @@ def doPesquisaSeries():
             addDir(titulo, url2, 27, img, False, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
-
+        
 def doPesquisaFilmes():
         a = pesquisa()
         if a is None : return
@@ -221,10 +224,9 @@ def player(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                url = urlVideo
-                url = 'plugin://plugin.video.elementum/play?uri=' + url
-                xbmc.executebuiltin('XBMC.RunPlugin('+url+')')
-                url2Play = url
+                urlF = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
+                #xbmc.executebuiltin('XBMC.RunPlugin('+url+')')
+                url2Play = urlF
                 OK = False
 
         if OK :
@@ -291,7 +293,8 @@ def player(name,url,iconimage):
             else:
                 xbmcPlayer.setSubtitles(legendas)
 
-
+        return ''
+        
 def player_series(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L421 - ' + str(url), xbmc.LOGINFO)
         OK = True
@@ -306,10 +309,8 @@ def player_series(name,url,iconimage):
         #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                url = urlVideo
-                url = 'plugin://plugin.video.elementum/play?uri=' + url
-                xbmc.executebuiltin('XBMC.RunPlugin('+url+')')
-                url2Play = url
+                urlF = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
+                url2Play = urlF
                 OK = False
 
         if OK : url2Play = urlresolver.resolve(urlVideo)
@@ -321,7 +322,7 @@ def player_series(name,url,iconimage):
         else:
             legendas = sub
 
-        mensagemprogresso.update(75, 'Abrindo Sinal para ' + name+ ' Por favor aguarde...')
+        mensagemprogresso.update(75, 'Abrindo Sinal para ' + name + ' Por favor aguarde...')
 
         playlist = xbmc.PlayList(1)
         playlist.clear()
@@ -364,8 +365,9 @@ def player_series(name,url,iconimage):
                     xbmcPlayer.setSubtitles(sfile)
             else:
                 xbmcPlayer.setSubtitles(legendas)
-
-        #return OK
+        OK = True
+        
+        return ''
 
 ############################################################################################################
 

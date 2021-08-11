@@ -490,23 +490,28 @@ def getInfo(url)    :
         titO = re.findall(r'<meta property="og:title" content="(.*?)" />', link)[0]
         titO = titO.replace('Assistir','').replace('Dublado','').replace('Legendado','').replace('Online','')
         titO = titO.replace('- Todas as Temporadas','')
+        titO = titO.split(':')[0]
+        xbmc.log('[plugin.video.ultracine] L494 - ' + str(titO), xbmc.LOGINFO)
 
         xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
-        xbmc.log('[plugin.video.ultracine] L512 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.ultracine] L499 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
-        uri = soup('a', {'id':'openTrailer'})[0]['data-iframe']
-        ytID = uri.split('embed/')[-1]
+        ytID = None
+        try:
+            ytID = re.findall('<a id="openTrailer" data-iframe="https://www.youtube.com/embed/(.*?)" href="#trailer"',link)[0]
+        except:
+            if not ytID :
+                addon = xbmcaddon.Addon()
+                addonname = addon.getAddonInfo('name')
+                line1 = str("Trailer não disponível!")
+                xbmcgui.Dialog().ok(addonname, line1)
+                return
 
-        if not ytID :
-            addon = xbmcaddon.Addon()
-            addonname = addon.getAddonInfo('name')
-            line1 = str("Trailer não disponível!")
-            xbmcgui.Dialog().ok(addonname, line1)
-            return
-
-        xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s)' % ytID)
+        #xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=youtubevideo, id=%s)' % ytID)
+        xbmcPlayer = xbmc.Player()
+        xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id='+ytID)
 
 def setViewMenu() :
         xbmcplugin.setContent(int(sys.argv[1]), 'movies')

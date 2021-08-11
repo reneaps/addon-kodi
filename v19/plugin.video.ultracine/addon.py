@@ -243,9 +243,9 @@ def player(name,url,iconimage):
         xbmc.log('[plugin.video.ultracine] L297 ' + str(urlVideo), xbmc.LOGINFO)
 
         if 'bolsonaro' in urlVideo :
-                #url2Play = urlVideo
-                segment_url = urlVideo
-                url2Play = 'http://127.0.0.1:8964?u=' + urllib.parse.quote(segment_url)
+                url2Play = urlVideo
+                #segment_url = urlVideo
+                #url2Play = 'http://127.0.0.1:8964?u=' + urllib.parse.quote(segment_url)
                 OK = False
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name +' Por favor aguarde...')
@@ -363,8 +363,9 @@ def player_series(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'bolsonaro' in urlVideo :
-                segment_url = urlVideo
-                url2Play = 'http://127.0.0.1:8964?u=' + urllib.parse.quote(segment_url)
+                url2Play = urlVideo
+                #segment_url = urlVideo
+                #url2Play = 'http://127.0.0.1:8964?u=' + urllib.parse.quote(segment_url)
                 OK = False
 
         xbmc.log('[plugin.video.ultracine] L366 - ' + str(urlVideo), xbmc.LOGINFO)
@@ -510,8 +511,8 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
         cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.parse.quote(name), url, urllib.parse.quote(iconimage))))
 
-        xbmc.log('[plugin.video.ultracine] L511 -  ' + str(cmItems), xbmc.LOGINFO)
-        liz.addContextMenuItems(cmItems)
+        #xbmc.log('[plugin.video.ultracine] L511 -  ' + str(cmItems), xbmc.LOGINFO)
+        liz.addContextMenuItems(cmItems, replaceItems=True)
 
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 
@@ -526,13 +527,18 @@ def getInfo(url):
 def playTrailer(name, url,iconimage):
         xbmc.log('[plugin.video.ultracine] L525 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
-        uri = soup('a', {'id':'openTrailer'})[0]['data-iframe']
-        ytID = uri.split('embed/')[-1]
-
-        dialog = xbmcgui.Dialog()
-        dialog.ok("addDir Erro:", str(ytID))
-
-        xbmc.executebuiltin('XBMC.RunPlugin("plugin://plugin.video.youtube/play/?video_id=%s")' % ytID)
+        ytID = None
+        try:
+            ytID = re.findall('<a id="openTrailer" data-iframe="https://www.youtube.com/embed/(.*?)" href="#trailer"',link)[0]
+        except:
+            if not ytID :
+                addon = xbmcaddon.Addon()
+                addonname = addon.getAddonInfo('name')
+                line1 = str("Trailer não disponível!")
+                xbmcgui.Dialog().ok(addonname, line1)
+                return
+        xbmcPlayer = xbmc.Player()
+        xbmcPlayer.play('plugin://plugin.video.youtube/play/?video_id='+ytID)
 
 def setViewMenu() :
         xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
