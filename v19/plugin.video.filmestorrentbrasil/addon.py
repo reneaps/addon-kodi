@@ -130,7 +130,11 @@ def getEpisodios(name, url,iconimage):
         links = soup('p')
         totF = len(links)
         imgF = ''
-
+        try:
+            imgF = links[1].img['src']
+        except:
+            pass
+        
         for link in links:
             if 'tulo Traduzido:' in str(link):
                 titF = link.strong.text
@@ -256,6 +260,7 @@ def player(name,url,iconimage):
                 #ip = addon.getSetting("inputstream")
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setArt({"Poster": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
                 listitem.setMimeType('application/x-mpegURL')
                 listitem.setProperty('inputstream','inputstream.hls')
@@ -266,6 +271,7 @@ def player(name,url,iconimage):
         else:
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setArt({"Poster": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
                 listitem.setMimeType('video/mp4')
                 playlist.add(url2Play,listitem)
@@ -331,6 +337,7 @@ def player_series(name,url,iconimage):
                 #ip = addon.getSetting("inputstream")
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setArt({"Poster": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
                 listitem.setMimeType('application/x-mpegURL')
                 listitem.setProperty('inputstream','inputstream.hls')
@@ -339,6 +346,7 @@ def player_series(name,url,iconimage):
         else:
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setArt({"Poster": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
                 listitem.setMimeType('video/mp4')
                 playlist.add(url2Play,listitem)
@@ -406,7 +414,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
         liz = xbmcgui.ListItem(name)
         liz.setProperty('fanart_image', fanart)
         liz.setInfo(type = "Video", infoLabels = {"title": name})
-        liz.setArt({ 'icon': iconimage, 'thumb': iconimage })
+        liz.setArt({'icon': iconimage, 'thumb': iconimage })
 
         #dialog = xbmcgui.Dialog()
         #dialog.ok("addDir Erro:", str(u))
@@ -424,7 +432,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         liz = xbmcgui.ListItem(name)
         liz.setProperty('fanart_image', fanart)
         liz.setInfo(type = "Video", infoLabels = {"title": name})
-        liz.setArt({ 'icon': iconimage, 'thumb': iconimage })
+        liz.setArt({ 'fanart': iconimage, 'icon': iconimage, 'thumb': iconimage })
 
         cmItems = []
 
