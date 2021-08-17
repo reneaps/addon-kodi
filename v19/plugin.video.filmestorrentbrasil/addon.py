@@ -154,7 +154,6 @@ def getEpisodios(name, url,iconimage):
                 urlF = base64.b64decode(fxID).decode('utf-8')
                 addDirF(titF, urlF, 110, imgF)
 
-
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
 
 def pesquisa():
@@ -228,9 +227,7 @@ def player(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                urlF = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
-                #xbmc.executebuiltin('XBMC.RunPlugin('+url+')')
-                url2Play = urlF
+                url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
 
         if OK :
@@ -315,8 +312,7 @@ def player_series(name,url,iconimage):
         #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                urlF = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
-                url2Play = urlF
+                url2Player = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
 
         if OK : url2Play = urlresolver.resolve(urlVideo)
@@ -373,8 +369,7 @@ def player_series(name,url,iconimage):
                     xbmcPlayer.setSubtitles(sfile)
             else:
                 xbmcPlayer.setSubtitles(legendas)
-        OK = True
-        
+
         return ''
 
 ############################################################################################################
