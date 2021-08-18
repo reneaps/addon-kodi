@@ -11,6 +11,7 @@
 # Atualizado (1.0.6) - 25/06/2021
 # Atualizado (1.1.1) - 06/07/2021
 # Atualizado (1.1.2) - 07/07/2021
+# Atualizado (1.1.3) - 18/08/2021
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -21,7 +22,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.1.0'
+version   = '1.1.3'
 addon_id  = 'plugin.video.querofilmeshd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
