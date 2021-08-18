@@ -16,7 +16,6 @@ import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base
 import json
 import urlresolver
 import requests
-import resources.lib.moonwalk as moonwalk
 
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
