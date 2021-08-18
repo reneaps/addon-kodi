@@ -10,7 +10,7 @@
 # Atualizado (1.0.5) - 23/06/2021
 # Atualizado (1.0.6) - 25/06/2021
 # Atualizado (1.1.1) - 06/07/2021
-# Atualizado (1.1.2) - 10/07/2021
+# Atualizado (1.1.2) - 07/07/2021
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -297,7 +297,6 @@ def player(name,url,iconimage):
                     pass
                 xbmc.log('[plugin.video.querofilmeshd] L297 - ' + str(urlF), xbmc.LOGINFO)
                 if urlF != "" : html = openURL(urlF)
-                #xbmc.log('[plugin.video.querofilmeshd] L299 - ' + str(html), xbmc.LOGINFO)
                 try:
                     urlF = re.findall(r"<iframe class='metaframe rptss' src='(.*?)' frameborder='0' scrolling='no' allow='autoplay; encrypted-media' allowfullscreen></iframe>", link)[0]
                     html = requests.get(urlF).text
@@ -318,12 +317,14 @@ def player(name,url,iconimage):
                 elif 'uauflix' in urlF : urlF = 'https://player.uauflix.online//CallPlayer'
                 data = urllib.parse.urlencode({'id': idS})
                 html = requests.post(url=urlF, data=data, headers=headers).text
-                xbmc.log('[plugin.video.querofilmeshd] L317 - ' + str(html), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.querofilmeshd] L320 - ' + str(html), xbmc.LOGINFO)
                 _html = str(html)
                 _html = bytes.fromhex(_html).decode('utf-8')
                 b = json.loads(_html)
-                xbmc.log('[plugin.video.querofilmeshd] L321 - ' + str(b), xbmc.LOGINFO)
                 urlF = b['url']
+                if 'bit' in str(urlF) :
+                    r = requests.get(url=urlF, verify=False)
+                    urlF = str(r.url)
                 if '//public' in urlF : urlF = urlF.replace('//public','/public')
                 fxID = urlF.split('id=')[1]
                 if "&" in fxID: fxID = fxID.split('&')[0]
@@ -334,7 +335,6 @@ def player(name,url,iconimage):
                 host = urlF.split('/public')[0]
                 t = int(round(time.time() * 1000))
                 urlF = host + '/playlist/' + fxID + '/' + str(t)
-
                 r = requests.get(url=urlF)
                 titsT = re.findall('RESOLUTION=(.*?)\n/hls.+', r.text)
                 idsT = re.findall('RESOLUTION=.*?\n/(.*?)\n', r.text)
@@ -348,12 +348,10 @@ def player(name,url,iconimage):
                 urlVideo = host + '/' + idsT[i]
                 url2Play = urlVideo
                 OK = False
-
-                xbmc.log('[plugin.video.querofilmeshd] L348 - ' + str(url2Play), xbmc.LOGINFO)
         except:
             pass
 
-        xbmc.log('[plugin.video.querofilmeshd] L352 - ' + str(urlVideo), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.querofilmeshd] L355 - ' + str(urlVideo), xbmc.LOGINFO)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name +' Por favor aguarde...')
         if OK :
@@ -365,7 +363,7 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        xbmc.log('[plugin.video.querofilmeshd] L364 - ' + str(url2Play), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.querofilmeshd] L367 - ' + str(url2Play), xbmc.LOGINFO)
 
         if not url2Play : return
 
@@ -419,7 +417,6 @@ def player(name,url,iconimage):
                     xbmcPlayer.setSubtitles(sfile)
             else:
                 xbmcPlayer.setSubtitles(legendas)
-
 
 def player_series(name,url,iconimage):
         xbmc.log('[plugin.video.querofilmeshd] L421 - ' + str(url), xbmc.LOGINFO)

@@ -384,15 +384,13 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.querofilmeshd" name="QueroFilmesHD" version="1.0.6" provider-name="AddonReneSilva">
+<addon id="plugin.video.querofilmeshd" name="QueroFilmesHD" version="1.0.8" provider-name="AddonReneSilva">
   <requires>
-        <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.urlresolver" version="1.0.0"/>
-		<import addon="script.module.videohosts" version="1.0.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-		<import addon="script.module.requests" version="2.9.1"/>
-        <import addon="inputstream.adaptive" version="2.0.19"/>
-        <import addon="script.extendedinfo" />
+    <import addon="xbmc.python" version="2.14.0"/>
+    <import addon="script.module.urlresolver" version="1.0.0"/>
+    <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    <import addon="script.module.requests" version="2.9.1"/>
+    <import addon="inputstream.hls" />
   </requires>
 
   <extension point="xbmc.python.pluginsource" library="addon.py">
@@ -400,14 +398,18 @@
   </extension>
 
   <extension point="xbmc.addon.metadata">
-        <language>en</language>
-        <platform>all</platform>
-        <summary lang="en">QueFilmesHD</summary>
-        <description lang="en">
-            No addon QueroFilmesHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
-        </description>
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">QueroFIlmes</summary>
+    <description lang="en">
+        No addon QueroFilmesHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+        VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+    </description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
   </extension>
 </addon>
 

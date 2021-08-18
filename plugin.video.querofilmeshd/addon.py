@@ -9,6 +9,7 @@
 # Atualizado (1.0.4) - 21/06/2021
 # Atualizado (1.0.5) - 23/06/2021
 # Atualizado (1.0.6) - 25/06/2021
+# Atualizado (1.0.7) - 18/08/2021
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -20,7 +21,7 @@ import resources.lib.moonwalk as moonwalk
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.6'
+version   = '1.0.7'
 addon_id  = 'plugin.video.querofilmeshd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -316,6 +317,9 @@ def player(name,url,iconimage):
                 b = json.loads(_html)
                 xbmc.log('[plugin.video.querofilmeshd] L321 - ' + str(b), xbmc.LOGINFO)
                 urlF = b['url']
+                if 'bit' in str(urlF) :
+                    r = requests.get(url=urlF, verify=False)
+                    urlF = str(r.url)
                 if '//public' in urlF : urlF = urlF.replace('//public','/public')
                 fxID = urlF.split('id=')[1]
                 if "&" in fxID: fxID = fxID.split('&')[0]
