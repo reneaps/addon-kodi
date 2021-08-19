@@ -11,7 +11,6 @@
 # Atualizado (1.0.6) - 25/06/2021
 # Atualizado (1.1.1) - 06/07/2021
 # Atualizado (1.1.2) - 07/07/2021
-# Atualizado (1.1.3) - 18/08/2021
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -22,7 +21,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.1.3'
+version   = '1.1.0'
 addon_id  = 'plugin.video.querofilmeshd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -156,7 +155,7 @@ def getTemporadas(name,url,iconimage):
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
-def getEpisodios(name, url ,iconimage):
+def getEpisodios(name, url,iconimage):
         xbmc.log('[plugin.video.querofilmeshd] L156 - ' + str(url), xbmc.LOGINFO)
         n = name.replace('ª Temporada', '')
         n = int(n)
@@ -196,7 +195,6 @@ def pesquisa():
         if (keyb.isConfirmed()):
                 texto    = keyb.getText()
                 pesquisa = urllib.parse.quote(texto)
-                base     = 'https://querofilmehd.org/'
                 url      = base + '?s=%s' % str(pesquisa)
 
                 xbmc.log('[plugin.video.querofilmeshd] L198 - ' + str(url), xbmc.LOGINFO)
@@ -207,29 +205,18 @@ def pesquisa():
                 filmes = soup.findAll('div', {'class':'image'})
                 totF = len(filmes)
                 for filme in filmes:
-                        titF = filme.img["alt"]
-                        urlF = filme.a["href"]
-                        urlF = base + urlF if urlF.startswith("/filmes") else urlF
-                        urlF = base + urlF if urlF.startswith("filmes") else urlF
-                        urlF = base + urlF if urlF.startswith("/series") else urlF
-                        urlF = base + urlF if urlF.startswith("series") else urlF
-                        urlF = base + "filmes/" + urlF if urlF.startswith("assistir") else urlF
-                        imgF = filme.img["src"]
+                        a = filme('a')
+                        urlF = a[0]['href']
+                        titF = filme.img['alt'].encode("utf-8")
+                        imgF = filme.img['src']
+                        imgF = imgF.replace('/w185/','/w300_and_h450_bestv2/')
                         if 'url=' in imgF : imgF = imgF.split('=')[3]
-                        imgF = imgF.replace('w92', 'w400')
-                        imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                        imgF = base + imgF if imgF.startswith("/wp-content") else imgF
-                        imgF = base + imgF if imgF.startswith("wp-content") else imgF
+                        imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
+                        pltF = titF
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
                 return hosts
-                '''a = []
-                for url, titulo, img in hosts:
-                    temp = [url, titulo, img]
-                    a.append(temp);
-                    xbmc.log('[plugin.video.querofilmeshd] L228 - ' + str(a), xbmc.LOGINFO)
-                return a'''
 
 def doPesquisaSeries():
         a = pesquisa()
@@ -237,7 +224,8 @@ def doPesquisaSeries():
         total = len(a)
         for url2, titulo, img in a:
             xbmc.log('[plugin.video.querofilmeshd] L237 - ' + str(url2), xbmc.LOGINFO)
-            addDir(titulo, url2, 26, img, False, total)
+            if 'tvshows' in url2 : addDir(titulo, url2, 26, img, False, total)
+            if 'filme' in url2 : addDir(titulo, url2, 100, img, False, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
@@ -246,7 +234,8 @@ def doPesquisaFilmes():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            addDir(titulo, url2, 100, img, False, total)
+            if 'tvshow' in url2 : addDir(titulo, url2, 26, img, False, total)
+            if 'filme' in url2 : addDir(titulo, url2, 100, img, False, total)
 
 def player(name,url,iconimage):
         xbmc.log('[plugin.video.querofilmeshd] L249 - ' + str(url), xbmc.LOGINFO)
@@ -322,6 +311,7 @@ def player(name,url,iconimage):
                 _html = str(html)
                 _html = bytes.fromhex(_html).decode('utf-8')
                 b = json.loads(_html)
+                xbmc.log('[plugin.video.querofilmeshd] L320 - ' + str(b), xbmc.LOGINFO)
                 urlF = b['url']
                 if 'bit' in str(urlF) :
                     r = requests.get(url=urlF, verify=False)
@@ -521,30 +511,35 @@ def player_series(name,url,iconimage):
                 _html = bytes.fromhex(_html).decode('utf-8')
                 b = json.loads(_html)
                 xbmc.log('[plugin.video.querofilmeshd] L512 - ' + str(b), xbmc.LOGINFO)
-                urlF = b['url']
-                if '//public' in urlF : urlF = urlF.replace('//public','/public')
-                fxID = urlF.split('id=')[1]
-                if "&" in fxID: fxID = fxID.split('&')[0]
-                if "&vlsub" in urlF:
-                    sub = 'https://sub.sfplayer.net/subdata/' + urlF.split('vlsub=')[1]
-                elif "&sub" in urlF:
-                    sub = urlF.split('&sub=')[1]
-                host = urlF.split('/public')[0]
-                t = int(round(time.time() * 1000))
-                urlF = host + '/playlist/' + fxID + '/' + str(t)
+                if 'url' in str(b) : urlF = b['url']
+                if 'file' in str(b) : 
+                    urlF = b['video'][0]['file']
+                    urlVideo = urlF
+                    url2Play - urlVideo
+                else:
+                    if '//public' in urlF : urlF = urlF.replace('//public','/public')
+                    fxID = urlF.split('id=')[1]
+                    if "&" in fxID: fxID = fxID.split('&')[0]
+                    if "&vlsub" in urlF:
+                        sub = 'https://sub.sfplayer.net/subdata/' + urlF.split('vlsub=')[1]
+                    elif "&sub" in urlF:
+                        sub = urlF.split('&sub=')[1]
+                    host = urlF.split('/public')[0]
+                    t = int(round(time.time() * 1000))
+                    urlF = host + '/playlist/' + fxID + '/' + str(t)
 
-                r = requests.get(url=urlF)
-                titsT = re.findall('RESOLUTION=(.*?)\n/hls.+', r.text)
-                idsT = re.findall('RESOLUTION=.*?\n/(.*?)\n', r.text)
+                    r = requests.get(url=urlF)
+                    titsT = re.findall('RESOLUTION=(.*?)\n/hls.+', r.text)
+                    idsT = re.findall('RESOLUTION=.*?\n/(.*?)\n', r.text)
 
-                if not titsT : return
+                    if not titsT : return
 
-                index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
+                    index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
 
-                if index == -1 : return
-                i = index
-                urlVideo = host + '/' + idsT[i]
-                url2Play = urlVideo
+                    if index == -1 : return
+                    i = index
+                    urlVideo = host + '/' + idsT[i]
+                    url2Play = urlVideo
                 OK = False
 
                 xbmc.log('[plugin.video.querofilmeshd] L539 - ' + str(urlVideo), xbmc.LOGINFO)
