@@ -16,7 +16,7 @@ import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base
 import json
 import urlresolver
 import requests
-
+from urlparse           import urlparse
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
@@ -61,7 +61,7 @@ def getCategorias(url):
         setViewMenu()
 
 def getFilmes(url):
-        xbmc.log('[plugin.video.querofilmeshd] L65 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.querofilmeshd] L65 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html.parser")
@@ -96,7 +96,7 @@ def getFilmes(url):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.querofilmeshd] L100- ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.querofilmeshd] L100- ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html.parser")
@@ -133,7 +133,7 @@ def getSeries(url):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
 def getTemporadas(name,url,iconimage):
-        xbmc.log('[plugin.video.querofilmeshd] L136 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.querofilmeshd] L136 - ' + str(url), xbmc.LOGNOTICE)
         html = openURL(url)
         soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', {'id':'seasons'})
@@ -152,8 +152,8 @@ def getTemporadas(name,url,iconimage):
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
-def getEpisodios(name, url):
-        xbmc.log('[plugin.video.querofilmeshd] L156 - ' + str(url), xbmc.LOGINFO)
+def getEpisodios(name, url ,iconimage):
+        xbmc.log('[plugin.video.querofilmeshd] L156 - ' + str(url), xbmc.LOGNOTICE)
         n = name.replace('ª Temporada', '')
         n = int(n)
         n = (n-1)
@@ -177,10 +177,11 @@ def getEpisodios(name, url):
             imgF = imgF.replace('w154', 'w300')
             imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
             imgF = base + imgF if imgF.startswith("/wp-content") else imgF
-            xbmc.log('[plugin.video.querofilmeshd] L180 - ' + str(imgF), xbmc.LOGINFO)
+            xbmc.log('[plugin.video.querofilmeshd] L180 - ' + str(imgF), xbmc.LOGNOTICE)
             titA = i(class_='numerando')[0].text.replace('-','x')
             titB = i(class_='episodiotitle')[0].a.text
             titF = titA + ' - ' + titB
+            titF = titF.encode('utf-8')
             addDirF(titF, urlF, 110, imgF, False, totF)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
@@ -191,11 +192,10 @@ def pesquisa():
 
         if (keyb.isConfirmed()):
                 texto    = keyb.getText()
-                pesquisa = urllib.parse.quote(texto)
-                base     = 'https://querofilmehd.org/'
+                pesquisa = urllib.quote(texto)
                 url      = base + '?s=%s' % str(pesquisa)
 
-                xbmc.log('[plugin.video.querofilmeshd] L198 - ' + str(url), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.querofilmeshd] L198 - ' + str(url), xbmc.LOGNOTICE)
                 hosts = []
                 temp = []
                 link = openURL(url)
@@ -226,7 +226,7 @@ def doPesquisaSeries():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            xbmc.log('[plugin.video.querofilmeshd] L237 - ' + str(url2), xbmc.LOGINFO)
+            xbmc.log('[plugin.video.querofilmeshd] L237 - ' + str(url2), xbmc.LOGNOTICE)
             addDir(titulo, url2, 26, img, False, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
@@ -261,98 +261,92 @@ def player(name,url,iconimage):
         except:
             plot = 'Sem Sinopse'
             pass
+        headers = {'Referer': url,
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'origin': base,
+                'Connection': 'keep-alive',
+                'X-Requested-With': 'XMLHttpRequest',
+                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+        }
+        urlF = base + 'wp-admin/admin-ajax.php'
+        xbmc.log('[plugin.video.querofilmeshd] L279 - ' + str(urlF), xbmc.LOGNOTICE)
+        data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
+        r = requests.post(url=urlF, data=data, headers=headers)
+        html = r.content
+        xbmc.log('[plugin.video.querofilmeshd] L283 - ' + str(html), xbmc.LOGNOTICE)
         try:
-                headers = {'Referer': url,
-                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                        'origin': base,
-                        'Connection': 'keep-alive',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-                }
-                urlF = base + 'wp-admin/admin-ajax.php'
-                xbmc.log('[plugin.video.querofilmeshd] L279 - ' + str(urlF), xbmc.LOGINFO)
-                data = urllib.parse.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
-                r = requests.post(url=urlF, data=data, headers=headers)
-                html = r.content
-                xbmc.log('[plugin.video.querofilmeshd] L283 - ' + str(html), xbmc.LOGINFO)
-                try:
-                    soup = BeautifulSoup(html, "html.parser")
-                    urlF = soup.iframe['src']
-                    urlVideo = urlF[0]
-                except:
-                    pass
-                try:
-                    b = json.loads(html)
-                    urlF = str(b['embed_url'])
-                    urlVideo = url
-                except:
-                    pass
-                xbmc.log('[plugin.video.querofilmeshd] L297 - ' + str(urlF), xbmc.LOGINFO)
-                if urlF != "" : html = openURL(urlF)
-                #xbmc.log('[plugin.video.querofilmeshd] L299 - ' + str(html), xbmc.LOGINFO)
-                try:
-                    urlF = re.findall(r"<iframe class='metaframe rptss' src='(.*?)' frameborder='0' scrolling='no' allow='autoplay; encrypted-media' allowfullscreen></iframe>", link)[0]
-                    html = requests.get(urlF).text
-                except:
-                    pass
-                xbmc.log('[plugin.video.querofilmeshd] L305 - ' + str(urlF), xbmc.LOGINFO)
-                idS = re.findall(r'idS[=:]\s*"(.*?)"', html)[0]
-                if idS is not None :
-                    d = urllib.parse.urlparse(urlF)
-                    host = d.netloc
-                headers = {'Referer': urlF,
-                           'Accept': '*/*',
-                           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                           'Connection': 'keep-alive',
-                           'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-                }
-                if 'querofilmeshd' in urlF : urlF = base + 'CallPlayer'
-                elif 'uauflix' in urlF : urlF = 'https://player.uauflix.online//CallPlayer'
-                data = urllib.parse.urlencode({'id': idS})
-                html = requests.post(url=urlF, data=data, headers=headers).text
-                xbmc.log('[plugin.video.querofilmeshd] L317 - ' + str(html), xbmc.LOGINFO)
-                _html = str(html)
-                _html = bytes.fromhex(_html).decode('utf-8')
-                b = json.loads(_html)
-                xbmc.log('[plugin.video.querofilmeshd] L321 - ' + str(b), xbmc.LOGINFO)
-                urlF = b['url']
-                if 'bit' in str(urlF) :
-                    r = requests.get(url=urlF, verify=False)
-                    urlF = str(r.url)
-                if '//public' in urlF : urlF = urlF.replace('//public','/public')
-                fxID = urlF.split('id=')[1]
-                if "&" in fxID: fxID = fxID.split('&')[0]
-                if "&vlsub" in urlF:
-                    sub = 'https://sub.sfplayer.net/subdata/' + urlF.split('vlsub=')[1]
-                elif "&sub" in urlF:
-                    sub = urlF.split('&sub=')[1]
-                host = urlF.split('/public')[0]
-                t = int(round(time.time() * 1000))
-                urlF = host + '/playlist/' + fxID + '/' + str(t)
-
-                r = requests.get(url=urlF)
-                titsT = re.findall('RESOLUTION=(.*?)\n/hls.+', r.text)
-                idsT = re.findall('RESOLUTION=.*?\n/(.*?)\n', r.text)
-
-                if not titsT : return
-
-                index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
-
-                if index == -1 : return
-                i = index
-                urlVideo = host + '/' + idsT[i]
-                url2Play = urlVideo
-                OK = False
-
-                xbmc.log('[plugin.video.querofilmeshd] L348 - ' + str(url2Play), xbmc.LOGINFO)
+            soup = BeautifulSoup(html, "html.parser")
+            urlF = soup.iframe['src']
+            urlVideo = urlF[0]
         except:
             pass
+        try:
+            b = json.loads(html)
+            urlF = str(b['embed_url'])
+            urlVideo = url
+        except:
+            pass
+        xbmc.log('[plugin.video.querofilmeshd] L297 - ' + str(urlF), xbmc.LOGNOTICE)
+        if urlF != "" : html = openURL(urlF)
+        #xbmc.log('[plugin.video.querofilmeshd] L299 - ' + str(html), xbmc.LOGNOTICE)
+        try:
+            urlF = re.findall(r"<iframe class='metaframe rptss' src='(.*?)' frameborder='0' scrolling='no' allow='autoplay; encrypted-media' allowfullscreen></iframe>", link)[0]
+            html = requests.get(urlF).text
+        except:
+            pass
+        xbmc.log('[plugin.video.querofilmeshd] L305 - ' + str(urlF), xbmc.LOGNOTICE)
+        idS = re.findall(r'idS[=:]\s*"(.*?)"', html)[0]
+        if idS is not None :
+            d = urlparse(urlF)
+            host = d.netloc
+        headers = {'Referer': urlF,
+                   'Accept': '*/*',
+                   'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                   'Connection': 'keep-alive',
+                   'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+        }
+        if 'querofilmeshd' in urlF : urlF = base + 'CallPlayer'
+        elif 'uauflix' in urlF : urlF = 'https://player.uauflix.online//CallPlayer'
+        data = urllib.urlencode({'id': idS})
+        html = requests.post(url=urlF, data=data, headers=headers).text
+        xbmc.log('[plugin.video.querofilmeshd] L317 - ' + str(html), xbmc.LOGNOTICE)
+        _html = str(html)
+        b = json.loads(_html.decode('hex'))
+        xbmc.log('[plugin.video.querofilmeshd] L321 - ' + str(b), xbmc.LOGNOTICE)
+        urlF = b['url']
+        if 'bit' in str(urlF) :
+            r = requests.get(url=urlF, verify=False)
+            urlF = str(r.url)
+        if '//public' in urlF : urlF = urlF.replace('//public','/public')
+        fxID = urlF.split('id=')[1]
+        if "&" in fxID: fxID = fxID.split('&')[0]
+        if "&vlsub" in urlF:
+            sub = 'https://sub.sfplayer.net/subdata/' + urlF.split('vlsub=')[1]
+        elif "&sub" in urlF:
+            sub = urlF.split('&sub=')[1]
+        host = urlF.split('/public')[0]
+        t = int(round(time.time() * 1000))
+        urlF = host + '/playlist/' + fxID + '/' + str(t)
 
-        xbmc.log('[plugin.video.querofilmeshd] L352 - ' + str(urlVideo), xbmc.LOGINFO)
+        r = requests.get(url=urlF)
+        titsT = re.findall('RESOLUTION=(.*?)\n/hls.+', r.text)
+        idsT = re.findall('RESOLUTION=.*?\n/(.*?)\n', r.text)
+
+        if not titsT : return
+
+        index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
+
+        if index == -1 : return
+        i = index
+        urlVideo = host + '/' + idsT[i]
+        url2Play = urlVideo
+        OK = False
+
+        xbmc.log('[plugin.video.querofilmeshd] L348 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
         
-       if OK :
+        if OK :
             try:
                 url2Play = urlresolver.resolve(urlVideo)
             except:
@@ -418,11 +412,12 @@ def player(name,url,iconimage):
 
 
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.querofilmeshd] L572 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.querofilmeshd] L415 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('QueroFilmesHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
         mensagemprogresso.update(0)
+
 
         titsT = []
         idsT = []
@@ -434,7 +429,7 @@ def player_series(name,url,iconimage):
         #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, 'html.parser')
         dados = soup('li',{'id':'player-option-1'})
-        xbmc.log('[plugin.video.querofilmeshd] L437 - ' + str(dados), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.querofilmeshd] L437 - ' + str(dados), xbmc.LOGNOTICE)
         if not dados :
                 dialog = xbmcgui.Dialog()
                 dialog.ok(name, " ainda não liberado, aguarde... ")
@@ -449,9 +444,11 @@ def player_series(name,url,iconimage):
 
         for dtype, dpost, dnume in dooplay:
             print(dtype, dpost, dnume)
+            
         if url is not None :
-            d = urllib.parse.urlparse(url)
+            d = urlparse(url)
             host = d.netloc
+            
         headers = {"Referer": url,
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0",
                 "Accept": "*/*",
@@ -460,23 +457,15 @@ def player_series(name,url,iconimage):
                 "X-Requested-With": "XMLHttpRequest",
                 "Alt-Used": host
         }
+        
         try:
-                '''
-                headers = {'Referer': url,
-                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                        'origin': base,
-                        'Connection': 'keep-alive',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-                }
-                '''
                 urlF = base + 'wp-admin/admin-ajax.php'
-                #xbmc.log('[plugin.video.querofilmeshd] L470 - ' + str(urlF), xbmc.LOGINFO)
-                data = urllib.parse.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
+                #xbmc.log('[plugin.video.querofilmeshd] L470 - ' + str(urlF), xbmc.LOGNOTICE)
+                data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
                 print(html)
-                xbmc.log('[plugin.video.querofilmeshd] L474 - ' + str(data)+"\n"+ str(html), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.querofilmeshd] L474 - ' + str(data)+"\n"+ str(html), xbmc.LOGNOTICE)
                 try:
                     soup = BeautifulSoup(html, "html.parser")
                     urlF = soup.iframe['src']
@@ -490,19 +479,18 @@ def player_series(name,url,iconimage):
                 except:
                     pass
 
-                xbmc.log('[plugin.video.querofilmeshd] L488 - ' + str(urlF), xbmc.LOGINFO)
                 if urlF != "" : html = openURL(urlF)
-                #xbmc.log('[plugin.video.querofilmeshd] L490 - ' + str(link), xbmc.LOGINFO)
+                #xbmc.log('[plugin.video.querofilmeshd] L490 - ' + str(link), xbmc.LOGNOTICE)
                 try:
                     urlF = re.findall(r"<iframe class='metaframe rptss' src='(.*?)' frameborder='0' scrolling='no' allow='autoplay; encrypted-media' allowfullscreen></iframe>", link)[0]
-                    xbmc.log('[plugin.video.querofilmeshd] L493 - ' + str(urlF), xbmc.LOGINFO)
+                    xbmc.log('[plugin.video.querofilmeshd] L493 - ' + str(urlF), xbmc.LOGNOTICE)
                     html = requests.get(urlF).text
                 except:
                     pass
-                xbmc.log('[plugin.video.querofilmeshd] L496 - ' + str(urlF), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.querofilmeshd] L496 - ' + str(urlF), xbmc.LOGNOTICE)
                 idS = re.findall(r'idS[=:]\s*"(.*?)"', html)[0]
                 if idS is not None :
-                    d = urllib.parse.urlparse(urlF)
+                    d = urlparse(urlF)
                     host = d.netloc
                 headers = {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                            'Connection': 'keep-alive',
@@ -512,14 +500,16 @@ def player_series(name,url,iconimage):
                 }
                 if 'querofilmeshd' in urlF : urlF = base + 'CallPlayer'
                 elif 'uauflix' in urlF : urlF = 'https://player.uauflix.online//CallEpi'
-                data = urllib.parse.urlencode({'idS': idS})
+                data = urllib.urlencode({'idS': idS})
                 html = requests.post(url=urlF, data=data, headers=headers).text
-                xbmc.log('[plugin.video.querofilmeshd] L508 - ' + str(data), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.querofilmeshd] L508 - ' + str(data), xbmc.LOGNOTICE)
                 _html = str(html)
-                _html = bytes.fromhex(_html).decode('utf-8')
-                b = json.loads(_html)
-                xbmc.log('[plugin.video.querofilmeshd] L512 - ' + str(b), xbmc.LOGINFO)
+                b = json.loads(_html.decode('hex'))
+                xbmc.log('[plugin.video.querofilmeshd] L512 - ' + str(b), xbmc.LOGNOTICE)
                 urlF = b['url']
+                if 'bit' in urlF :
+                    r = requests.get(urlF)
+                    urlF = r.url
                 if '//public' in urlF : urlF = urlF.replace('//public','/public')
                 fxID = urlF.split('id=')[1]
                 if "&" in fxID: fxID = fxID.split('&')[0]
@@ -545,11 +535,11 @@ def player_series(name,url,iconimage):
                 url2Play = urlVideo
                 OK = False
 
-                xbmc.log('[plugin.video.querofilmeshd] L539 - ' + str(urlVideo), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.querofilmeshd] L539 - ' + str(urlVideo), xbmc.LOGNOTICE)
         except:
             pass
 
-        xbmc.log('[plugin.video.querofilmeshd] L543 ' + str(urlVideo), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.querofilmeshd] L543 ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -787,7 +777,7 @@ elif mode == 10   : getCategorias(url)
 elif mode == 20   : getFilmes(url)
 elif mode == 25   : getSeries(url)
 elif mode == 26   : getTemporadas(name,url,iconimage)
-elif mode == 27   : getEpisodios(name,url)
+elif mode == 27   : getEpisodios(name,url,iconimage)
 elif mode == 30   : doPesquisaSeries()
 elif mode == 35   : doPesquisaFilmes()
 elif mode == 40   : getFavoritos()

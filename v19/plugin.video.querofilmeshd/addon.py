@@ -156,7 +156,7 @@ def getTemporadas(name,url,iconimage):
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
-def getEpisodios(name, url,iconimage):
+def getEpisodios(name, url ,iconimage):
         xbmc.log('[plugin.video.querofilmeshd] L156 - ' + str(url), xbmc.LOGINFO)
         n = name.replace('ª Temporada', '')
         n = int(n)
