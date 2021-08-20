@@ -224,8 +224,8 @@ def doPesquisaSeries():
         total = len(a)
         for url2, titulo, img in a:
             xbmc.log('[plugin.video.querofilmeshd] L237 - ' + str(url2), xbmc.LOGINFO)
-            if 'tvshows' in url2 : addDir(titulo, url2, 26, img, False, total)
-            if 'filme' in url2 : addDir(titulo, url2, 100, img, False, total)
+            if '/tvshows/' in url2 : addDir(titulo, url2, 26, img, False, total)
+            if '/filme/' in url2 : addDir(titulo, url2, 100, img, False, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
@@ -234,8 +234,8 @@ def doPesquisaFilmes():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            if 'tvshow' in url2 : addDir(titulo, url2, 26, img, False, total)
-            if 'filme' in url2 : addDir(titulo, url2, 100, img, False, total)
+            if '/tvshow/' in url2 : addDir(titulo, url2, 26, img, False, total)
+            if '/filme/' in url2 : addDir(titulo, url2, 100, img, False, total)
 
 def player(name,url,iconimage):
         xbmc.log('[plugin.video.querofilmeshd] L249 - ' + str(url), xbmc.LOGINFO)
