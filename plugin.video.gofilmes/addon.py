@@ -37,15 +37,15 @@ addonfolder  = selfAddon.getAddonInfo('path')
 artfolder    = addonfolder + '/resources/media/'
 fanart       = addonfolder + '/resources/media/fanart.png'
 addon_handle = int(sys.argv[1])
-base         = base64.b64decode('aHR0cDovL2dvZmlsbWVzLm1lLw==')
+base         = 'https://gofilmes.me/'
 sbase        = 'https://maxseries.me/'
 
 ############################################################################################################
 
 def menuPrincipal():
         addDir('Categorias'                 , base                              ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + '/genero/lancamentos/'     ,   20, artfolder + 'ultimos.png')
-        addDir('Series'                     , sbase + '/series-e-animes/'       ,   25, artfolder + 'series.png')
+        addDir('Lançamentos'                , base + 'genero/lancamentos/'      ,   20, artfolder + 'ultimos.png')
+        addDir('Series'                     , sbase + 'series-e-animes/'        ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                              ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                              ,   35, artfolder + 'pesquisa.png')
         addDir('Configurações'              , base                              ,  999, artfolder + 'config.png', 1, False)
@@ -117,7 +117,6 @@ def getSeries(url):
             titF = filme.img['alt'].encode('utf-8')
             urlF = filme.a['href']
             imgF = filme.img['src']
-            #xbmc.log('[plugin.video.gofilmes] L116 - ' + str(urlF), xbmc.LOGNOTICE)
             addDir(titF, urlF, 26, imgF)
 
         try :
@@ -130,8 +129,8 @@ def getSeries(url):
         except :
             pass
 
-        xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
-        #setViewFilmes()
+        #xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
+        setViewFilmes()
 
 def getTemporadas(url):
         link = openURL(url)
