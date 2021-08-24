@@ -6,6 +6,7 @@
 # By AddonReneSilva - 28/07/2021
 # Atualizado (1.0.0) - 24/06/2021
 # Atualizado (1.0.1) - 02/08/2021
+# Atualizado (1.0.2) - 24/08/2021
 # 
 #####################################################################
 
@@ -140,9 +141,9 @@ def getEpisodios(name, url):
         xbmc.log('[plugin.video.ultracineBiz] L128 - ' + str(totF), xbmc.LOGINFO)
 
         for filme in filmes:
-            titF = filme.a.span.text.encode('utf-8')
+            titF = filme.a.span.findNext().text.encode('utf-8')
             urlF = filme.a['href']
-            addDirF(titF, urlF, 100, imgF, False, totF)
+            addDirF(titF, urlF, 110, imgF, False, totF)
 
         xbmcplugin.setContent(int(sys.argv[1]) ,"episodes")
 
@@ -157,9 +158,10 @@ def pesquisa():
                 hosts = []
 
                 link = openURL(url)
-                soup     = BeautifulSoup(link, 'html.parser')
+                soup = BeautifulSoup(link, 'html.parser')
                 filmes = soup('div', attrs={'class':'grid-item'})
                 totF = len(filmes)
+                xbmc.log('[plugin.video.ultracine] L171 - ' + str(filmes), xbmc.LOGINFO)
 
                 for filme in filmes:
                         titF = filme.img['alt'].encode('utf-8')
@@ -178,16 +180,16 @@ def pesquisa():
 
 def doPesquisaSeries():
         a = pesquisa()
-        a = pesquisa()
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
             xbmc.log('[plugin.video.ultracine] L189 - ' + str(url2), xbmc.LOGINFO)
-            if 'serie' in url2 :
+            if 'serie' in str(url2) :
                 addDir(titulo, url2, 26, img, False, total)
             else :
                 addDir(titulo, url2, 100, img, False, total)
 
+        return ''
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         
 def doPesquisaFilmes():
@@ -195,11 +197,12 @@ def doPesquisaFilmes():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            if 'serie' in url2 :
+            if 'serie' in str(url2) :
                 addDir(titulo, url2, 26, img, False, total)
             else :
                 addDir(titulo, url2, 100, img, False, total)
 
+        return ''
         setViewFilmes()
 
 def player(name,url,iconimage):
@@ -491,7 +494,7 @@ def getInfo(url)    :
         titO = titO.replace('Assistir','').replace('Dublado','').replace('Legendado','').replace('Online','')
         titO = titO.replace('- Todas as Temporadas','')
         titO = titO.split(':')[0]
-        xbmc.log('[plugin.video.ultracine] L494 - ' + str(titO), xbmc.LOGINFO)
+        #xbmc.log('[plugin.video.ultracine] L494 - ' + str(titO), xbmc.LOGNOTICE)
 
         xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
