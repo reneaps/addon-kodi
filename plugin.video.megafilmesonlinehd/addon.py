@@ -9,17 +9,21 @@
 # Atualizado (1.1.2) - 27/03/2020
 # Atualizado (1.1.3) - 07/07/2020
 # Atualizado (1.1.4) - 20/10/2020
+# Atualizado (1.1.5) - 30/08/2021
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import urlresolver
 import requests
+import json
 
 from resources.lib.BeautifulSoup import BeautifulSoup
 from resources.lib               import jsunpack
 from urlparse import urlparse
 
-version     = '1.1.4'
+s = requests.Session()
+
+version     = '1.1.5'
 addon_id    = 'plugin.video.megafilmesonlinehd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 
@@ -44,10 +48,10 @@ def menuPrincipal():
 
 def getCategorias(url):
         link = openURL(url)
-        link = unicode(link, 'utf-8', 'ignore')
+        #link = unicode(link, 'utf-8', 'ignore')
 
         soup = BeautifulSoup(link)
-        conteudo = soup("nav", {"class": "Menu"})
+        conteudo = soup("div", {"class": "head-main-nav"})
         dados = conteudo[0]("ul")
         categorias = dados[0]('li')
 
@@ -56,7 +60,7 @@ def getCategorias(url):
         for categoria in categorias:
                 titC = categoria.a.text.encode('utf-8','replace')
                 if not 'Lançamento' in titC :
-                    if not 'Como Assistir' in titC:
+                    if not 'Categorias' in titC:
                         urlC = categoria.a["href"]
                         imgC = artfolder + limpa(titC) + '.png'
                         addDir(titC,urlC,20,imgC)
@@ -66,7 +70,7 @@ def getCategorias(url):
 def getFilmes(url):
         xbmc.log('[plugin.video.megafilmesonlinehd] L67 - ' + str(url), xbmc.LOGNOTICE)
         link  = openURL(url)
-        link = unicode(link, 'utf-8', 'ignore')
+        #link = unicode(link, 'utf-8', 'ignore')
         soup     = BeautifulSoup(link)
         filmes = soup("article", {"class":"item movies"})
         totF = len(filmes)
@@ -89,44 +93,38 @@ def getFilmes(url):
         setViewFilmes()
 
 def getSeries(url):
+        xbmc.log('[plugin.video.megafilmesonlinehd] L96 - ' + str(url), xbmc.LOGNOTICE)
         link  = openURL(url)
-        link = unicode(link, 'utf-8', 'ignore')
-
-        soup     = BeautifulSoup(link)
-        conteudo = soup("main")
-        dados = conteudo[0]("ul")
-        filmes = dados[0]('li')
+        #link = unicode(link, 'utf-8', 'ignore')
+        soup = BeautifulSoup(link)
+        filmes = soup("article", {'class':'item tvshows'})
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.a.h3.getText().encode('utf-8')
-                titF = titF.replace('&#8211;','-')
                 urlF = filme.a["href"].encode('utf-8')
-                try:
-                    imgF = filme.img["src"].encode('utf-8')
-                    imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
-                except:
-                    imgF = ""
-                    pass
+                imgF = filme.img["src"].encode('utf-8')
+                titF = filme.img["alt"].encode('utf-8')
+                imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
                 addDir(titF, urlF, 26, imgF)
 
         try :
-                proxima = re.findall('<a class="next page-numbers" href="(.*?)"', link)[0]
+                proxima = re.findall('<link rel="next" href="(.*?)" />', link)[0]
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
+                
         setViewFilmes()
 
 def getTemporadas(url):
+        xbmc.log('[plugin.video.megafilmesonlinehd] L119 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
-        link = unicode(link, 'utf-8', 'ignore')
+        #link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link)
-        conteudo = soup('main')
-        dados = conteudo[0]('article', attrs={'class':'TPost Single'})
-        figure = dados[0]('div', {'class':'Image'})
+        conteudo = soup('div', {'class':'sheader'})
+        figure = conteudo[0]('div', {'class':'poster'})
         imgF = figure[0].img['src']
         imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
-        seasons = soup('div',{'class':'Wdgt AABox'})
+        seasons = soup('div',{'class':'se-c'})
         totF = len(seasons)
         i = 0
 
@@ -144,24 +142,27 @@ def getEpisodios(name, url):
         n = n - 1
         link = openURL(url)
         soup = BeautifulSoup(link)
-        conteudo = soup('main')
-        dados = conteudo[0]('article', attrs={'class':'TPost Single'})
-        figure = dados[0]('div', {'class':'Image'})
+        conteudo = soup('div', {'class':'sheader'})
+        figure = conteudo[0]('div', {'class':'poster'})
         imgF = figure[0].img['src']
-        seasons = soup('div',{'class':'Wdgt AABox'})
-        dados = seasons[n]('div',{'class':'TPTblCn AA-cont'})
-        episodes = dados[0]('td',{'class':'MvTbImg B'})
+        conteudo = soup('div', {'class':'se-c'})
+        dados = conteudo[n]('ul', {'class':'episodios'})
+        episodes = dados[0]('li')
         totF = len(episodes)
-        #print(episodes)
+        
         for i in episodes:
-            urlF = i.a['href'].encode('utf-8')
-            titF = urlF.split('/')[4].encode('utf-8')
-            try:
-                imgF = i.img['src']
-            except:
-                pass
-            imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
-            xbmc.log('[plugin.video.MegaFilmesOnlineHD] L168 - ' + str(imgF), xbmc.LOGNOTICE)
+            urlF = i.a['href']
+            #if not url in urlF : urlF = base + urlF
+            imgF = i.img['src']
+            if 'url=' in imgF : imgF = imgF.split('=')[3]
+            imgF = imgF.replace('w154', 'w300')
+            imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+            imgF = base + imgF if imgF.startswith("/wp-content") else imgF
+            #titA = i(class_='numerando')[0].text.replace('-','x')
+            #titB = i.a.text  #i(class_='episodiotitle')[0].a.text
+            #titF = titA + ' - ' + titB
+            titF = i.a.text + ', ' + i.span.text
+            titF = titF.encode('utf-8')
             addDirF(titF, urlF, 110, imgF, False, totF)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
@@ -173,24 +174,19 @@ def pesquisa():
         if (keyb.isConfirmed()):
                 texto    = keyb.getText()
                 pesquisa = urllib.quote(texto)
-                url      = base + '/?s=%s' % str(pesquisa)
+                url      = base + '?s=%s' % str(pesquisa)
                 hosts = []
 
                 link  = openURL(url)
-                link = unicode(link, 'utf-8', 'ignore')
-
+                #link = unicode(link, 'utf-8', 'ignore')
                 soup = BeautifulSoup(link)
-                conteudo = soup("main")
-                dados = conteudo[0]("ul")
-                filmes = dados[0]('li')
-                totF = len(filmes)
-
+                filmes = soup("article")
                 totF = len(filmes)
 
                 for filme in filmes:
-                        titF = filme.a.h3.getText().encode('utf-8')
                         urlF = filme.a["href"].encode('utf-8')
                         imgF = filme.img["src"].encode('utf-8')
+                        titF = filme.img["alt"].encode('utf-8')
                         imgF = 'https:%s' % imgF if imgF.startswith("//") else imgF
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
@@ -206,13 +202,22 @@ def doPesquisaSeries():
         a = pesquisa()
         total = len(a)
         for url2, titulo, img in a:
-            addDir(titulo, url2, 26, img, False, total)
-
+            if 'serie' in str(url2):
+                addDir(titulo, url2, 26, img, False, total)
+            else:
+                addDirF(titulo, url2, 100, img, False, total)
+                
+        setViewFilmes()
+        
 def doPesquisaFilmes():
         a = pesquisa()
         total = len(a)
         for url2, titulo, img in a:
-            addDirF(titulo, url2, 100, img, False, total)
+            if 'serie' in str(url2):
+                addDir(titulo, url2, 26, img, False, total)
+            else:
+                addDirF(titulo, url2, 100, img, False, total)
+                
         setViewFilmes()
 
 def player(name,url,iconimage):
@@ -225,34 +230,6 @@ def player(name,url,iconimage):
         titsT = []
         idsT = []
         matriz = []
-        headers = {
-            'content-type': 'text/html; charset=UTF-8',
-            'Connection':'keep-alive',
-            'DNT':'1',
-            'Upgrade-Insecure-Requests':'1',
-            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
-        }
-        link = openURL(url)
-        #r = requests.get(url=url, headers=headers)
-        #cookies = r.cookies
-        #xbmc.log('[plugin.video.megafilmesonlinehd] L253 - ' + str(link), xbmc.LOGNOTICE)
-        #link = r.text.encode('utf-8')
-        soup = BeautifulSoup(link)
-        postid = re.findall(r'<body class="movies-template-default single single-movies postid-(.*?)">', link)[0]
-        try:
-            urlF = 'https://megafilmeshd50.com/wp-json/dooplayer/v2/%s/movie/1' % postid
-            r = requests.get(url=urlF, headers=headers)
-            urlF = r.json()['embed_url']
-            xbmc.log('[plugin.video.megafilmesonlinehd] L246 - ' + str(urlF), xbmc.LOGNOTICE)
-        except:
-            pass
-
-        try:
-            urlVideo = re.findall(r'file: "(.+?)",', link)[0]
-        except:
-            pass
-            
-        xbmc.log('[plugin.video.megafilmesonlinehd] L253 - ' + str(urlF), xbmc.LOGNOTICE)
         '''
         html = openURL(urlF)
         links = re.findall("addiframe\('(.*?)'\);", html)
@@ -271,7 +248,7 @@ def player(name,url,iconimage):
         i = int(index)
         link = idsT[i]
         '''
-        urlVideo = urlF
+        urlVideo = url
         
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -332,7 +309,20 @@ def player(name,url,iconimage):
                 OK = False
 
         elif 'megafilmeshd50' in urlVideo :
-                parse = urlparse(urlVideo)
+                headers = {
+                    'Upgrade-Insecure-Requests':'1',
+                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
+                }
+                r = s.get(url=urlVideo, headers=headers)
+                link = r.text
+                postid = re.findall(r'<body class="movies-template-default single single-movies postid-(.*?)">', link)[0]         
+                urlF = 'https://megafilmeshd50.com/wp-json/dooplayer/v2/%s/movie/1' % postid
+                r = s.get(url=urlF, headers=headers)
+                url2 = r.json()['embed_url']
+                #js = json.loads(link)
+                #url2 = js['embed_url'].encode('utf-8')
+                xbmc.log('[plugin.video.megafilmesonlinehd] L315 - ' + str(url2), xbmc.LOGNOTICE)
+                parse = urlparse(url2)
                 host = parse.scheme + '://' + parse.netloc
                 auth = parse.netloc
                 path = parse.path +'?' + parse.query
@@ -340,37 +330,31 @@ def player(name,url,iconimage):
                     'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                     'Connection': 'keep-alive',
                     'DNT':'1',
-                    'Host': auth,
-                    'Referer': host,
+                    'Host':'play.megafilmeshd50.com',
+                    'Referer': 'https://megafilmeshd50.com/',
                     'Upgrade-Insecure-Requests':'1',
                     'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
                 }
-                url2 = 'https://t.dtscout.com/i/?l=https%3A%2F%2Fmegafilmeshd50.com%2F&j='
-                r = requests.post(url2)
-                cookies = ('__dtsu=' + r.cookies['l'])
-                xbmc.log('[plugin.video.megafilmesonlinehd] L351 - ' + str(cookies), xbmc.LOGNOTICE)
-                s = requests.Session()
-                #r = requests.get(url=urlVideo, headers=headers, cookies=cookies)
-                #urlF = r.json()['embed_url']
-                #link = openURL(urlVideo)
-                #s.headers.update({'Cookie': cookies})
-                #s.headers.update({'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'})
-                s.headers.update({
-                    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                    'Alt-Used': auth.encode('utf-8'),
-                    'Connection': 'keep-alive',
-                    'Cookie': cookies,
-                    'DNT':'1',
-                    'Host': auth.encode('utf-8'),
-                    'Referer': host.encode('utf-8'),
-                    'TE':'trailers',
-                    'Upgrade-Insecure-Requests':'1',
-                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
-                })
-                r = s.get(url=urlF, headers=headers)  #, cookies=r.cookies)
-                xbmc.log('[plugin.video.megafilmesonlinehd] L371 - ' + str(s.headers) + "\n" + str(r.text.encode('utf-8')), xbmc.LOGNOTICE)
-                #urlVideo = re.findall(r'source src=\s*\"(.+?)\"', r.text)[-1]
-                url2Play = url
+                response = s.get(url=url2, headers=headers)
+                #xbmc.log('[plugin.video.megafilmesonlinehd] L339 - ' + str(response.text.encode('utf-8')), xbmc.LOGNOTICE)
+                if response.status_code >= 200 and response.status_code <= 299:
+                    # Sucesso
+                    link = response.text
+                    if re.search('baixar=', r.text) is None:
+                        print('Não achei...')
+                        url2Play = url2
+                    else:
+                        urlVideo = re.findall(r'baixar=\s*\"(.+?)\"', link)[-1]
+                        url2Play = urlVideo
+                    if re.search('source:', r.text) is None:
+                        print('Não achei...')
+                        url2Play = url2
+                    else:
+                        urlVideo = re.findall(r'source:\s*\"(.+?)\"', link)[-1]
+                        url2Play = urlVideo
+                else:
+                    # Erros
+                    url2Play = url2
                 OK = False
 
         elif 'filmeseries' in urlVideo :
@@ -385,7 +369,7 @@ def player(name,url,iconimage):
                 }
                 link = requests.get(url=urlVideo,headers=headers).text
                 #link = openURL(urlVideo)
-                xbmc.log('[plugin.video.megafilmesonlinehd] L388 - ' + str(headers), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.megafilmesonlinehd] L359 - ' + str(headers), xbmc.LOGNOTICE)
                 url2Play = re.findall(r'file:\s*"(.+?)",', link)[0]
                 OK = False
        
@@ -400,7 +384,7 @@ def player(name,url,iconimage):
 
         if not url2Play : return
 
-        xbmc.log('[plugin.video.megafilmesonlinehd] L403 - ' + str(url2Play), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L374 - ' + str(url2Play), xbmc.LOGNOTICE)
         
         legendas = '-'
 
@@ -414,9 +398,9 @@ def player(name,url,iconimage):
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
-                listitem.setMimeType('application/vnd.apple.mpegurl')
-                listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
-                listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+                listitem.setMimeType('application/x-mpegURL')
+                listitem.setProperty('inputstreamaddon', 'inputstream.hls')
+                listitem.setContentLookup(False)
                 playlist.add(url2Play,listitem)
         else:
                 listitem = xbmcgui.ListItem(name, path=url2Play)
@@ -456,20 +440,8 @@ def player_series(name,url,iconimage):
 
         titsT = []
         idsT = []
-
         matriz = []
 
-        xbmc.log('[plugin.video.megafilmesonlinehd] L399 ' + str(url), xbmc.LOGNOTICE)
-        link     = openURL(url)
-        link     = unicode(link, 'utf-8', 'ignore')
-        soup     = BeautifulSoup(link)
-        conteudo = soup('div',{'class':'TPlayer'})
-        filme =conteudo[0]('a')
-        auth = filme[0]['href']
-        shex = auth.split('=')[1]
-        urlF = shex.decode('hex')
-        urlF = urlF.replace('#038;','')
-        xbmc.log('[plugin.video.megafilmesonlinehd] L409 - ' + str(urlF), xbmc.LOGNOTICE)
         '''
         try:
             conteudo = soup("div",{"class":"list_play"})
@@ -499,7 +471,7 @@ def player_series(name,url,iconimage):
 
         urlVideo = srvsdub[i]['href']
         '''
-        urlVideo = urlF
+        urlVideo = url
 
         xbmc.log('[plugin.video.megafilmesonlinehd] L441 ' + str(urlVideo), xbmc.LOGNOTICE)
 
@@ -553,6 +525,44 @@ def player_series(name,url,iconimage):
                 url2Play = urlVideo
                 OK = False
 
+        elif 'megafilmeshd50' in urlVideo :
+                headers = {
+                    'Upgrade-Insecure-Requests':'1',
+                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
+                }
+                r = s.get(url=urlVideo, headers=headers)
+                link = r.text
+                postid = re.findall(r'<body class="episodes-template-default single single-episodes postid-(.*?)">', link)[0]         
+                urlF = 'https://megafilmeshd50.com/wp-json/dooplayer/v2/%s/tv/1' % postid
+                r = s.get(url=urlF, headers=headers)
+                url2 = r.json()['embed_url']
+                #js = json.loads(link)
+                #url2 = js['embed_url'].encode('utf-8')
+                xbmc.log('[plugin.video.megafilmesonlinehd] L315 - ' + str(url2), xbmc.LOGNOTICE)
+                parse = urlparse(url2)
+                host = parse.scheme + '://' + parse.netloc
+                auth = parse.netloc
+                path = parse.path +'?' + parse.query
+                headers = {
+                    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Connection': 'keep-alive',
+                    'DNT':'1',
+                    'Host':'play.megafilmeshd50.com',
+                    'Referer': 'https://megafilmeshd50.com/',
+                    'Upgrade-Insecure-Requests':'1',
+                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
+                }
+                response = s.get(url=url2, headers=headers)
+                if response.status_code >= 200 and response.status_code <= 299:
+                    # Sucesso
+                    link = response.text
+                    urlVideo = re.findall(r'baixar=\s*\"(.+?)\"', link)[-1]
+                    url2Play = urlVideo
+                else:
+                    # Erros
+                    url2Play = url2
+                OK = False
+
         if OK : url2Play = urlresolver.resolve(urlVideo)
 
         if not url2Play : return
@@ -604,11 +614,26 @@ def openConfigEI():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        req = urllib2.Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        response = urllib2.urlopen(req)
-        link=response.read()
-        response.close()
+        parse = urlparse(url)
+        host = parse.scheme + '://' + parse.netloc
+        auth = parse.netloc
+        path = parse.path +'?' + parse.query
+        headers = {
+                #'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                #'Connection': 'keep-alive',
+                #'DNT':'1',
+                #'Host': str(auth),
+                'Referer': url,
+                'Upgrade-Insecure-Requests':'1',
+                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
+        }
+        r = s.get(url=url, headers=headers)
+        link = r.text
+        #req = urllib2.Request(url)
+        #req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        #response = urllib2.urlopen(req)
+        #link=response.read()
+        #response.close()
         return link
 
 def addDir(name, url, mode, iconimage, total=1, pasta=True):
