@@ -340,18 +340,24 @@ def player(name,url,iconimage):
                 if response.status_code >= 200 and response.status_code <= 299:
                     # Sucesso
                     link = response.text
-                    if re.search('baixar=', r.text) is None:
-                        print('Não achei...')
-                        url2Play = url2
-                    else:
-                        urlVideo = re.findall(r'baixar=\s*\"(.+?)\"', link)[-1]
-                        url2Play = urlVideo
-                    if re.search('source:', r.text) is None:
+                    if re.search('source:', response.text) is None:
                         print('Não achei...')
                         url2Play = url2
                     else:
                         urlVideo = re.findall(r'source:\s*\"(.+?)\"', link)[-1]
                         url2Play = urlVideo
+                    if re.search('source src=', response.text) is None:
+                        print('Não achei...')
+                        url2Play = url2
+                    else:
+                        urlVideo = re.findall(r'source src=\s*\"(.+?)\"', link)[-1]
+                        url2Play = urlVideo
+                    if re.search('baixar=', response.text) is None:
+                        print('Não achei...')
+                        url2Play = url2
+                    else:
+                        urlVideo = re.findall(r'baixar=\s*\"(.+?)\"', link)[-1]
+                        url2Play = urlVideo 
                 else:
                     # Erros
                     url2Play = url2
@@ -473,7 +479,7 @@ def player_series(name,url,iconimage):
         '''
         urlVideo = url
 
-        xbmc.log('[plugin.video.megafilmesonlinehd] L441 ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.megafilmesonlinehd] L441 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -526,6 +532,8 @@ def player_series(name,url,iconimage):
                 OK = False
 
         elif 'megafilmeshd50' in urlVideo :
+                host_mega = urlparse(urlVideo)
+                referer = host_mega.scheme + '://' + host_mega.netloc + '/'
                 headers = {
                     'Upgrade-Insecure-Requests':'1',
                     'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
@@ -538,7 +546,7 @@ def player_series(name,url,iconimage):
                 url2 = r.json()['embed_url']
                 #js = json.loads(link)
                 #url2 = js['embed_url'].encode('utf-8')
-                xbmc.log('[plugin.video.megafilmesonlinehd] L315 - ' + str(url2), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.megafilmesonlinehd] L541 - ' + str(url2), xbmc.LOGNOTICE)
                 parse = urlparse(url2)
                 host = parse.scheme + '://' + parse.netloc
                 auth = parse.netloc
@@ -547,17 +555,36 @@ def player_series(name,url,iconimage):
                     'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                     'Connection': 'keep-alive',
                     'DNT':'1',
-                    'Host':'play.megafilmeshd50.com',
-                    'Referer': 'https://megafilmeshd50.com/',
+                    'Host': auth.encode('utf-8'),
+                    'Referer': referer.encode('utf-8'),
                     'Upgrade-Insecure-Requests':'1',
                     'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
                 }
+                xbmc.log('[plugin.video.megafilmesonlinehd] L556 - ' + str(headers), xbmc.LOGNOTICE)
                 response = s.get(url=url2, headers=headers)
+                
                 if response.status_code >= 200 and response.status_code <= 299:
                     # Sucesso
                     link = response.text
-                    urlVideo = re.findall(r'baixar=\s*\"(.+?)\"', link)[-1]
-                    url2Play = urlVideo
+                    xbmc.log('[plugin.video.megafilmesonlinehd] L556 - ' + str(response.text.encode('utf-8')), xbmc.LOGNOTICE)
+                    if re.search('source:', response.text) is None:
+                        print('Não achei...')
+                        url2Play = url2
+                    else:
+                        urlVideo = re.findall(r'source:\s*\"(.+?)\"', link)[-1]
+                        url2Play = urlVideo
+                    if re.search('source src=', response.text) is None:
+                        print('Não achei...')
+                        url2Play = url2
+                    else:
+                        urlVideo = re.findall(r'source src=\s*\"(.+?)\"', link)[-1]
+                        url2Play = urlVideo
+                    if re.search('baixar=', response.text) is None:
+                        print('Não achei...')
+                        url2Play = url2
+                    else:
+                        urlVideo = re.findall(r'baixar=\s*\"(.+?)\"', link)[-1]
+                        url2Play = urlVideo                        
                 else:
                     # Erros
                     url2Play = url2
@@ -574,14 +601,28 @@ def player_series(name,url,iconimage):
         playlist = xbmc.PlayList(1)
         playlist.clear()
 
-        listitem = xbmcgui.ListItem(name,thumbnailImage=iconimage)
-        listitem.setPath(url2Play)
-        listitem.setProperty('mimetype','video/mp4')
-        listitem.setProperty('IsPlayable', 'true')
-        playlist.add(url2Play,listitem)
+        if "m3u8" in url2Play:
+                #ip = addon.getSetting("inputstream")
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('application/x-mpegURL')
+                listitem.setProperty('inputstreamaddon', 'inputstream.hls')
+                listitem.setContentLookup(False)
+                playlist.add(url2Play,listitem)
+        else:
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem.setArt({"thumb": iconimage, "icon": iconimage})
+                listitem.setProperty('IsPlayable', 'true')
+                listitem.setMimeType('video/mp4')
+                playlist.add(url2Play,listitem)
 
         xbmcPlayer = xbmc.Player()
-        xbmcPlayer.play(playlist)
+
+        while xbmcPlayer.play(playlist) :
+            xbmc.sleep(20000)
+            if not xbmcPlayer.isPlaying():
+                xbmc.stop()
 
         mensagemprogresso.update(100)
         mensagemprogresso.close()
