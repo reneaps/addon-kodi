@@ -565,23 +565,22 @@ def player_series(name,url,iconimage):
                 
                 if response.status_code >= 200 and response.status_code <= 299:
                     # Sucesso
+                    url2Play = url2
                     link = response.text
-                    xbmc.log('[plugin.video.megafilmesonlinehd] L556 - ' + str(response.text.encode('utf-8')), xbmc.LOGNOTICE)
+                    #xbmc.log('[plugin.video.megafilmesonlinehd] L556 - ' + str(response.text.encode('utf-8')), xbmc.LOGNOTICE)
                     if re.search('source:', response.text) is None:
                         print('Não achei...')
-                        url2Play = url2
                     else:
                         urlVideo = re.findall(r'source:\s*\"(.+?)\"', link)[-1]
                         url2Play = urlVideo
                     if re.search('source src=', response.text) is None:
                         print('Não achei...')
-                        url2Play = url2
                     else:
                         urlVideo = re.findall(r'source src=\s*\"(.+?)\"', link)[-1]
+                        xbmc.log('[plugin.video.megafilmesonlinehd] L580 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         url2Play = urlVideo
-                    if re.search('baixar=', response.text) is None:
+                    if re.search('baixar2=', response.text) is None:
                         print('Não achei...')
-                        url2Play = url2
                     else:
                         urlVideo = re.findall(r'baixar=\s*\"(.+?)\"', link)[-1]
                         url2Play = urlVideo                        
@@ -601,7 +600,7 @@ def player_series(name,url,iconimage):
         playlist = xbmc.PlayList(1)
         playlist.clear()
 
-        if "m3u8" in url2Play:
+        if "2m3u8" in url2Play:
                 #ip = addon.getSetting("inputstream")
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
