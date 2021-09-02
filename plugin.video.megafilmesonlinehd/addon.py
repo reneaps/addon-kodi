@@ -10,6 +10,7 @@
 # Atualizado (1.1.3) - 07/07/2020
 # Atualizado (1.1.4) - 20/10/2020
 # Atualizado (1.1.5) - 30/08/2021
+# Atualizado (1.1.6) - 02/09/2021
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -23,7 +24,7 @@ from urlparse import urlparse
 
 s = requests.Session()
 
-version     = '1.1.5'
+version     = '1.1.6'
 addon_id    = 'plugin.video.megafilmesonlinehd'
 selfAddon   = xbmcaddon.Addon(id=addon_id)
 
@@ -339,25 +340,25 @@ def player(name,url,iconimage):
                 #xbmc.log('[plugin.video.megafilmesonlinehd] L339 - ' + str(response.text.encode('utf-8')), xbmc.LOGNOTICE)
                 if response.status_code >= 200 and response.status_code <= 299:
                     # Sucesso
+                    url2Play = url2
                     link = response.text
+                    #xbmc.log('[plugin.video.megafilmesonlinehd] L556 - ' + str(response.text.encode('utf-8')), xbmc.LOGNOTICE)
                     if re.search('source:', response.text) is None:
                         print('Não achei...')
-                        url2Play = url2
                     else:
                         urlVideo = re.findall(r'source:\s*\"(.+?)\"', link)[-1]
                         url2Play = urlVideo
                     if re.search('source src=', response.text) is None:
                         print('Não achei...')
-                        url2Play = url2
                     else:
                         urlVideo = re.findall(r'source src=\s*\"(.+?)\"', link)[-1]
+                        xbmc.log('[plugin.video.megafilmesonlinehd] L580 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         url2Play = urlVideo
-                    if re.search('baixar=', response.text) is None:
+                    if re.search('baixar2=', response.text) is None:
                         print('Não achei...')
-                        url2Play = url2
                     else:
                         urlVideo = re.findall(r'baixar=\s*\"(.+?)\"', link)[-1]
-                        url2Play = urlVideo 
+                        url2Play = urlVideo    
                 else:
                     # Erros
                     url2Play = url2
