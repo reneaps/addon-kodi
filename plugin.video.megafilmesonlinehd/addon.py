@@ -143,6 +143,9 @@ def getEpisodios(name, url):
         n = n - 1
         link = openURL(url)
         soup = BeautifulSoup(link)
+        titL = soup('div', {'class':'data'})
+        title = titL[0].h1.text
+        title = title.replace('#038;','')
         conteudo = soup('div', {'class':'sheader'})
         figure = conteudo[0]('div', {'class':'poster'})
         imgF = figure[0].img['src']
@@ -162,7 +165,7 @@ def getEpisodios(name, url):
             #titA = i(class_='numerando')[0].text.replace('-','x')
             #titB = i.a.text  #i(class_='episodiotitle')[0].a.text
             #titF = titA + ' - ' + titB
-            titF = i.a.text + ', ' + i.span.text
+            titF = title + ' - ' + i.a.text + ', ' + i.span.text
             titF = titF.encode('utf-8')
             addDirF(titF, urlF, 110, imgF, False, totF)
 
