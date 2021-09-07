@@ -6,6 +6,7 @@
 # Atualizado (1.1.1) - 13/07/2020
 # Atualizado (1.1.2) - 29/08/2020
 # Atualizado (2.0.0) - 22/07/2021
+# Atualizado (2.0.1) - 07/09/2021
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -17,7 +18,7 @@ from bs4            import BeautifulSoup
 from resources.lib  import jsunpack
 from time           import time
 
-version   = '2.0.0'
+version   = '2.0.1'
 addon_id  = 'plugin.video.midiaflixhd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -114,7 +115,7 @@ def getSeries(url):
                     pltF = ""
                     pass
                 i = i + 1
-                addDirF(titF, urlF, 27, imgF, True, totF, pltF)
+                addDirF(titF, urlF, 26, imgF, True, totF, pltF)
 
         try :
                 proxima = re.findall('<link rel="next" href="(.*?)"', link)[0]
@@ -147,29 +148,33 @@ def getTemporadas(name,url,iconimage):
 
 def getEpisodios(name, url):
         xbmc.log('[plugin.video.midiaflixhd] L175 ' + str(url), xbmc.LOGINFO)
-        link = openURL(urlF)
-        soup = BeautifulSoup(link, 'html.parser')
-        conteudo = soup('div', {'class':'content clearfix'})
-        links = conteudo[0]('p')
-        imgF = links[0].img['src']
-        idsT = []
-        idsU = []
-        tepis = links[7]    #titulo episodio
-        for i in tepis:
-            if 'EPIS' in i : 
-                titF = i
-                idsT.append(titF)
-                
-        lepis = links[7]('a') #link episodio
-        for i in lepis:
-            if 'filmesmp4' in i['href']:
-                urlF = i['href']
-                idsU.append(urlF)
-        totD = len(idsT)
+        n = name.replace('ª Temporada', '')
+        n = int(n)
+        n = (n-1)
+        temp = []
+        episodios = []
 
-        for i in range(0, totD):
-            urlF = [idsU[i]
-            titF = idsT[i]
+        link = openURL(url)
+        soup = BeautifulSoup(link, 'html.parser')
+        titulo = soup('div', {'class':'data'})
+        title = titulo[0].h1.text #.encode('utf-8')
+        conteudo = soup('div', {'class':'se-c'})
+        episodes = conteudo[n]('ul', {'class':'episodios'})
+        itens = episodes[0]('li')
+
+        totF = len(itens)
+
+        for i in itens:
+            urlF = i.a['href']
+            #if not url in urlF : urlF = base + urlF
+            imgF = i.img['src']
+            imgF = imgF.replace('w154', 'w300')
+            imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+            imgF = base + imgF if imgF.startswith("/wp-content") else imgF
+            xbmc.log('[plugin.video.midiaflixhd] L198 - ' + str(imgF), xbmc.LOGINFO)
+            titA = i(class_='numerando')[0].text.replace('-','x')
+            titB = i(class_='episodiotitle')[0].a.text
+            titF = title + ' - ' + titA + ' - ' + titB
             addDirF(titF, urlF, 110, imgF, False, totF)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
@@ -215,7 +220,10 @@ def doPesquisaSeries():
         a = pesquisa()
         total = len(a)
         for url2, titulo, img in a:
-            addDir(titulo, url2, 26, img, False, total)
+        	if '/series/' in str(url2) :
+        		addDir(titulo, url2, 26, img, False, total)
+        	else:
+        		addDir(titulo, url2, 100, img, False, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
@@ -223,7 +231,11 @@ def doPesquisaFilmes():
         a = pesquisa()
         total = len(a)
         for url2, titulo, img in a:
-            addDir(titulo, url2, 100, img, False, total)
+        	if '/series/' in str(url2) :
+        		addDir(titulo, url2, 26, img, False, total)
+        	else:
+        		addDir(titulo, url2, 100, img, False, total)
+        		
         setViewFilmes()
 
 def player(name,url,iconimage):
@@ -235,6 +247,7 @@ def player(name,url,iconimage):
 
         titsT = []
         idsT = []
+        sub = None
 
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
@@ -382,9 +395,11 @@ def player(name,url,iconimage):
                 b = json.loads(_html)
                 try:
                         urlF = b['url']
+                        urlF = 'https:%s' % urlF if urlF.startswith('//') else urlF
                         urlVideo = urlF
                 except:
                         c = b['video'][0]
+                		sub = b['subtitle']
                         urlF = c['file']
                         url2Play = urlF
                         OK = False
@@ -443,8 +458,10 @@ def player(name,url,iconimage):
                                 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                         }
                         r = requests.get(url=urlVideo, headers=headers)
-                        e = re.findall('sources:\s*\[\{[\'"]file[\'"]:[\'"](.+?)[\'"], type:[\'"]mp4[\'"], default:[\'"]true[\'"]\}\],', r.content)[0]
-                        url2Play = e #+ '%7C' + urllib.urlencode(headers)
+                        e = re.findall('var \$data = JSON.parse\(\'(.*?)\'\);', r.text)[0]
+                        b = json.loads(e)
+                        xbmc.log('[plugin.video.midiaflixhd] L451 - ' + str(b['g']), xbmc.LOGINFO)
+                        url2Play = b['g']
                         OK = False
 
                 elif '4toshare' in urlVideo :
@@ -557,7 +574,10 @@ def player(name,url,iconimage):
 
         if not url2Play : return
 
-        legendas = '-'
+        if sub is None:
+            legendas = '-'
+        else:
+            legendas = sub
 
         mensagemprogresso.update(75, 'Abrindo Sinal para ' + name +' Por favor aguarde...')
 
@@ -598,7 +618,7 @@ def player(name,url,iconimage):
                     sfile = os.path.join(xbmc.translatePath("special://temp"),'sub.srt')
                     sfile_xml = os.path.join(xbmc.translatePath("special://temp"),'sub.xml')#timedtext
                     sub_file_xml = open(sfile_xml,'w')
-                    sub_file_xml.write(urllib2.urlopen(legendas).read())
+                    sub_file_xml.write(urllib.parse.urlopen(legendas).read())
                     sub_file_xml.close()
                     xmltosrt.main(sfile_xml)
                     xbmcPlayer.setSubtitles(sfile)
@@ -617,6 +637,7 @@ def player_series(name,url,iconimage):
         idsT = []
         links = []
         hosts = []
+        sub = None
 
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
@@ -669,6 +690,7 @@ def player_series(name,url,iconimage):
             soup = BeautifulSoup(link, 'html.parser')
             conteudo = soup.select('.source-box')
             #print(link)
+            titsT = []
             for i in conteudo:
                     if 'auth' in str(i) :
                             uri = i.a['href']
@@ -676,23 +698,39 @@ def player_series(name,url,iconimage):
                             urlF = base64.b64decode(uri)
                             b = json.loads(urlF)
                             urlF = b['url']
-                            print(urlF)
+                            au = urlF.split('/')[-1]
+                            idsT.append(urlF)
+                            if 'dub' == au : au = titsT.append("Dublado")
+                            if 'leg' == au : au = titsT.append("Legendado")
+
+            if not titsT : return
+
+            index = xbmcgui.Dialog().select('Selecione uma das opções :', titsT)
+
+            if index == -1 : return
+
+            i = int(index)
+            urlF = idsT[i]
         except:
                 pass
-                
+
         urlVideo = urlF
 
         xbmc.log('[plugin.video.midiaflixhd] L622 - ' + str(urlVideo), xbmc.LOGINFO)
         
         if 'play.midiaflixhd.com' in urlVideo:
                 html = requests.get(urlVideo).text
-                match = re.findall('idS="(.+?)"', html)
+                match = re.findall('id[sS]="(.+?)"', html)
+                idsT = []
+                titsT = []
                 for x in match:
                     idsT.append(x)
-                match = re.findall('<button class="btn btn-l.+?" idS=".+?" id="btn-(.+?)"><i id="icon-.+?" class="glyphicon glyphicon-play-circle"></i> Others</button>', html)
-                for x in match:
-                        if x =='0' : titsT.append("Dublado")
-                        if x =='1' : titsT.append("Legendado")
+                match = re.findall('<button class=".+?" idS=".+?" id="btn-(.+?)"><i id=".+?" class="glyphicon glyphicon-play-circle"></i>.+?</button>', html)
+                for x in match :
+                        x = int(x)+1
+                        s = 'Player ' + str(x)
+                        titsT.append(s)
+
 
                 if not titsT : return
 
@@ -721,14 +759,22 @@ def player_series(name,url,iconimage):
                 _html = str(html)
                 _html = bytes.fromhex(_html).decode('utf-8')
                 b = json.loads(_html)
-                c = b['video']
-                urlF = c[0]['file']
-                headers = {'referer': urlVideo,
-                            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'}
-                r = requests.get(url=urlF,allow_redirects=False,headers=headers)
-                urlF = r.headers['Location']
-                r = requests.get(url=urlF,allow_redirects=False,headers=headers)
-                urlF = r.headers['Location']
+                xbmc.log('[plugin.video.midiaflixhd] L591 - ' + str(b), xbmc.LOGINFO)
+                if 'video' in str(b) :
+                	c = b['video']
+                	urlF = c[0]['file']
+                	sub = b['subtitle']
+                	xbmc.log('[plugin.video.midiaflixhd] L761 - ' + str(sub), xbmc.LOGINFO)
+	                headers = {'referer': urlVideo,
+	                            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'}
+	                r = requests.get(url=urlF,allow_redirects=False,headers=headers)
+	                urlF = r.headers['Location']
+	                r = requests.get(url=urlF,allow_redirects=False,headers=headers)
+	                urlF = r.headers['Location']                	
+                elif 'url' in str(b) :
+                	c = b['url']
+                	urlF = c
+
                 urlVideo = urlF
 
                 xbmc.log('[plugin.video.midiaflixhd] L602 - ' + str(urlVideo), xbmc.LOGINFO)
@@ -787,7 +833,10 @@ def player_series(name,url,iconimage):
 
         if not url2Play : return
 
-        legendas = '-'
+        if sub is None:
+            legendas = '-'
+        else:
+            legendas = sub
 
         mensagemprogresso.update(75, 'Abrindo Sinal para ' + name + ' Por favor aguarde...')
 
@@ -828,7 +877,7 @@ def player_series(name,url,iconimage):
                     sfile = os.path.join(xbmc.translatePath("special://temp"),'sub.srt')
                     sfile_xml = os.path.join(xbmc.translatePath("special://temp"),'sub.xml')#timedtext
                     sub_file_xml = open(sfile_xml,'w')
-                    sub_file_xml.write(urllib2.urlopen(legendas).read())
+                    sub_file_xml.write(urllib.parse.urlopen(legendas).read())
                     sub_file_xml.close()
                     xmltosrt.main(sfile_xml)
                     xbmcPlayer.setSubtitles(sfile)
