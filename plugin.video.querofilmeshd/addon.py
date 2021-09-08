@@ -12,6 +12,7 @@
 # Atualizado (1.0.7) - 18/08/2021
 # Atualizado (1.0.8) - 23/08/2021
 # Atualizado (1.0.9) - 24/08/2021
+# Atualizado (1.1.0) - 10/09/2021
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -23,7 +24,7 @@ from urlparse           import urlparse
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.9'
+version   = '1.1.0'
 addon_id  = 'plugin.video.querofilmeshd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -348,7 +349,11 @@ def player(name,url,iconimage):
 
         if index == -1 : return
         i = index
+        t = int(round(time.time() * 1000))
         urlVideo = host + '/' + idsT[i]
+        urlVideo = str(urlVideo)
+        if 'assistirfilmes' in str(urlVideo) : 
+            urlVideo = urlVideo.replace(".m3u8", "?v=") + str(t)
         url2Play = urlVideo
         OK = False
 
@@ -379,7 +384,7 @@ def player(name,url,iconimage):
         playlist = xbmc.PlayList(1)
         playlist.clear()
 
-        if "m3u8" in url2Play:
+        if "m3u8" in url2Play or "hls" in url2Play:
                 #ip = addon.getSetting("inputstream")
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
@@ -536,6 +541,9 @@ def player_series(name,url,iconimage):
                 if index == -1 : return
                 i = index
                 urlVideo = host + '/' + idsT[i]
+                urlVideo = str(urlVideo)
+                if 'assistirfilmes' in str(urlVideo) : 
+                    urlVideo = urlVideo.replace(".m3u8", "?v=") + str(t)
                 url2Play = urlVideo
                 OK = False
 
@@ -561,7 +569,7 @@ def player_series(name,url,iconimage):
         playlist = xbmc.PlayList(1)
         playlist.clear()
 
-        if "m3u8" in url2Play:
+        if "m3u8" in url2Play or "hls" in url2Play:
                 #ip = addon.getSetting("inputstream")
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
