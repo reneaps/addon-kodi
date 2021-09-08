@@ -12,6 +12,7 @@
 # Atualizado (1.1.1) - 13/07/2020
 # Atualizado (1.1.2) - 29/08/2020
 # Atualizado (1.1.3) - 23/07/2021
+# Atualizado (1.1.4) - 10/09/2021
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -24,7 +25,7 @@ from bs4                import BeautifulSoup
 from urlparse           import urlparse
 from resources.lib      import jsunpack
 
-version   = '1.1.3'
+version   = '1.1.4'
 addon_id  = 'plugin.video.midiaflixhd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -66,7 +67,7 @@ def getCategorias(url):
         setViewMenu()
 
 def getFilmes(url):
-        xbmc.log('[plugin.video.midiaflixhd] L69 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L70 ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, 'html.parser')
@@ -141,7 +142,7 @@ def getSeries(url):
         setViewFilmes()
 
 def getTemporadas(name,url,iconimage):
-        xbmc.log('[plugin.video.midiaflixhd] L144 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L145 ' + str(url), xbmc.LOGNOTICE)
         html = openURL(url)
         soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', {'id':'seasons'})
@@ -161,7 +162,7 @@ def getTemporadas(name,url,iconimage):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url):
-        xbmc.log('[plugin.video.midiaflixhd] L164 ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L165 ' + str(url), xbmc.LOGNOTICE)
         n = name.replace('ª Temporada', '')
         n = int(n)
         n = (n-1)
@@ -184,7 +185,7 @@ def getEpisodios(name, url):
             imgF = imgF.replace('w154', 'w300')
             imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
             imgF = base + imgF if imgF.startswith("/wp-content") else imgF
-            xbmc.log('[plugin.video.midiaflixhd] L187 - ' + str(imgF), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.midiaflixhd] L188 - ' + str(imgF), xbmc.LOGNOTICE)
             titA = i(class_='numerando')[0].text.encode('utf-8').replace('-','x')
             titB = i(class_='episodiotitle')[0].a.text.encode('utf-8')
             titF = titA + ' - ' + titB
@@ -246,7 +247,7 @@ def doPesquisaFilmes():
         setViewFilmes()
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.midiaflixhd] L249 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L250 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('MidiaFlixHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -254,6 +255,7 @@ def player(name,url,iconimage):
 
         titsT = []
         idsT = []
+        sub = None
 
         link = openURL(url)
         dooplay = re.findall(r'<li id=[\'"]player-option-1[\'"] class=[\'"]dooplay_player_option[\'"] data-type=[\'"](.+?)[\'"] data-post=[\'"](.+?)[\'"] data-nume=[\'"](.+?)[\'"]>', link)
@@ -273,11 +275,11 @@ def player(name,url,iconimage):
                         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
                 }
                 urlF = 'https://www.midiaflixhd.net/wp-admin/admin-ajax.php'
-                xbmc.log('[plugin.video.midiaflixhd] L276 - ' + str(dooplay), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.midiaflixhd] L278 - ' + str(dooplay), xbmc.LOGNOTICE)
                 data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
                 r = requests.post(url=urlF, data=data, headers=headers)
                 html = r.content
-                xbmc.log('[plugin.video.midiaflixhd] L280 - ' + str(html), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.midiaflixhd] L282 - ' + str(html), xbmc.LOGNOTICE)
         except:
             pass
 
@@ -291,7 +293,7 @@ def player(name,url,iconimage):
             urlF = soup.a['href']
             fxID = urlF.split('l=')[1]
             urlF = base64.b64decode(fxID)
-            xbmc.log('[plugin.video.midiaflixhd] L294 - ' + str(urlF), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.midiaflixhd] L296 - ' + str(urlF), xbmc.LOGNOTICE)
         except:
             pass
 
@@ -317,12 +319,12 @@ def player(name,url,iconimage):
         except:
             pass
 
-        xbmc.log('[plugin.video.midiaflixhd] L320 - ' + str(urlF), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L322 - ' + str(urlF), xbmc.LOGNOTICE)
         html = openURL(urlF)
         urlVideo = urlF
         try:
             urlVideo = re.findall(r'var JWp = \{[\'"]mp4file[\'"]: [\'"](.+?)[\'"],', html)[0]
-            xbmc.log('[plugin.video.midiaflixhd] L325 - ' + str(html), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.midiaflixhd] L327 - ' + str(html), xbmc.LOGNOTICE)
             url2Play = urlVideo
             OK = False
             print urlVideo
@@ -335,18 +337,18 @@ def player(name,url,iconimage):
             r = urllib2.urlopen(url2Play)
             url2Play = r.geturl()
             OK = False
-            xbmc.log('[plugin.video.midiaflixhd] L338 - ' + str(url2Play), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.midiaflixhd] L340 - ' + str(url2Play), xbmc.LOGNOTICE)
         except:
             pass
         try:
             urlVideo = re.findall(r'file: "(.+?)",', html)[2]
             url2Play = urlVideo
             OK = False
-            xbmc.log('[plugin.video.midiaflixhd] L345 - ' + str(url2Play), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.midiaflixhd] L347 - ' + str(url2Play), xbmc.LOGNOTICE)
         except:
             pass
 
-        xbmc.log('[plugin.video.midiaflixhd] L349 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L351 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -355,14 +357,14 @@ def player(name,url,iconimage):
                 soup = BeautifulSoup(html, 'html.parser')
                 urlF = soup.iframe["src"]
                 urlVideo = urlF
-                xbmc.log('[plugin.video.midiaflixhd] L358 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.midiaflixhd] L360 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         elif 'embed.mystream.to' in urlVideo:
                 html = openURL(urlVideo)
                 soup = BeautifulSoup(html, 'html.parser')
                 urlF = soup.source["src"]
                 url2Play = urlF
-                xbmc.log('[plugin.video.midiaflixhd] L365 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.midiaflixhd] L367 - ' + str(urlVideo), xbmc.LOGNOTICE)
                 OK = False
 
         elif 'playercdn.net' in urlVideo:
@@ -370,14 +372,14 @@ def player(name,url,iconimage):
                 soup = BeautifulSoup(html, 'html.parser')
                 urlF = soup.source["src"]
                 url2Play = urlF
-                xbmc.log('[plugin.video.midiaflixhd] L373 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.midiaflixhd] L375 - ' + str(urlVideo), xbmc.LOGNOTICE)
                 OK = False
 
         elif 'play.midiaflixhd.com' in urlVideo:
                 r = requests.get(urlVideo)
                 html = r.content
                 soup = BeautifulSoup(html, 'html.parser')
-                #xbmc.log('[plugin.video.midiaflixhd] L380 - ' + str(html), xbmc.LOGNOTICE)
+                #xbmc.log('[plugin.video.midiaflixhd] L382 - ' + str(html), xbmc.LOGNOTICE)
                 match = re.findall(r'\("SvplayerID",{\r\n\t\t\t\t\t\t\tidS: "(.*?)"\r\n\t\t\t\t\t\t}\);', html)
                 for x in match:
                     idsT.append(x)
@@ -413,11 +415,12 @@ def player(name,url,iconimage):
                 except:
                         c = b['video'][0]
                         urlF = c['file']
+                        sub = b['subtitle']
                         url2Play = urlF
                         OK = False
                         pass
 
-                xbmc.log('[plugin.video.midiaflixhd] L420 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.midiaflixhd] L423 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
                 if 'letsupload.co' in urlVideo:
                         nowID = urlVideo.split("=")[1]
@@ -444,7 +447,7 @@ def player(name,url,iconimage):
                         r = json.loads(link.text).get('stream')
                         urlF = r.get('backup') if r.get('backup') else r.get('src')
                         url2Play = urlF
-                        xbmc.log('[plugin.video.midiaflixhd] L447 - ' + str(url2Play), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.midiaflixhd] L450 - ' + str(url2Play), xbmc.LOGNOTICE)
                         OK = False
 
                 elif 'gdriveplayer.to' in urlVideo:
@@ -460,7 +463,7 @@ def player(name,url,iconimage):
                         html = openURL(urlVideo)
                         e = re.findall('<meta name="twitter:image" content="(.+?)">', html)[0]
                         url2Play = e.replace('/img', '').replace('jpg','mp4')
-                        xbmc.log('[plugin.video.midiaflixhd] L463 - ' + str(url2Play), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.midiaflixhd] L466 - ' + str(url2Play), xbmc.LOGNOTICE)
                         OK = False
 
                 elif 'gofilmes.me' in urlVideo:
@@ -490,11 +493,11 @@ def player(name,url,iconimage):
                 elif 'video.php' in urlVideo :
                         fxID = urlVideo.split('u=')[1]
                         urlVideo = base64.b64decode(fxID)
-                        xbmc.log('[plugin.video.midiaflixhd] L493 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.midiaflixhd] L496 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         OK = True
 
                 elif 'actelecup.com' in urlVideo :
-                        xbmc.log('[plugin.video.midiaflixhd] L497 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.midiaflixhd] L500 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         urlVideo = moonwalk.get_playlist(urlVideo)
                         urlVideo = urlVideo[0]
                         qual = []
@@ -518,7 +521,7 @@ def player(name,url,iconimage):
                         host = urlF.split('/public')[0]
                         t = int(round(time.time() * 1000))
                         urlF = host + '/playlist/' + fxID + '/' + str(t)
-                        xbmc.log('[plugin.video.midiaflixhd] L521 - ' + str(urlF), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.midiaflixhd] L524 - ' + str(urlF), xbmc.LOGNOTICE)
 
                         r = requests.get(url=urlF)
                         titsT = re.findall('RESOLUTION=(.*?)\n/hls.+', r.text)
@@ -567,7 +570,7 @@ def player(name,url,iconimage):
                         soup = BeautifulSoup(link, 'html.parser')
                         filme = soup('video')
                         url2Play = filme[0].source['src']
-                        xbmc.log('[plugin.video.midiaflixhd] L570 - ' + str(url2Play), xbmc.LOGINFO)
+                        xbmc.log('[plugin.video.midiaflixhd] L573 - ' + str(url2Play), xbmc.LOGINFO)
                         OK = False
 
                 elif 'filmesmp4' in url or 'pandafiles' in urlVideo :
@@ -610,11 +613,14 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        xbmc.log('[plugin.video.midiaflixhd] L613 - ' + str(url2Play), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L616 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         if not url2Play : return
 
-        legendas = '-'
+        if sub is None:
+            legendas = '-'
+        else:
+            legendas = sub
 
         mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
 
@@ -647,9 +653,10 @@ def player(name,url,iconimage):
             else:
                 xbmcPlayer.setSubtitles(legendas)
 
+        return OK
 
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.midiaflixhd] L652 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L659 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('MidiaFlixHD', 'Obtendo Fontes para ' + name, 'Por favor aguarde...')
@@ -659,12 +666,13 @@ def player_series(name,url,iconimage):
         idsT = []
         links = []
         hosts = []
+        sub = None
 
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, 'html.parser')
         dados = soup('li',{'id':'player-option-1'})
-        xbmc.log('[plugin.video.midiaflixhd] L667 - ' + str(dados), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L675 - ' + str(dados), xbmc.LOGNOTICE)
         if not dados :
                 dialog = xbmcgui.Dialog()
                 dialog.ok(name, " ainda não liberado, aguarde... ")
@@ -687,7 +695,7 @@ def player_series(name,url,iconimage):
             }
             urlF = 'https://www.midiaflixhd.net/wp-admin/admin-ajax.php'
             data = urllib.urlencode({'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype})
-            xbmc.log('[plugin.video.midiaflixhd] L690 - ' + str(data), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.midiaflixhd] L698 - ' + str(data), xbmc.LOGNOTICE)
             r = requests.post(url=urlF, data=data, headers=headers)
             html = r.content
             soup = BeautifulSoup(html, 'html.parser')
@@ -696,7 +704,7 @@ def player_series(name,url,iconimage):
 
         try:
             urlF = soup.iframe['src']
-            xbmc.log('[plugin.video.midiaflixhd] L699 - ' + str(urlF), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.midiaflixhd] L707 - ' + str(urlF), xbmc.LOGNOTICE)
         except:
             pass
 
@@ -735,7 +743,7 @@ def player_series(name,url,iconimage):
         except:
                 pass
 
-        xbmc.log('[plugin.video.midiaflixhd] L738 - ' + str(urlF), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L746 - ' + str(urlF), xbmc.LOGNOTICE)
 
         urlVideo = urlF
 
@@ -771,24 +779,38 @@ def player_series(name,url,iconimage):
                 urlF ='https://play.midiaflixhd.com/CallEpi'
                 data = urllib.urlencode({'idS': idS})
                 r = requests.post(url=urlF, data=data, headers=headers)
-                xbmc.log('[plugin.video.midiaflixhd] L774 - ' + str(data), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.midiaflixhd] L782 - ' + str(data), xbmc.LOGNOTICE)
 
-                xbmc.log('[plugin.video.midiaflixhd] L776 - ' + str(r.text), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.midiaflixhd] L784 - ' + str(r.text), xbmc.LOGNOTICE)
 
                 html = r.content
                 _html = str(html)
                 b = json.loads(_html.decode('hex'))
                 c = b['video']
+                sub = b['subtitle']
+                xbmc.log('[plugin.video.midiaflixhd] L791 - ' + str(b), xbmc.LOGNOTICE)
                 urlF = c[0]['file']
                 headers = {'referer': urlVideo,
                             'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'}
                 r = requests.get(url=urlF,allow_redirects=False,headers=headers)
-                urlF = r.headers['Location']
+                if r.status_code >= 300 and r.status_code <= 399:
+                    #Sucesso
+                    urlF = r.headers['Location']
+                else :
+                    #Erros
+                    return
+
                 r = requests.get(url=urlF,allow_redirects=False,headers=headers)
-                urlF = r.headers['Location']
+                if r.status_code >= 300 and r.status_code <= 399:
+                    #Sucesso
+                    urlF = r.headers['Location']
+                else :
+                    #Erros
+                    return
+
                 urlVideo = urlF
 
-                xbmc.log('[plugin.video.midiaflixhd] L791 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                xbmc.log('[plugin.video.midiaflixhd] L813 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
                 if 'letsupload.co' in urlVideo:
                         nowID = urlVideo.split("=")[1]
@@ -819,12 +841,12 @@ def player_series(name,url,iconimage):
                 elif 'video.php' in urlVideo :
                         fxID = urlVideo.split('=')[1]
                         urlVideo = base64.b64decode(fxID)
-                        xbmc.log('[plugin.video.midiaflixhd] L822 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                        xbmc.log('[plugin.video.midiaflixhd] L844 - ' + str(urlVideo), xbmc.LOGNOTICE)
                         OK = True
 
                         if 'alfastream.cc' in urlVideo:
                                 if 'actelecup.com' in urlVideo:
-                                        xbmc.log('[plugin.video.midiaflixhd] L827 - ' + str(urlVideo), xbmc.LOGNOTICE)
+                                        xbmc.log('[plugin.video.midiaflixhd] L849 - ' + str(urlVideo), xbmc.LOGNOTICE)
                                         urlVideo = moonwalk.get_playlist(urlVideo)
                                         urlVideo = urlVideo[0]
                                         qual = []
@@ -836,7 +858,7 @@ def player_series(name,url,iconimage):
                                         url2Play = urlVideo[i]
                                         OK = False
 
-        xbmc.log('[plugin.video.midiaflixhd] L839 ' + str(urlVideo), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.midiaflixhd] L861 ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name,'Por favor aguarde...')
 
@@ -844,7 +866,10 @@ def player_series(name,url,iconimage):
 
         if not url2Play : return
 
-        legendas = '-'
+        if sub is None:
+            legendas = '-'
+        else:
+            legendas = sub
 
         mensagemprogresso.update(75, 'Abrindo Sinal para ' + name,'Por favor aguarde...')
 
