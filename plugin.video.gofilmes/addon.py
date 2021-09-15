@@ -3,7 +3,7 @@
 #####################################################################
 # -*- coding: utf-8 -*-
 #####################################################################
-# Addon : Filmes e Series Online
+# Addon : GoFilmes
 # By AddonReneSilva - 03/05/2019
 # Atualizado (1.0.0) - 03/05/2019
 # Atualizado (1.0.1) - 26/05/2019
@@ -16,6 +16,7 @@
 # Atualizado (1.0.8) - 10/07/2020
 # Atualizado (1.0.9) - 17/07/2020
 # Atualizado (1.1.0) - 24/08/2021
+# Atualizado (1.1.1) - 15/09/2021
 #####################################################################
 
 import urllib, urllib2, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -30,7 +31,7 @@ from resources.lib               import jsunpack
 import socket
 socket.setdefaulttimeout(60)
 
-version      = '1.1.0'
+version      = '1.1.1'
 addon_id     = 'plugin.video.gofilmes'
 selfAddon    = xbmcaddon.Addon(id=addon_id)
 addonfolder  = selfAddon.getAddonInfo('path')
@@ -133,20 +134,21 @@ def getSeries(url):
         setViewFilmes()
 
 def getTemporadas(url):
+        xbmc.log('[plugin.video.gofilmes] L136 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
         soup = BeautifulSoup(link, "html5lib")
         conteudo = soup.find("div", {"id": "seasons"})
         temporadas = conteudo("div", {"class":"se-c"})
         totF = len(temporadas)
-        img = soup.find("div", {"class": "p1"})
+        imgF = iconimage.replace("w185","w300_and_h450_bestv2") if 'w185' in iconimage else iconimage
         urlF = url
         pltF = sinopse(urlF)
         i = 1
         while i <= totF:
             titF = str(i) + "ª Temporada"
             try:
-                addDirF(titF, urlF, 27, iconimage, True, totF, pltF)
+                addDirF(titF, urlF, 27, imgF, True, totF, pltF)
             except:
                 pass
             i = i + 1
@@ -198,19 +200,19 @@ def pesquisa():
 
 def doPesquisaSeries():
         texto = pesquisa()
-        url = sbase + 'search?q=%s' % str(texto)
+        url = sbase + '?s=%s' % str(texto)
         link  = openURL(url)
         link = unicode(link, 'utf-8', 'ignore')
 
         soup = BeautifulSoup(link, "html5lib")
-        conteudo = soup('div',{'class':'main'})
-        filmes = conteudo[0]('div',{'class':'serie'})
+        conteudo = soup('div',{'class':'search-page'})
+        filmes = conteudo[0]('article')
         totF = len(filmes)
 
         hosts = []
         for filme in filmes:
-            titF = filme('div',{'class':'tt'})[0].text.encode('utf-8')
-            urlF = sbase + filme.a['href']
+            titF = filme.img['alt'].encode('utf-8')
+            urlF = filme.a['href']
             imgF = filme.img['src']
             temp = [urlF, titF, imgF]
             hosts.append(temp)
@@ -228,16 +230,16 @@ def doPesquisaSeries():
         
 def doPesquisaFilmes():
         texto = pesquisa()
-        url = base + '/search.php?s=%s' % str(texto)
+        url = base + '?s=%s' % str(texto)
         html = openURL(url)
         soup = BeautifulSoup(html, 'html5lib')
-        conteudo = soup('div',{'class':'main'})
-        filmes = conteudo[0]('div',{'class':'poster'})
+        conteudo = soup('div',{'class':'search-page'})
+        filmes = conteudo[0]('article')
         totF = len(filmes)
 
         hosts = []
         for filme in filmes:
-            titF = filme.a['title'].encode('utf-8')
+            titF = filme.a['alt'].encode('utf-8')
             urlF = filme.a['href']
             imgF = filme.img['src']
             temp = [urlF, titF, imgF]
