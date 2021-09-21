@@ -4,6 +4,7 @@
 # Addon : FilmestorrentBrasil
 # By AddonBrasil - 08/08/2020
 # Atualizado (1.0.0) - 01/08/2021
+# Atualizado (1.0.1) - 21/09/2021
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -14,7 +15,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.0'
+version   = '1.0.1'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -154,6 +155,7 @@ def getEpisodios(name, url,iconimage):
                 urlF = base64.b64decode(fxID).decode('utf-8')
                 addDirF(titF, urlF, 110, imgF)
 
+
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
 
 def pesquisa():
@@ -227,6 +229,7 @@ def player(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
+                urlVideo = urllib.parse.unquote(urlVideo)
                 url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
 
@@ -278,7 +281,7 @@ def player(name,url,iconimage):
         while xbmcPlayer.play(playlist) :
             xbmc.sleep(20000)
             if not xbmcPlayer.isPlaying():
-                xbmc.stop()
+                xbmcPlayer.stop()
 
         mensagemprogresso.update(100)
         mensagemprogresso.close()
@@ -296,10 +299,10 @@ def player(name,url,iconimage):
             else:
                 xbmcPlayer.setSubtitles(legendas)
 
-        return ''
+        return OK
         
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L421 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L305 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -312,10 +315,20 @@ def player_series(name,url,iconimage):
         #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                url2Player = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
+                urlVideo = urllib.parse.unquote(urlVideo)
+                url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
 
-        if OK : url2Play = urlresolver.resolve(urlVideo)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L324 - ' + str(url2Play), xbmc.LOGINFO)
+        
+        if OK :
+            try:
+                url2Play = urlresolver.resolve(urlVideo)
+            except:
+                dialog = xbmcgui.Dialog()
+                dialog.ok(" Erro:", " Video removido! ")
+                url2Play = []
+                pass
 
         if not url2Play : return
 
@@ -352,7 +365,7 @@ def player_series(name,url,iconimage):
         while xbmcPlayer.play(playlist) :
             xbmc.sleep(20000)
             if not xbmcPlayer.isPlaying():
-                xbmc.stop()
+                xbmcPlayer.stop()
 
         mensagemprogresso.update(100)
         mensagemprogresso.close()
@@ -370,7 +383,7 @@ def player_series(name,url,iconimage):
             else:
                 xbmcPlayer.setSubtitles(legendas)
 
-        return ''
+        return OK
 
 ############################################################################################################
 

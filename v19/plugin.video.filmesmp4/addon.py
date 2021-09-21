@@ -4,6 +4,7 @@
 # Addon : FilmesMP4
 # By AddonBrasil - 11/12/2015
 # Atualizado (1.0.0) - 20/08/2021
+# Atualizado (1.0.1) - 21/09/2021
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -15,7 +16,7 @@ from bs4            import BeautifulSoup
 from resources.lib  import jsunpack
 from time           import time
 
-version   = '1.0.0'
+version   = '1.0.1'
 addon_id  = 'plugin.video.filmesmp4'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -616,7 +617,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1,plot='') :
         cmItems = []
 
         cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
-        cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.parse.quote(name), url, urllib.parse.quote(iconimage))))
+        cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.parse.quote(name), url, urllib.parse.quote(iconimage))))
 
         liz.addContextMenuItems(cmItems, replaceItems=False)
 
@@ -632,10 +633,15 @@ def getInfo(url):
 
 def playTrailer(name, url,iconimage):
         link = openURL(url)
-        #ytID = re.findall('<a id="open-trailer" class="btn iconized trailer" data-trailer="https://www.youtube.com/embed/(.*?)rel=0&amp;controls=1&amp;showinfo=0&autoplay=0"><b>Trailler</b> <i class="icon fa fa-play"></i></a>', link)[0]
-        ytID = '' #SytID.replace('?','')
-
-        xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
+        ytID = re.findall('<iframe title="Trailer" width=".*?" height=".*?" src="https://www.youtube.com/embed/(.*?)" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>', link)[0]
+        #ytID = '' #SytID.replace('?','')
+        xbmc.log('[plugin.video.filmesmp4] L637 - ' + str(ytID), xbmc.LOGINFO)
+        if ytID == '' : 
+            dialog = xbmcgui.Dialog()
+            dialog.ok(" Desculpe:", " Trailer não disponivel! ")
+            return ''
+        xbmc.executebuiltin('RunPlugin("plugin://plugin.video.youtube/play/?video_id=%s")' % ytID)
+        #xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
 
 def setViewMenu() :
         xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
