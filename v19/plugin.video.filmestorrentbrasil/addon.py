@@ -117,7 +117,7 @@ def getTemporadas(name,url,iconimage):
         while i <= totF:
                 titF = str(i) + "ª Temporada"
                 try:
-                    addDirF(titF, urlF, 27, iconimage, True, totF)
+                    addDir(titF, urlF, 27, iconimage, True, totF)
                 except:
                     pass
                 i = i + 1
@@ -153,8 +153,7 @@ def getEpisodios(name, url,iconimage):
                 u = link.a['href']
                 fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
-                addDirF(titF, urlF, 110, imgF)
-
+                addDir(titF, urlF, 110, imgF, totF, False)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
 
@@ -192,7 +191,7 @@ def doPesquisaSeries():
         total = len(a)
         for url2, titulo, img in a:
             xbmc.log('[plugin.video.filmestorrentbrasil] L237 - ' + str(url2), xbmc.LOGINFO)
-            addDir(titulo, url2, 27, img, False, total)
+            addDirF(titulo, url2, 27, img, True, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         
@@ -201,7 +200,7 @@ def doPesquisaFilmes():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            addDir(titulo, url2, 100, img, False, total)
+            addDirF(titulo, url2, 100, img, False, total)
 
 def player(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L249 - ' + str(url), xbmc.LOGINFO)
@@ -315,7 +314,7 @@ def player_series(name,url,iconimage):
         #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                urlVideo = urllib.parse.unquote(urlVideo)
+                #urlVideo = urllib.parse.unquote(urlVideo)
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
 
