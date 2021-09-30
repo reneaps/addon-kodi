@@ -400,7 +400,7 @@ def openURL(url):
                 'Upgrade-Insecure-Requests': '1',
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36'
         }
-        link = requests.get(url).text
+        link = requests.get(url=url, headers=headers).text
         return link
 
 def postURL(url):
