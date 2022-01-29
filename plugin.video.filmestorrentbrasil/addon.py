@@ -5,7 +5,8 @@
 # By AddonBrasil - 08/08/2020
 # Atualizado (1.0.0) - 01/08/2021
 # Atualizado (1.0.1) - 21/09/2021
-# Atualizado (1.0.2) - 29/01/2022
+# Atualizado (1.0.2) - 30/09/2021
+# Atualizado (1.0.3) - 08/01/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -16,7 +17,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.2'
+version   = '1.0.3'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
