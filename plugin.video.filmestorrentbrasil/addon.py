@@ -6,7 +6,7 @@
 # Atualizado (1.0.0) - 01/08/2021
 # Atualizado (1.0.1) - 21/09/2021
 # Atualizado (1.0.2) - 30/09/2021
-# Atualizado (1.0.3) - 08/01/2022
+# Atualizado (1.0.3) - 30/01/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -59,16 +59,17 @@ def getCategorias(url):
         setViewMenu()
 
 def getFilmes(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L65 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L65 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
-        soup = BeautifulSoup(link, "html.parser")
+        soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup('div', attrs={'class':'listPost'})
-        filmes = conteudo[0]('div', {'class':'post green'})
+        #xbmc.log('[plugin.video.filmestorrentbrasil] L64 - ' + str(link), xbmc.LOGNOTICE)
+        filmes = conteudo[0]('div', attrs={'class':'post green'})
 
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.a['title']
+                titF = filme.a['title'].encode('utf-8')
                 imgF = filme.img['src']
                 urlF = filme.a['href']
                 pltF = titF
@@ -83,7 +84,7 @@ def getFilmes(name,url,iconimage):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L100- ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L100- ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div', attrs={'class':'listPost'})
@@ -92,7 +93,7 @@ def getSeries(url):
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.a['title']
+                titF = filme.a['title'].encode('utf-8')
                 imgF = filme.img['src']
                 urlF = filme.a['href']
                 pltF = titF
@@ -107,7 +108,7 @@ def getSeries(url):
         setViewFilmes()
 
 def getTemporadas(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L136 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L136 - ' + str(url), xbmc.LOGNOTICE)
         html = openURL(url)
         soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', {'id':'seasons'})
@@ -119,7 +120,7 @@ def getTemporadas(name,url,iconimage):
         while i <= totF:
                 titF = str(i) + "ª Temporada"
                 try:
-                    addDir(titF, urlF, 27, iconimage, True, totF)
+                    addDir(titF, urlF, 27, iconimage, totF, True)
                 except:
                     pass
                 i = i + 1
@@ -127,7 +128,7 @@ def getTemporadas(name,url,iconimage):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='seasons')
 
 def getEpisodios(name, url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L127 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L127 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
         links = soup('p')
@@ -149,13 +150,14 @@ def getEpisodios(name, url,iconimage):
                 if 'img' in str(link):
                     titF = link.img['alt']
             elif 'Epis' in str(link):
-                if '<strong>' in str(link) : titF = link.strong.text
+                if '<strong>' in str(link) : titF = link.strong.text
                 if '<b>' in str(link) : titF = link.text
             if 'campanha' in str(link):
                 #if titF: titF = 'Epis'
                 u = link.a['href']
                 fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
+                titF = titF.encode('utf-8')
                 addDir(titF, urlF, 110, imgF, totF, False)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
@@ -166,10 +168,10 @@ def pesquisa():
 
         if (keyb.isConfirmed()):
                 texto    = keyb.getText()
-                pesquisa = urllib.parse.quote(texto)
+                pesquisa = urllib.quote(texto)
                 url      = base + '?s=%s' % str(pesquisa)
 
-                xbmc.log('[plugin.video.filmestorrentbrasil] L198 - ' + str(url), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.filmestorrentbrasil] L169 - ' + str(url), xbmc.LOGNOTICE)
                 hosts = []
                 temp = []
                 link = openURL(url)
@@ -180,7 +182,7 @@ def pesquisa():
                 totF = len(filmes)
 
                 for filme in filmes:
-                        titF = filme.a['title']
+                        titF = filme.a['title'].encode('utf-8')
                         imgF = filme.img['src']
                         urlF = filme.a['href']
                         temp = [urlF, titF, imgF]
@@ -193,7 +195,6 @@ def doPesquisaSeries():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            xbmc.log('[plugin.video.filmestorrentbrasil] L237 - ' + str(url2), xbmc.LOGINFO)
             addDirF(titulo, url2, 27, img, True, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
@@ -206,7 +207,7 @@ def doPesquisaFilmes():
             addDirF(titulo, url2, 100, img, False, total)
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L249 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L249 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -226,12 +227,11 @@ def player(name,url,iconimage):
                 idS = urlF.split('id=')[-1]
                 urlVideo = base64.b64decode(idS).decode('utf-8')
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L352 - ' + str(urlVideo), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L352 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                urlVideo = urllib.parse.unquote(urlVideo)
                 url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
 
@@ -244,7 +244,7 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L364 - ' + str(url2Play), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L364 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         if not url2Play : return
 
@@ -294,7 +294,7 @@ def player(name,url,iconimage):
                     sfile = os.path.join(xbmc.translatePath("special://temp"),'sub.srt')
                     sfile_xml = os.path.join(xbmc.translatePath("special://temp"),'sub.xml')#timedtext
                     sub_file_xml = open(sfile_xml,'w')
-                    sub_file_xml.write(urllib.parse.urlopen(legendas).read())
+                    sub_file_xml.write(requests.get(legendas).text)
                     sub_file_xml.close()
                     xmltosrt.main(sfile_xml)
                     xbmcPlayer.setSubtitles(sfile)
@@ -304,7 +304,7 @@ def player(name,url,iconimage):
         return OK
         
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L305 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L305 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -317,11 +317,10 @@ def player_series(name,url,iconimage):
         #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                #urlVideo = urllib.parse.unquote(urlVideo)
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L324 - ' + str(url2Play), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L324 - ' + str(url2Play), xbmc.LOGNOTICE)
         
         if OK :
             try:
@@ -378,7 +377,7 @@ def player_series(name,url,iconimage):
                     sfile = os.path.join(xbmc.translatePath("special://temp"),'sub.srt')
                     sfile_xml = os.path.join(xbmc.translatePath("special://temp"),'sub.xml')#timedtext
                     sub_file_xml = open(sfile_xml,'w')
-                    sub_file_xml.write(urllib.parse.urlopen(legendas).read())
+                    sub_file_xml.write(requests.get(legendas).text)
                     sub_file_xml.close()
                     xmltosrt.main(sfile_xml)
                     xbmcPlayer.setSubtitles(sfile)
@@ -395,11 +394,14 @@ def openConfig():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        headers= {'Upgrade-Insecure-Requests': '1',
+        headers= {
+                'Upgrade-Insecure-Requests': '1',
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36'
         }
-        link = requests.get(url=url, headers=headers).text
-        return link
+        link = requests.get(url=url, headers=headers)
+        #xbmc.log('[plugin.video.filmestorrentbrasil] L403 - ' + str(link.text), xbmc.LOGNOTICE)
+        #xbmc.log('[plugin.video.filmestorrentbrasil] L403 - ' + str(link.text), xbmc.LOGNOTICE)
+        return link.text
 
 def postURL(url):
         headers = {'Referer': base,
@@ -408,11 +410,11 @@ def postURL(url):
                    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
         }
         response = requests.post(url=url, data='', headers=headers)
-        link=response.text
+        link = response.text
         return link
 
 def addDir(name, url, mode, iconimage, total=1, pasta=True):
-        u = sys.argv[0]+"?url="+urllib.parse.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.parse.quote_plus(name)+"&iconimage="+urllib.parse.quote_plus(iconimage)
+        u = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
 
         ok = True
 
@@ -430,7 +432,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
 
 
 def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
-        u  = sys.argv[0]+"?url="+urllib.parse.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.parse.quote_plus(name)+"&iconimage="+urllib.parse.quote_plus(iconimage)
+        u  = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
 
         ok = True
 
@@ -442,7 +444,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         cmItems = []
 
         cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
-        cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.parse.quote(name), url, urllib.parse.quote(iconimage))))
+        cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.quote(name), url, urllib.quote(iconimage))))
 
         liz.addContextMenuItems(cmItems, replaceItems=False)
 
@@ -534,13 +536,13 @@ name      = None
 mode      = None
 iconimage = None
 
-try    : url=urllib.parse.unquote_plus(params["url"])
+try    : url=urllib.unquote_plus(params["url"])
 except : pass
-try    : name=urllib.parse.unquote_plus(params["name"])
+try    : name=urllib.unquote_plus(params["name"])
 except : pass
 try    : mode=int(params["mode"])
 except : pass
-try    : iconimage=urllib.parse.unquote_plus(params["iconimage"])
+try    : iconimage=urllib.unquote_plus(params["iconimage"])
 except : pass
 
 print("Mode: "+str(mode))

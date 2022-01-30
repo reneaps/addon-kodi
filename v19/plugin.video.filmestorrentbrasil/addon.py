@@ -5,6 +5,8 @@
 # By AddonBrasil - 08/08/2020
 # Atualizado (1.0.0) - 01/08/2021
 # Atualizado (1.0.1) - 21/09/2021
+# Atualizado (1.0.2) - 30/09/2021
+# Atualizado (1.0.3) - 08/01/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -15,7 +17,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.1'
+version   = '1.0.3'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -147,7 +149,8 @@ def getEpisodios(name, url,iconimage):
                 if 'img' in str(link):
                     titF = link.img['alt']
             elif 'Epis' in str(link):
-                titF = link.strong.text
+                if '<strong>' in str(link) : titF = link.strong.text
+                if '<b>' in str(link) : titF = link.text
             if 'campanha' in str(link):
                 #if titF: titF = 'Epis'
                 u = link.a['href']
@@ -392,12 +395,7 @@ def openConfig():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        headers= {'authority': 'filmestorrentbrasil.org',
-                'Referer': url,
-                'accept-encoding':'gzip, deflate, br',
-                'scheme': 'https',
-                'content-type': 'text/html; charset=UTF-8',
-                'Upgrade-Insecure-Requests': '1',
+        headers= {'Upgrade-Insecure-Requests': '1',
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36'
         }
         link = requests.get(url=url, headers=headers).text
