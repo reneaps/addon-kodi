@@ -147,17 +147,21 @@ def getEpisodios(name, url,iconimage):
             elif 'emporada' in str(link):
                 if 'strong' in str(link):
                     titF = link.strong.text
+                if 'b' in str(link):
+                    titF = link.text
                 if 'img' in str(link):
                     titF = link.img['alt']
             elif 'Epis' in str(link):
-                if '<strong>' in str(link) : titF = link.strong.text
+                if '<strong>' in str(link) : titF = link.strong.text
                 if '<b>' in str(link) : titF = link.text
             if 'campanha' in str(link):
                 #if titF: titF = 'Epis'
                 u = link.a['href']
                 fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
-                titF = titF.encode('utf-8')
+                addDir(titF, urlF, 110, imgF, totF, False)
+            elif 'magnet' in str(link):
+                urlF = link.a['href']
                 addDir(titF, urlF, 110, imgF, totF, False)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
