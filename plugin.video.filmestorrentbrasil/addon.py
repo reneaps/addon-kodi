@@ -7,6 +7,7 @@
 # Atualizado (1.0.1) - 21/09/2021
 # Atualizado (1.0.2) - 30/09/2021
 # Atualizado (1.0.3) - 30/01/2022
+# Atualizado (1.0.4) - 07/03/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -17,7 +18,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.3'
+version   = '1.0.4'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -141,19 +142,19 @@ def getEpisodios(name, url,iconimage):
         
         for link in links:
             if 'tulo Traduzido:' in str(link):
-                titF = link.strong.text
+                titF = link.strong.text.encode('utf-8')
             elif 'tulo Original:' in str(link):
-                titF = link.strong.text            
+                titF = link.strong.text.encode('utf-8')            
             elif 'emporada' in str(link):
                 if 'strong' in str(link):
-                    titF = link.strong.text
+                    titF = link.strong.text.encode('utf-8')
                 if 'b' in str(link):
-                    titF = link.text
+                    titF = link.text.encode('utf-8')
                 if 'img' in str(link):
                     titF = link.img['alt']
             elif 'Epis' in str(link):
-                if '<strong>' in str(link) : titF = link.strong.text
-                if '<b>' in str(link) : titF = link.text
+                if '<strong>' in str(link) : titF = link.strong.text.encode('utf-8')
+                if '<b>' in str(link) : titF = link.text.encode('utf-8')
             if 'campanha' in str(link):
                 #if titF: titF = 'Epis'
                 u = link.a['href']
