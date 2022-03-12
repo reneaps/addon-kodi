@@ -6,7 +6,8 @@
 # Atualizado (1.0.0) - 01/08/2021
 # Atualizado (1.0.1) - 21/09/2021
 # Atualizado (1.0.2) - 30/09/2021
-# Atualizado (1.0.3) - 08/01/2022
+# Atualizado (1.0.3) - 30/01/2022
+# Atualizado (1.0.4) - 11/03/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -17,7 +18,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.3'
+version   = '1.0.4'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -70,12 +71,15 @@ def getFilmes(name,url,iconimage):
         for filme in filmes:
                 titF = filme.a['title']
                 imgF = filme.img['src']
+                imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
+                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 100, imgF, False, totF)
 
         try :
-                proxima = re.findall('a class="nextpostslink" rel="next" aria-label="Next Page" href="(.*?)">&raquo;</a>', link)[0]
+                proxima = re.findall('a class="nextpostslink" rel="next" aria-label="Próxima página" href="(.*?)">.*?</a>', link)[0]
+                proxima = 'https://filmestorrentbrasil.com.br%s' % proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
                 pass
@@ -94,12 +98,15 @@ def getSeries(url):
         for filme in filmes:
                 titF = filme.a['title']
                 imgF = filme.img['src']
+                imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
+                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 27, imgF, True, totF)
 
         try :
-                proxima = re.findall('a class="nextpostslink" rel="next" aria-label="Next Page" href="(.*?)">&raquo;</a>', link)[0]
+                proxima = re.findall('a class="nextpostslink" rel="next" aria-label="Próxima página" href="(.*?)">.*?</a>', link)[0]
+                proxima = 'https://filmestorrentbrasil.com.br%s' % proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
@@ -139,6 +146,7 @@ def getEpisodios(name, url,iconimage):
             pass
         
         for link in links:
+            xbmc.log('[plugin.video.filmestorrentbrasil] L142 - ' + str(link), xbmc.LOGINFO)
             if 'tulo Traduzido:' in str(link):
                 titF = link.strong.text
             elif 'tulo Original:' in str(link):
@@ -146,6 +154,8 @@ def getEpisodios(name, url,iconimage):
             elif 'emporada' in str(link):
                 if 'strong' in str(link):
                     titF = link.strong.text
+                if 'b' in str(link):
+                    titF = link.text
                 if 'img' in str(link):
                     titF = link.img['alt']
             elif 'Epis' in str(link):
@@ -156,6 +166,11 @@ def getEpisodios(name, url,iconimage):
                 u = link.a['href']
                 fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
+                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                addDir(titF, urlF, 110, imgF, totF, False)
+            elif 'magnet' in str(link):
+                urlF = link.a['href']
+                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
                 addDir(titF, urlF, 110, imgF, totF, False)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
@@ -183,6 +198,7 @@ def pesquisa():
                         titF = filme.a['title']
                         imgF = filme.img['src']
                         urlF = filme.a['href']
+                        urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
@@ -231,7 +247,7 @@ def player(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                urlVideo = urllib.parse.unquote(urlVideo)
+                #urlVideo = urllib.parse.unquote(urlVideo)
                 url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
 
@@ -395,8 +411,9 @@ def openConfig():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        headers= {'Upgrade-Insecure-Requests': '1',
-                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36'
+        headers= {
+                    'Upgrade-Insecure-Requests': '1',
+                    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
         }
         link = requests.get(url=url, headers=headers).text
         return link
@@ -404,7 +421,7 @@ def openURL(url):
 def postURL(url):
         headers = {'Referer': base,
                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                   'Host': 'www.midiaflixhd.net',
+                   'Host': 'filmestorrentbrasil.com.br',
                    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
         }
         response = requests.post(url=url, data='', headers=headers)
