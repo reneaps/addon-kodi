@@ -8,6 +8,7 @@
 # Atualizado (1.0.2) - 30/09/2021
 # Atualizado (1.0.3) - 30/01/2022
 # Atualizado (1.0.4) - 11/03/2022
+# Atualizado (1.0.5) - 07/07/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -18,7 +19,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.4'
+version   = '1.0.5'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -63,13 +64,13 @@ def getFilmes(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L65 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div', attrs={'class':'listPost'})
-        filmes = conteudo[0]('div', {'class':'post green'})
+        conteudo = soup('div', attrs={'class':'posts'})
+        filmes = conteudo[0]('div', {'class':'post'})
 
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.a['title']
+                titF = filme.img['title'].encode('utf-8')
                 imgF = filme.img['src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
@@ -90,13 +91,13 @@ def getSeries(url):
         xbmc.log('[plugin.video.filmestorrentbrasil] L100- ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div', attrs={'class':'listPost'})
-        filmes = conteudo[0]('div', {'class':'post green'})
+        conteudo = soup('div', attrs={'class':'posts'})
+        filmes = conteudo[0]('div', {'class':'post'})
 
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.a['title']
+                titF = filme.img['title'].encode('utf-8')
                 imgF = filme.img['src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
@@ -189,13 +190,13 @@ def pesquisa():
                 temp = []
                 link = openURL(url)
                 soup = BeautifulSoup(link, 'html.parser')
-                conteudo = soup('div', attrs={'class':'listPost'})
-                filmes = conteudo[0]('div', {'class':'post green'})
+                conteudo = soup('div', attrs={'class':'posts'})
+                filmes = conteudo[0]('div', {'class':'post'})
 
                 totF = len(filmes)
 
                 for filme in filmes:
-                        titF = filme.a['title']
+                        titF = filme.img['title'].encode('utf-8')
                         imgF = filme.img['src']
                         urlF = filme.a['href']
                         urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
@@ -232,7 +233,7 @@ def player(name,url,iconimage):
         
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div', attrs={'class':'right'})
+        conteudo = soup('article')
         links = conteudo[0]('p')
 
         for link in links:
