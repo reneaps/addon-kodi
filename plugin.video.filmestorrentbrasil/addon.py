@@ -9,6 +9,7 @@
 # Atualizado (1.0.3) - 30/01/2022
 # Atualizado (1.0.5) - 11/03/2022
 # Atualizado (1.0.6) - 07/04/2022
+# Atualizado (1.0.7) - 19/04/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -19,7 +20,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.6'
+version   = '1.0.7'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -221,12 +222,14 @@ def doPesquisaFilmes():
             addDirF(titulo, url2, 100, img, False, total)
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L249 - ' + str(url), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L224 - ' + str(url), xbmc.LOGNOTICE)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
         mensagemprogresso.update(0)
 
+        titsT = []
+        idsT = []
         sub = None
         
         link = openURL(url)
@@ -235,14 +238,29 @@ def player(name,url,iconimage):
         conteudo = soup('article')
         links = conteudo[0]('p')
 
+        n = 1
+
         for link in links:
             if 'campanha' in str(link) :
                 urlF = link.a['href']
                 print(urlF)
                 idS = urlF.split('id=')[-1]
                 urlVideo = base64.b64decode(idS).decode('utf-8')
+                titS = "Server_" + str(n)
+                n = n + 1
+                titsT.append(titS)
+                idsT.append(urlVideo)
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L352 - ' + str(urlVideo), xbmc.LOGNOTICE)
+        if not titsT : return
+
+        index = xbmcgui.Dialog().select('Selecione uma das opcoes :', titsT)
+
+        if index == -1 : return
+
+        i = int(index)
+        urlVideo = idsT[i]
+
+        xbmc.log('[plugin.video.filmestorrentbrasil] L262 - ' + str(urlVideo), xbmc.LOGNOTICE)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
@@ -259,7 +277,7 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L364 - ' + str(url2Play), xbmc.LOGNOTICE)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L279 - ' + str(url2Play), xbmc.LOGNOTICE)
 
         if not url2Play : return
 
@@ -410,11 +428,11 @@ def openConfig():
 
 def openURL(url):
         headers= {
-                'Upgrade-Insecure-Requests': '1',
-                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0',
+                'Upgrade-Insecure-Requests': '1'
         }
         link = requests.get(url=url, headers=headers)
-        #xbmc.log('[plugin.video.filmestorrentbrasil] L403 - ' + str(link.text), xbmc.LOGNOTICE)
+        #xbmc.log('[plugin.video.filmestorrentbrasil] L403 - ' + str(link.headers), xbmc.LOGNOTICE)
         #xbmc.log('[plugin.video.filmestorrentbrasil] L403 - ' + str(link.text), xbmc.LOGNOTICE)
         return link.text
 
