@@ -91,6 +91,7 @@ def getFilmes(name,url,iconimage):
 
 def getSeries(url):
         xbmc.log('[plugin.video.filmestorrentbrasil] L93 - ' + str(url), xbmc.LOGNOTICE)
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div', attrs={'class':'posts'})
@@ -114,8 +115,6 @@ def getSeries(url):
         except :
                 pass
 
-        setViewFilmes()
-
 def getTemporadas(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L120 - ' + str(url), xbmc.LOGNOTICE)
         html = openURL(url)
@@ -123,7 +122,7 @@ def getTemporadas(name,url,iconimage):
         conteudo = soup('div', {'id':'seasons'})
         seasons = conteudo[0]('div', {'class': 'se-c'})
         totF = len(seasons)
-        imgF = ''
+        imgF = iconimage
         urlF = url
         i = 1
         while i <= totF:
@@ -142,7 +141,7 @@ def getEpisodios(name, url,iconimage):
         soup = BeautifulSoup(link, 'html.parser')
         links = soup('p')
         totF = len(links)
-        imgF = ''
+        imgF = iconimage
         try:
             imgF = links[1].img['src']
         except:
