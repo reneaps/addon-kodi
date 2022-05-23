@@ -81,8 +81,8 @@ def getFilmes(name,url,iconimage):
                 addDirF(titF, urlF, 100, imgF, False, totF)
 
         try :
-                proxima = re.findall('a class="nextpostslink" rel="next" aria-label="Próxima página" href="(.*?)">.*?</a>', link)[0]
-                proxima = 'https://filmestorrentbrasil.com.br%s' % proxima if proxima.startswith("/") else proxima
+                proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
+                proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
                 pass
@@ -109,8 +109,8 @@ def getSeries(url):
                 addDirF(titF, urlF, 27, imgF, True, totF)
 
         try :
-                proxima = re.findall('a class="nextpostslink" rel="next" aria-label="Próxima página" href="(.*?)">.*?</a>', link)[0]
-                proxima = 'https://filmestorrentbrasil.com.br%s' % proxima if proxima.startswith("/") else proxima
+                proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
+                proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
