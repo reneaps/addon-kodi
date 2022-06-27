@@ -11,6 +11,7 @@
 # Atualizado (1.0.6) - 07/04/2022
 # Atualizado (1.0.7) - 19/04/2022
 # Atualizado (1.0.8) - 23/05/2022
+# Atualizado (1.0.9) - 27/06/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -265,6 +266,8 @@ def player(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
+                urlVideo = urllib.unquote(urlVideo)
+                if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
 
@@ -350,6 +353,8 @@ def player_series(name,url,iconimage):
         #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
+                urlVideo = urllib.unquote(urlVideo)
+                if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
 
