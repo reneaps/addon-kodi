@@ -12,6 +12,7 @@
 # Atualizado (1.0.7) - 19/04/2022
 # Atualizado (1.0.8) - 23/05/2022
 # Atualizado (1.0.9) - 27/06/2022
+# Atualizado (1.1.0) - 01/10/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -432,12 +433,28 @@ def openConfig():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        headers= {
-                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0',
-                'Upgrade-Insecure-Requests': '1'
-        }
-        link = requests.get(url=url, headers=headers)
-        return link.text
+        import sys, platform
+        os = ""
+        user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+        
+        if hasattr(sys, 'getandroidapilevel'):
+            os = "Android"
+        else:
+            os = platform.system()
+
+        if os == 'Windows' :
+            result = subprocess.check_output(["curl", "-A", user_agent, url], shell=True)
+            return result
+        elif os == "Android" :
+            result = subprocess.run(["curl", "-A", user_agent, url], capture_output=True,text=True,encoding='UTF-8').stdout
+            return result
+        else:
+            headers= {
+                    "Upgrade-Insecure-Requests": "1",
+                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+                     }
+            link = requests.get(url=url, headers=headers).text
+            return link
 
 def postURL(url):
         headers = {'Referer': base,
