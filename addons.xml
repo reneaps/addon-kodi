@@ -1,173 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.audio.zofe" name="Zofe PodCast" version="0.0.1" provider-name="AddonReneSilva">
-    <requires>
-        <import addon="xbmc.python" version="2.24.0" />
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>audio</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en">Zofe PodCast</summary>
-        <license>GNU General Public License, v2</license>
-        <description lang="en">Zofe PodCast - Sao Paulo</description>
-        <platform>all</platform>
-        <source>https://github.com/reneapsi/plugin.audio.zofe</source>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
-<addon id="plugin.video.assistirfilmeshd" name="AssistirFilmesHD" version="1.2.0" provider-name="AddonReneSilva">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-		<import addon="script.module.urlresolver" version="2.10.8"/>
-		<import addon="script.module.requests" version="2.19.1"/>
-		<import addon="script.extendedinfo" version="3.0.0"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Filmes e Series Online</summary>
-    <description lang="en">
-			No addon AssistirFilmesHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.	VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C"). Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
-		</description>
-  </extension>
-</addon>
-
-<addon id="plugin.video.bestfilmes" name="BestFilmes" version="1.0.6" provider-name="AddonReneSilva">
-  <requires>
-        <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.urlresolver" version="2.10.8"/>
-        <import addon="script.extendedinfo" version="3.0.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-        <import addon="script.module.requests" version="2.9.1"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Filmes e Series Online</summary>
-    <description lang="en">
-            No addon BestFilmes voce assiste filmes separados por categorias, lancamentos,filmes HD, etc.
-            Voce tambem pode ver as informacoes ou assistir ao trailer do filme no submenu do addon (Botao direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
-        </description>
-  </extension>
-</addon>
-
-<addon id="plugin.video.bkseries" name="BKSeries" version="1.0.2" provider-name="AddonReneSilva">
-  <requires>
-        <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.urlresolver" version="1.0.0"/>
-		<import addon="script.module.videohosts" version="1.0.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-		<import addon="script.module.requests" version="2.9.1"/>
-		<import addon="script.module.html5lib" />
-        <import addon="script.extendedinfo" />
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-        <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-        <language>en</language>
-        <platform>all</platform>
-        <summary lang="en">BKSeries</summary>
-        <description lang="en">
-            No addon BKSeries vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-        </description>
-  </extension>
-</addon>
-
-<addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.3.2" provider-name="AddonReneSilva">
-  <requires>
-      <import addon="xbmc.python" version="2.1.0"/>
-      <import addon="script.module.urlresolver" version="1.0.0"/>
-      <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-      <import addon="script.extendedinfo" />
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-        <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-      <language>en</language>
-      <platform>all</platform>
-      <summary lang="en">FilmeseSeriesOnline</summary>
-      <description lang="en">
-            No addon FilmeseSeriesOnline vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
-      </description>
-  </extension>
-</addon>
-
-<addon id="plugin.video.filmesonlinehd11" name=".FilmesHD11" version="1.2.1" provider-name="AddonReneSilva">
-  <requires>
-        <import addon="xbmc.python" version="2.1.0"/>
-		<import addon="script.module.urlresolver" version="2.10.8"/>
-		<import addon="script.extendedinfo" version="3.0.0"/>
-		<import addon="script.module.videohosts" version="1.0.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-        <import addon="script.module.requests" version="2.9.1"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Filmes e Series Online</summary>
-    <description lang="en">
-			No addon FilmesOnlineHD11 vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-			VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-			Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
-		</description>
-  </extension>
-</addon>
-
-<addon id="plugin.video.filmesonlineplus" name="FilmesOnlinePlus" version="1.0.6" provider-name="AddonReneSilva">
-  <requires>
-        <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.urlresolver" version="1.0.0"/>
-		<import addon="script.module.videohosts" version="1.0.0"/>
-        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-		<import addon="script.module.requests" version="2.9.1"/>
-        <import addon="script.extendedinfo" />
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-        <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-        <language>en</language>
-        <platform>all</platform>
-        <summary lang="en">FilmesOnlinePlus</summary>
-        <description lang="en">
-            No addon FilmesOnlinePlus vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-        </description>
-  </extension>
-</addon>
-
 <addon id="plugin.video.filmesonlinex" name="FILMESONLINEX" version="1.0.6" provider-name="Cleiton Leonel Creton">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -191,44 +23,114 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.filmestorrentbrasil" name="FilmesTorrentBrasil" version="1.0.9" provider-name="AddonReneSilva">
+<addon id="plugin.video.megafilmesonlinehd" name="Megafilmesonlinehd" version="1.1.6" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.urlresolver" version="1.0.0"/>
-    <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-    <import addon="script.module.requests" version="2.9.1"/>
-    <!--import addon="inputstream.hls" /-->
+    <import addon="script.module.urlresolver" version="2.10.8"/>
+    <import addon="script.extendedinfo" version="3.0.0"/>
   </requires>
 
   <extension point="xbmc.python.pluginsource" library="addon.py">
-        <provides>video</provides>
+    <provides>video</provides>
   </extension>
 
   <extension point="xbmc.addon.metadata">
     <language>en</language>
     <platform>all</platform>
-    <summary lang="en">FilmesTorrentBrasil</summary>
+    <summary lang="en">Mega Filmes OnlineHD</summary>
     <description lang="en">
-        No addon FilmesTorrentBras vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-        VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-        Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
-    </description>
-    <assets>
-      <icon>resources/icon.png</icon>
-      <fanart>resources/fanart.jpg</fanart>
-    </assets>
+        No addon Megafilmesonlinehd você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+        Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+        </description>
   </extension>
 </addon>
 
-<addon id="plugin.video.gofilmes" name="GoFilmes" version="1.1.1" provider-name="AddonReneSilva">
+<addon id="plugin.video.ultracine" name="Ultracine" version="1.0.2" provider-name="AddonReneSilva">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.urlresolver" version="2.10.8"/>
+    <import addon="script.module.requests" version="2.19.1"/>
+    <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">Filmes e Series Online</summary>
+    <description lang="en">
+            No addon Ultracine.app voce assiste filmes separados por categorias, lancamentos,filmes HD, etc.
+            Voce tambem pode ver as informacoes ou assistir ao trailer do filme no submenu do addon (Botao direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+        </description>
+  </extension>
+</addon>
+
+<addon id="plugin.video.megafilmesonline" name="MegaFilmesHD" version="2.1.7" provider-name="AddonReneSilva">
+  <requires>
+    	<import addon="xbmc.python" version="2.1.0"/>
+		<import addon="script.module.urlresolver" version="2.10.8"/>
+		<import addon="script.extendedinfo" version="3.0.0"/>
+		<import addon="script.module.requests" version="2.9.1"/>
+		<import addon="script.module.videohosts" version="1.0.0"/>
+		<import addon="script.module.beautifulsoup4" version="4.3.2"/>
+		<import addon="script.module.html5lib" />
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">Filmes e Series Online</summary>
+    <description lang="en">
+			No addon MegaFilmesHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+			Vocêtambém pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+		</description>
+  </extension>
+</addon>
+
+<addon id="plugin.video.filmesonlinehd11" name=".FilmesHD11" version="1.2.1" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+		<import addon="script.module.urlresolver" version="2.10.8"/>
+		<import addon="script.extendedinfo" version="3.0.0"/>
+		<import addon="script.module.videohosts" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="script.module.requests" version="2.9.1"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">Filmes e Series Online</summary>
+    <description lang="en">
+			No addon FilmesOnlineHD11 você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+			Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+			Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+		</description>
+  </extension>
+</addon>
+
+<addon id="plugin.video.filmesonlineplus" name="FilmesOnlinePlus" version="1.0.6" provider-name="AddonReneSilva">
   <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.urlresolver" version="1.0.0"/>
-        <import addon="script.extendedinfo" />
 		<import addon="script.module.videohosts" version="1.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-		<import addon="script.module.html5lib" />
-        <import addon="script.module.requests" version="2.9.1"/>
+		<import addon="script.module.requests" version="2.9.1"/>
+        <import addon="script.extendedinfo" />
   </requires>
 
   <extension point="xbmc.python.pluginsource" library="addon.py">
@@ -238,13 +140,32 @@
   <extension point="xbmc.addon.metadata">
         <language>en</language>
         <platform>all</platform>
-        <summary lang="en">GoFilmes</summary>
+        <summary lang="en">FilmesOnlinePlus</summary>
         <description lang="en">
-            No addon GoFilmes vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+            No addon FilmesOnlinePlus você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
         </description>
   </extension>
+</addon>
+
+<addon id="plugin.audio.zofe" name="Zofe PodCast" version="0.0.1" provider-name="AddonReneSilva">
+    <requires>
+        <import addon="xbmc.python" version="2.24.0" />
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>audio</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Zofe PodCast</summary>
+        <license>GNU General Public License, v2</license>
+        <description lang="en">Zofe PodCast - Sao Paulo</description>
+        <platform>all</platform>
+        <source>https://github.com/reneapsi/plugin.audio.zofe</source>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
 </addon>
 
 <addon id="plugin.video.hdfilmesonline" name="HDFilmesOnline" version="1.2.8" provider-name="AddonReneSilva">
@@ -271,63 +192,14 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.megafilmesonline" name="MegaFilmesHD" version="2.1.7" provider-name="AddonReneSilva">
-  <requires>
-    	<import addon="xbmc.python" version="2.1.0"/>
-		<import addon="script.module.urlresolver" version="2.10.8"/>
-		<import addon="script.extendedinfo" version="3.0.0"/>
-		<import addon="script.module.requests" version="2.9.1"/>
-		<import addon="script.module.videohosts" version="1.0.0"/>
-		<import addon="script.module.beautifulsoup4" version="4.3.2"/>
-		<import addon="script.module.html5lib" />
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Filmes e Series Online</summary>
-    <description lang="en">
-			No addon MegaFilmesHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-			VocÃªtambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-			Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
-		</description>
-  </extension>
-</addon>
-
-<addon id="plugin.video.megafilmesonlinehd" name="Megafilmesonlinehd" version="1.1.6" provider-name="AddonReneSilva">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.urlresolver" version="2.10.8"/>
-    <import addon="script.extendedinfo" version="3.0.0"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Mega Filmes OnlineHD</summary>
-    <description lang="en">
-        No addon Megafilmesonlinehd vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-        VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-        Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
-        </description>
-  </extension>
-</addon>
-
-<addon id="plugin.video.midiaflixhd" name="MidiaFlixHD" version="1.1.5" provider-name="AddonReneSilva">
+<addon id="plugin.video.bkseries" name="BKSeries" version="1.0.2" provider-name="AddonReneSilva">
   <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.urlresolver" version="1.0.0"/>
 		<import addon="script.module.videohosts" version="1.0.0"/>
         <import addon="script.module.beautifulsoup4" version="4.3.2"/>
 		<import addon="script.module.requests" version="2.9.1"/>
+		<import addon="script.module.html5lib" />
         <import addon="script.extendedinfo" />
   </requires>
 
@@ -338,11 +210,10 @@
   <extension point="xbmc.addon.metadata">
         <language>en</language>
         <platform>all</platform>
-        <summary lang="en">MidiaFlixHD</summary>
+        <summary lang="en">BKSeries</summary>
         <description lang="en">
-            No addon MidiaFlixHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+            No addon BKSeries você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
         </description>
   </extension>
 </addon>
@@ -368,23 +239,84 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.olhardigital" name="Olhar Digital" version="2.0.1" provider-name="ReneSilvabyAddonBrasil">
+<addon id="plugin.video.querofilmeshd" name="QueroFilmesHD" version="1.1.0" provider-name="AddonReneSilva">
   <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.addon.common" version="2.0.0"/>
-    <import addon="plugin.video.youtube" version="5.0.0"/>
+    <import addon="xbmc.python" version="2.14.0"/>
+    <import addon="script.module.urlresolver" version="1.0.0"/>
+    <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    <import addon="script.module.requests" version="2.9.1"/>
+    <import addon="inputstream.hls" />
   </requires>
 
-  <extension point="xbmc.python.pluginsource" library="default.py">
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">QueroFIlmes</summary>
+    <description lang="en">
+        No addon QueroFilmesHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+        Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+    </description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
+
+<addon id="plugin.video.bestfilmes" name="BestFilmes" version="1.0.6" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="script.module.urlresolver" version="2.10.8"/>
+        <import addon="script.extendedinfo" version="3.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="script.module.requests" version="2.9.1"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
 
   <extension point="xbmc.addon.metadata">
-    <summary lang="en">Olhar Digital</summary>
-    <description lang="en">Acompanhe na integra ao programa semanal do Olhar Digital Plus.</description>
+    <language>en</language>
     <platform>all</platform>
-    <forum></forum>
-    <website></website>
+    <summary lang="en">Filmes e Series Online</summary>
+    <description lang="en">
+            No addon BestFilmes voce assiste filmes separados por categorias, lancamentos,filmes HD, etc.
+            Voce tambem pode ver as informacoes ou assistir ao trailer do filme no submenu do addon (Botao direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+        </description>
+  </extension>
+</addon>
+
+<addon id="plugin.video.gofilmes" name="GoFilmes" version="1.1.1" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="script.module.urlresolver" version="1.0.0"/>
+        <import addon="script.extendedinfo" />
+		<import addon="script.module.videohosts" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+		<import addon="script.module.html5lib" />
+        <import addon="script.module.requests" version="2.9.1"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary lang="en">GoFilmes</summary>
+        <description lang="en">
+            No addon GoFilmes você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+        </description>
   </extension>
 </addon>
 
@@ -407,19 +339,91 @@
         <platform>all</platform>
         <summary lang="en">OverFlix</summary>
         <description lang="en">
-            No addon OverFlix vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+            No addon OverFlix você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
         </description>
   </extension>
 </addon>
 
-<addon id="plugin.video.querofilmeshd" name="QueroFilmesHD" version="1.1.0" provider-name="AddonReneSilva">
+<addon id="plugin.video.teutorrent" name="TeuTorrent" version="1.0.2" provider-name="AddonReneSilva">
   <requires>
-    <import addon="xbmc.python" version="2.14.0"/>
+    <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="script.module.urlresolver" version="2.10.8"/>
+        <import addon="script.extendedinfo" version="3.0.0"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">Filmes e Series Online</summary>
+    <description lang="en">
+            No addon TeuTorrent você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior e o plugin de video PULSAR 0.6.1 ou superior.
+        </description>
+        <website>http://teutorrent.com/</website>
+  </extension>
+</addon>
+
+<addon id="plugin.video.assistirfilmeshd" name="AssistirFilmesHD" version="1.2.0" provider-name="AddonReneSilva">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+		<import addon="script.module.urlresolver" version="2.10.8"/>
+		<import addon="script.module.requests" version="2.19.1"/>
+		<import addon="script.extendedinfo" version="3.0.0"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">Filmes e Series Online</summary>
+    <description lang="en">
+			No addon AssistirFilmesHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.	Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C"). Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+		</description>
+  </extension>
+</addon>
+
+<addon id="plugin.video.midiaflixhd" name="MidiaFlixHD" version="1.1.5" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="script.module.urlresolver" version="1.0.0"/>
+		<import addon="script.module.videohosts" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+		<import addon="script.module.requests" version="2.9.1"/>
+        <import addon="script.extendedinfo" />
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary lang="en">MidiaFlixHD</summary>
+        <description lang="en">
+            No addon MidiaFlixHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+        </description>
+  </extension>
+</addon>
+
+<addon id="plugin.video.filmestorrentbrasil" name="FilmesTorrentBrasil" version="1.1.0" provider-name="AddonReneSilva">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.urlresolver" version="1.0.0"/>
     <import addon="script.module.beautifulsoup4" version="4.3.2"/>
     <import addon="script.module.requests" version="2.9.1"/>
-    <import addon="inputstream.hls" />
+    <!--import addon="inputstream.hls" /-->
   </requires>
 
   <extension point="xbmc.python.pluginsource" library="addon.py">
@@ -429,16 +433,83 @@
   <extension point="xbmc.addon.metadata">
     <language>en</language>
     <platform>all</platform>
-    <summary lang="en">QueroFIlmes</summary>
+    <summary lang="en">FilmesTorrentBrasil</summary>
     <description lang="en">
-        No addon QueroFilmesHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-        VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-        Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+        No addon FilmesTorrentBras você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+        Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
     </description>
     <assets>
       <icon>resources/icon.png</icon>
       <fanart>resources/fanart.jpg</fanart>
     </assets>
+  </extension>
+</addon>
+
+<addon id="plugin.video.filmeseseriesonline" name="FilmeseSeriesOnline" version="1.3.2" provider-name="AddonReneSilva">
+  <requires>
+      <import addon="xbmc.python" version="2.1.0"/>
+      <import addon="script.module.urlresolver" version="1.0.0"/>
+      <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+      <import addon="script.extendedinfo" />
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+      <language>en</language>
+      <platform>all</platform>
+      <summary lang="en">FilmeseSeriesOnline</summary>
+      <description lang="en">
+            No addon FilmeseSeriesOnline você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+      </description>
+  </extension>
+</addon>
+
+<addon id="repository.addonReneSilva" name="AddonReneSilva Repository" version="0.0.4" provider-name="AddonReneSilva">
+	<extension point="xbmc.addon.repository" name="AddonReneSilva Repository">
+        <dir>
+		    <info compressed="false">https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml</info>
+		    <checksum>https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml.md5</checksum>
+		    <datadir zip="true">https://github.com/reneaps/addon-kodi/raw/master/repo/</datadir>
+        </dir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<platform>all</platform>
+		<summary>Repositório AddonReneSilva</summary>
+		<description>Repositório de addons brasileiros AddonReneSilva</description>
+        <license></license>
+        <language></language>
+        <website></website>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+	</extension>
+</addon>
+
+<addon id="plugin.video.olhardigital" name="Olhar Digital" version="2.0.1" provider-name="ReneSilvabyAddonBrasil">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.addon.common" version="2.0.0"/>
+    <import addon="plugin.video.youtube" version="5.0.0"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">Olhar Digital</summary>
+    <description lang="en">Acompanhe na integra ao programa semanal do Olhar Digital Plus.</description>
+    <platform>all</platform>
+    <forum></forum>
+    <website></website>
   </extension>
 </addon>
 
@@ -460,84 +531,13 @@
         <platform>all</platform>
         <summary lang="en">SuperFlix</summary>
         <description lang="en">
-            No addon SuperFlix vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+            No addon SuperFlix você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
         </description>
     <assets>
       <icon>resources/icon.png</icon>
       <fanart>resources/fanart.jpg</fanart>
     </assets>
   </extension>
-</addon>
-
-<addon id="plugin.video.teutorrent" name="TeuTorrent" version="1.0.2" provider-name="AddonReneSilva">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.urlresolver" version="2.10.8"/>
-        <import addon="script.extendedinfo" version="3.0.0"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Filmes e Series Online</summary>
-    <description lang="en">
-            No addon TeuTorrent vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior e o plugin de video PULSAR 0.6.1 ou superior.
-        </description>
-        <website>http://teutorrent.com/</website>
-  </extension>
-</addon>
-
-<addon id="plugin.video.ultracine" name="Ultracine" version="1.0.2" provider-name="AddonReneSilva">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.urlresolver" version="2.10.8"/>
-    <import addon="script.module.requests" version="2.19.1"/>
-    <import addon="script.module.beautifulsoup4" version="4.3.2"/>
-  </requires>
-
-  <extension point="xbmc.python.pluginsource" library="addon.py">
-    <provides>video</provides>
-  </extension>
-
-  <extension point="xbmc.addon.metadata">
-    <language>en</language>
-    <platform>all</platform>
-    <summary lang="en">Filmes e Series Online</summary>
-    <description lang="en">
-            No addon Ultracine.app voce assiste filmes separados por categorias, lancamentos,filmes HD, etc.
-            Voce tambem pode ver as informacoes ou assistir ao trailer do filme no submenu do addon (Botao direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
-        </description>
-  </extension>
-</addon>
-
-<addon id="repository.addonReneSilva" name="AddonReneSilva Repository" version="0.0.4" provider-name="AddonReneSilva">
-	<extension point="xbmc.addon.repository" name="AddonReneSilva Repository">
-        <dir>
-		    <info compressed="false">https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml</info>
-		    <checksum>https://raw.githubusercontent.com/reneaps/addon-kodi/master/addons.xml.md5</checksum>
-		    <datadir zip="true">https://github.com/reneaps/addon-kodi/raw/master/repo/</datadir>
-        </dir>
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<platform>all</platform>
-		<summary>RepositÃ³rio AddonReneSilva</summary>
-		<description>RepositÃ³rio de addons brasileiros AddonReneSilva</description>
-        <license></license>
-        <language></language>
-        <website></website>
-        <news></news>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-        </assets>
-	</extension>
 </addon>
 </addons>
