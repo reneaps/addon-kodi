@@ -14,6 +14,7 @@
 # Atualizado (1.0.9) - 27/06/2022
 # Atualizado (1.1.0) - 01/10/2022
 # Atualizado (1.1.1) - 03/10/2022
+# Atualizado (1.1.2) - 02/03/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -32,7 +33,7 @@ _handle = int(sys.argv[1])
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://filmestorrentbrasil.com.br'
+base        = 'https://filmestorrentbrasil.net'
 
 ############################################################################################################
 
@@ -68,18 +69,19 @@ def getFilmes(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L65 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         #xbmc.log('[plugin.video.filmestorrentbrasil] L67 - ' + str(link), xbmc.LOGNOTICE)
-        soup = BeautifulSoup(link, 'html.parser')
-        conteudo = soup('div', attrs={'class':'posts'})
-        filmes = conteudo[0]('div', attrs={'class':'post'})
+        soup = BeautifulSoup(link, 'html.parser')        
+        conteudo = soup('div', attrs={'class':'finewp-posts-container'})
+        filmes = conteudo[0]('div', {'class':'finewp-grid-post finewp-3-col'})
 
         totF = len(filmes)
 
         for filme in filmes:
                 titF = filme.img['title'].encode('utf-8')
+                titF = titF.replace('Permanent Link to ','')
                 imgF = filme.img['src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
-                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 100, imgF, False, totF)
 
@@ -97,17 +99,18 @@ def getSeries(url):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div', attrs={'class':'posts'})
-        filmes = conteudo[0]('div', attrs={'class':'post'})
+        conteudo = soup('div', attrs={'class':'finewp-posts-container'})
+        filmes = conteudo[0]('div', {'class':'finewp-grid-post finewp-3-col'})
 
         totF = len(filmes)
 
         for filme in filmes:
                 titF = filme.img['title'].encode('utf-8')
+                titF = titF.replace('Permanent Link to ','')
                 imgF = filme.img['src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
-                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 27, imgF, True, totF)
 
@@ -170,10 +173,12 @@ def getEpisodios(name, url,iconimage):
                 u = link.a['href']
                 fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
+                urlF = base + urlF if urlF.startswith("/") else urlF
+                titF = str(titF)
                 addDir(titF, urlF, 110, imgF, totF, False)
             elif 'magnet' in str(link):
                 urlF = link.a['href']
-                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                urlF = base + urlF if urlF.startswith("/") else urlF
                 addDir(titF, urlF, 110, imgF, totF, False)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
@@ -192,17 +197,17 @@ def pesquisa():
                 temp = []
                 link = openURL(url)
                 soup = BeautifulSoup(link, 'html.parser')
-                conteudo = soup('div', attrs={'class':'posts'})
-                filmes = conteudo[0]('div', attrs={'class':'post'})
+                conteudo = soup('div', attrs={'class':'finewp-posts-container'})
+                filmes = conteudo[0]('div', {'class':'finewp-grid-post finewp-3-col'})
 
                 totF = len(filmes)
 
                 for filme in filmes:
                         titF = filme.img['title'].encode('utf-8')
+                        titF = titF.replace('Permanent Link to ','')
                         imgF = filme.img['src']
                         imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                        urlF = filme.a['href']
-                        urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                        urlF = base + urlF if urlF.startswith("/") else urlF
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
