@@ -13,6 +13,7 @@
 # Atualizado (1.1.1) - 03/10/2022
 # Atualizado (1.1.2) - 02/03/2023
 # Atualizado (1.1.3) - 03/03/2023
+# Atualizado (1.1.4) - 03/03/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -203,8 +204,13 @@ def pesquisa():
                 for filme in filmes:
                         titF = filme.a['title'].encode('utf-8')
                         titF = titF.replace('Permanent Link to ','')
-                        imgF = filme.img['src']
+                        try:
+                                imgF = filme.img['src']
+                        except: 
+                                imgF = ""
+                                pass
                         imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                        urlF = filme.a['href']
                         urlF = base + urlF if urlF.startswith("/") else urlF
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
