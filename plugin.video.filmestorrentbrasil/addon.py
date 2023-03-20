@@ -14,6 +14,7 @@
 # Atualizado (1.1.2) - 02/03/2023
 # Atualizado (1.1.3) - 03/03/2023
 # Atualizado (1.1.4) - 03/03/2023
+# Atualizado (1.1.5) - 20/03/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -32,7 +33,7 @@ _handle = int(sys.argv[1])
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://filmestorrentbrasil.net'
+base        = 'https://novobrasil.net'
 
 ############################################################################################################
 
@@ -104,7 +105,7 @@ def getSeries(url):
         totF = len(filmes)
 
         for filme in filmes:
-                titF = Ultracime.encode('utf-8')
+                titF = filme.a['title'].encode('utf-8')
                 titF = titF.replace('Permanent Link to ','')
                 imgF = filme.img['src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
@@ -471,7 +472,7 @@ def openURL(url):
 def postURL(url):
         headers = {'Referer': base,
                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                   'Host': 'www.midiaflixhd.net',
+                   'Host': base,
                    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
         }
         response = requests.post(url=url, data='', headers=headers)
