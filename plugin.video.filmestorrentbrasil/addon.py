@@ -15,6 +15,7 @@
 # Atualizado (1.1.3) - 03/03/2023
 # Atualizado (1.1.4) - 03/03/2023
 # Atualizado (1.1.5) - 20/03/2023
+# Atualizado (1.1.6) - 16/08/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -486,6 +487,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
 
         liz = xbmcgui.ListItem(name)
         liz.setProperty('fanart_image', fanart)
+        liz.setProperty('IsPlayable', 'true')
         liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({'icon': iconimage, 'thumb': iconimage })
 
@@ -504,6 +506,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
 
         liz = xbmcgui.ListItem(name)
         liz.setProperty('fanart_image', fanart)
+        liz.setProperty('IsPlayable', 'true')
         liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({ 'fanart': iconimage, 'icon': iconimage, 'thumb': iconimage })
 
