@@ -16,6 +16,7 @@
 # Atualizado (1.1.4) - 03/03/2023
 # Atualizado (1.1.5) - 20/03/2023
 # Atualizado (1.1.6) - 16/08/2023
+# Atualizado (1.1.7) - 02/12/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -34,7 +35,7 @@ _handle = int(sys.argv[1])
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://novobrasil.net'
+base        = 'https://nerdfilmes.com.br'
 
 ############################################################################################################
 
@@ -44,7 +45,7 @@ def menuPrincipal():
         addDir('Seriados'                   , base + '/series1/'              ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
-        addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
+        #addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
 
         setViewMenu()
 
@@ -70,24 +71,29 @@ def getFilmes(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L65 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
         #xbmc.log('[plugin.video.filmestorrentbrasil] L67 - ' + str(link), xbmc.LOGNOTICE)
-        soup = BeautifulSoup(link, 'html.parser')        
-        conteudo = soup('div', attrs={'class':'finewp-posts-container'})
-        filmes = conteudo[0]('div', {'class':'finewp-grid-post finewp-3-col'})
+        soup = BeautifulSoup(link, 'html.parser')
+        conteudo = soup('div',{'class':'elementor-widget-container'})
+        filmes =conteudo[4]('a')
+
+        #xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
 
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.a['title'].encode('utf-8')
-                titF = titF.replace('Permanent Link to ','')
-                imgF = filme.img['src']
+            try:
+                titF = filme.img['alt'].encode('utf-8')
+                imgF = filme.img['data-src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                urlF = filme.a['href']
+                urlF = filme['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 100, imgF, False, totF)
+            except:
+                pass
 
         try :
-                proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
+                proxima = re.findall(r'<a class="page-numbers next" href="(.*?)">.*?</a>', str(soup))[0]
+                #proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
@@ -100,27 +106,31 @@ def getSeries(url):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div', attrs={'class':'finewp-posts-container'})
-        filmes = conteudo[0]('div', {'class':'finewp-grid-post finewp-3-col'})
+        conteudo = soup('div',{'class':'elementor-widget-container'})
+        filmes =conteudo[4]('a')
 
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.a['title'].encode('utf-8')
-                titF = titF.replace('Permanent Link to ','')
-                imgF = filme.img['src']
+            try:
+                titF = filme.img['alt'].encode('utf-8')
+                imgF = filme.img['data-src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                urlF = filme.a['href']
+                urlF = filme['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 27, imgF, True, totF)
+            except:
+                pass
 
         try :
-                proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
+                proxima = re.findall(r'<a class="page-numbers next" href="(.*?)">.*?</a>', str(soup))[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
+
+        #setViewFilmes()
 
 def getTemporadas(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L120 - ' + str(url), xbmc.LOGNOTICE)
