@@ -17,6 +17,7 @@
 # Atualizado (1.1.5) - 20/03/2023
 # Atualizado (1.1.6) - 16/08/2023
 # Atualizado (1.1.7) - 02/12/2023
+# Atualizado (1.1.8) - 25/12/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -73,24 +74,25 @@ def getFilmes(name,url,iconimage):
         #xbmc.log('[plugin.video.filmestorrentbrasil] L67 - ' + str(link), xbmc.LOGNOTICE)
         soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup('div',{'class':'elementor-widget-container'})
-        filmes =conteudo[4]('a')
+        filmes =conteudo[4]('article')
 
         #xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
 
         totF = len(filmes)
 
         for filme in filmes:
+            titF = ""
             try:
-                titF = filme.img['alt'].encode('utf-8')
-                imgF = filme.img['data-src']
+                titF = filme.h3.text #.encode('utf-8')
+                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
+                imgF = filme.a.img['data-src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                urlF = filme['href']
+                urlF = filme.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 100, imgF, False, totF)
             except:
                 pass
-
         try :
                 proxima = re.findall(r'<a class="page-numbers next" href="(.*?)">.*?</a>', str(soup))[0]
                 #proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
@@ -107,16 +109,17 @@ def getSeries(url):
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div',{'class':'elementor-widget-container'})
-        filmes =conteudo[4]('a')
+        filmes =conteudo[4]('article')
 
         totF = len(filmes)
 
         for filme in filmes:
             try:
-                titF = filme.img['alt'].encode('utf-8')
-                imgF = filme.img['data-src']
+                titF = filme.h3.text #.encode('utf-8')
+                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
+                imgF = filme.a.img['data-src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                urlF = filme['href']
+                urlF = filme.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 27, imgF, True, totF)
@@ -208,24 +211,22 @@ def pesquisa():
                 temp = []
                 link = openURL(url)
                 soup = BeautifulSoup(link, 'html.parser')
-                conteudo = soup('div', attrs={'class':'finewp-posts-container'})
-                filmes = conteudo[0]('div', {'class':'finewp-grid-post finewp-3-col'})
+                conteudo = soup('div',{'class':'elementor-widget-container'})
+                filmes =conteudo[4]('a')
 
                 totF = len(filmes)
 
                 for filme in filmes:
-                        titF = filme.a['title'].encode('utf-8')
-                        titF = titF.replace('Permanent Link to ','')
                         try:
+                                titF = filme.img['alt'].encode('utf-8')
                                 imgF = filme.img['src']
-                        except: 
-                                imgF = ""
+                                imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                                urlF = filme['href']
+                                urlF = base + urlF if urlF.startswith("/") else urlF
+                                temp = [urlF, titF, imgF]
+                                hosts.append(temp)
+                        except:
                                 pass
-                        imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                        urlF = filme.a['href']
-                        urlF = base + urlF if urlF.startswith("/") else urlF
-                        temp = [urlF, titF, imgF]
-                        hosts.append(temp)
 
                 return hosts
 
@@ -258,9 +259,8 @@ def player(name,url,iconimage):
 
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        #conteudo = soup('div', attrs={'class':'apenas_itemprop'})
-        conteudo = soup('article')
-        links = conteudo[0]('p')
+        conteudo = soup('div', attrs={'class':'elementor-widget-container'})
+        links = conteudo[7]('p')
 
         n = 1
 
