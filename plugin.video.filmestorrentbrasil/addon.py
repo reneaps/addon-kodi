@@ -45,8 +45,8 @@ base        = 'https://brtorrenthd.org'
 
 def menuPrincipal():
         addDir('Categorias'                 , base + ''                     ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + '/category/filmes/'    ,   20, artfolder + 'new.png')
-        addDir('Seriados'                   , base + '/category/series/'    ,   25, artfolder + 'series.png')
+        addDir('Lançamentos'                , base + '/filmes-utorrent/'    ,   20, artfolder + 'new.png')
+        addDir('Seriados'                   , base + '/download-series-hd/' ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
         #addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
@@ -64,7 +64,7 @@ def getCategorias(url):
         for categoria in categorias:
             if not 'Menu' in str(categoria):
                 if not '//brtorrent' in str(categoria):
-                    titC = categoria.a.text
+                    titC = categoria.a.text.encode('utf-8')
                     urlC = categoria.a["href"]
                     urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
                     urlC = base + urlC if urlC.startswith("/") else urlC
@@ -88,7 +88,7 @@ def getFilmes(name,url,iconimage):
         for filme in filmes:
             titF = ""
             try:
-                titF = filme('a')[1].text
+                titF = filme('a')[1].text.encode('utf-8')
                 titF = str(titF).replace('Downloads','').replace('Nacional','').replace('Torrent','').replace('\n','').replace('\t','')
                 imgF = re.findall('<div class="img" style="background-image:url\((.*?)\);"></div>', str(filme.a.div))[0]
                 urlF = filme('a')[0]['href']
@@ -98,7 +98,6 @@ def getFilmes(name,url,iconimage):
                 pass
         try :
                 proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
-                #proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
@@ -119,7 +118,7 @@ def getSeries(url):
         for filme in filmes:
             titF = ""
             try:
-                titF = filme('a')[1].text
+                titF = filme('a')[1].text.encode('utf-8')
                 titF = str(titF).replace('Downloads','').replace('Nacional','').replace('Torrent','').replace('\n','').replace('\t','')
                 imgF = re.findall('<div class="img" style="background-image:url\((.*?)\);"></div>', str(filme.a.div))[0]
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
