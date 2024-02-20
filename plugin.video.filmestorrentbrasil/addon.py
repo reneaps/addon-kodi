@@ -16,6 +16,7 @@
 # Atualizado (1.2.0) - 27/12/2023
 # Atualizado (1.2.1) - 22/01/2024
 # Atualizado (1.2.2) - 17/02/2024
+# Atualizado (1.2.3) - 20/02/2024
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -40,8 +41,8 @@ base        = 'https://nerdtorrent.com.br'
 
 def menuPrincipal():
         addDir('Categorias'                 , base + ''                     ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + '/filmes-utorrent/'    ,   20, artfolder + 'new.png')
-        addDir('Seriados'                   , base + '/download-series-hd/' ,   25, artfolder + 'series.png')
+        addDir('Lançamentos'                , base + '/category/filmes/'    ,   20, artfolder + 'new.png')
+        addDir('Seriados'                   , base + '/category/series/'    ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
         #addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
@@ -57,7 +58,7 @@ def getCategorias(url):
         totC = len(categorias)
 
         for categoria in categorias:
-                titC = categoria.a.text
+                titC = categoria.a.text.encode('utf-8')
                 urlC = categoria.a["href"]
                 urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
                 urlC = base + urlC if urlC.startswith("/") else urlC
@@ -81,9 +82,9 @@ def getFilmes(name,url,iconimage):
         for filme in filmes:
             titF = ""
             try:
-                titF = filme.h3.text #.encode('utf-8')
-                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
-                imgF = filme.a.img['data-src']
+                titF = filme.h3.text.encode('utf-8')
+                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','').replace('\xe2\x80\x93','-')
+                imgF = filme.a.img['data-src'].encode('utf-8')
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
@@ -91,10 +92,11 @@ def getFilmes(name,url,iconimage):
                 addDirF(titF, urlF, 100, imgF, False, totF)
             except:
                 pass
+
         try :
-                proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
+                proxima = re.findall(r'<a class="page-numbers next" href="(.*?)">.*?</a>', str(soup))[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
-                addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
+                addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
 
@@ -112,9 +114,9 @@ def getSeries(url):
 
         for filme in filmes:
             try:
-                titF = filme.h3.text #.encode('utf-8')
-                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
-                imgF = filme.a.img['data-src']
+                titF = filme.h3.text.encode('utf-8')
+                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','').replace('\xe2\x80\x93','-')
+                imgF = filme.a.img['data-src'].encode('utf-8')
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
@@ -198,7 +200,7 @@ def getEpisodios(name, url,iconimage):
             elif 'magnet' in str(link):
                 urlF = link.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
-                titF = str(link.text) #str(titF) + name.split("emporada")[0] + " | " + str(titF)
+                titF = str(link.text.encode('utf-8')) #str(titF) + name.split("emporada")[0] + " | " + str(titF)
                 addDirF(name+"|"+titF, urlF, 110, imgF, False, totF)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
@@ -212,7 +214,7 @@ def pesquisa():
                 pesquisa = urllib.quote(texto)
                 url      = base + '?s=%s' % str(pesquisa)
 
-                xbmc.log('[plugin.video.filmestorrentbrasil] L241 - ' + str(url), xbmc.LOGNOTICE)
+                #xbmc.log('[plugin.video.filmestorrentbrasil] L241 - ' + str(url), xbmc.LOGNOTICE)
                 hosts = []
                 temp = []
                 link = openURL(url)
@@ -223,20 +225,15 @@ def pesquisa():
                 totF = len(filmes)
 
                 for filme in filmes:
-                        try:
-                                titF = filme.h3.text  #.encode('utf-8')
-                                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
-                                imgF = filme.a.img['src']
-                                urlF = filme.a['href']
-                                #titF = filme.img['alt'].encode('utf-8')
-                                #imgF = filme.img['src']
-                                #imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                                #urlF = filme['href']
-                                urlF = base + urlF if urlF.startswith("/") else urlF
-                                temp = [urlF, titF, imgF]
-                                hosts.append(temp)
-                        except:
-                                pass
+                        titF = ''
+                        titF = filme.h3.text.encode('utf-8')
+                        titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','').replace('\xe2\x80\x93','-')
+                        imgF = filme.a.img['src'].encode('utf-8')
+                        imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                        urlF = filme.a['href']
+                        urlF = base + urlF if urlF.startswith("/") else urlF
+                        temp = [urlF, titF, imgF]
+                        hosts.append(temp)
 
                 return hosts
 
@@ -501,7 +498,7 @@ def openURL(url):
                     "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
                      }
             link = requests.get(url=url, headers=headers).text
-            return link.text
+            return link
 
 def postURL(url):
         headers = {'Referer': base,
@@ -532,8 +529,10 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
 
 
 def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
-        u  = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
-
+        u = sys.argv[0]+"?url="+urllib.quote_plus(url)
+        u = u+"&mode="+str(mode)+"&name="+name+"&iconimage="
+        u = u+urllib.quote_plus(iconimage)
+        #u  = sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
         ok = True
 
         liz = xbmcgui.ListItem(name)
