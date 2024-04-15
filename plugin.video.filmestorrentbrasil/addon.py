@@ -17,6 +17,7 @@
 # Atualizado (1.2.1) - 22/01/2024
 # Atualizado (1.2.2) - 17/02/2024
 # Atualizado (1.2.3) - 20/02/2024
+# Atualizado (1.2.4) - 15/04/2024
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -73,7 +74,7 @@ def getFilmes(name,url,iconimage):
         #xbmc.log('[plugin.video.filmestorrentbrasil] L79 - ' + str(link), xbmc.LOGNOTICE)
         soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup('div',{'class':'elementor-widget-container'})
-        filmes =conteudo[3]('article')
+        filmes =conteudo[2]('article')
 
         #xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
 
@@ -108,7 +109,7 @@ def getSeries(url):
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div',{'class':'elementor-widget-container'})
-        filmes =conteudo[3]('article')
+        filmes =conteudo[2]('article')
 
         totF = len(filmes)
 
