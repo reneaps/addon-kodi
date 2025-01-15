@@ -18,6 +18,7 @@
 # Atualizado (1.2.2) - 17/02/2024
 # Atualizado (1.2.3) - 20/02/2024
 # Atualizado (1.2.4) - 15/04/2024
+# Atualizado (1.2.5) - 15/01/2025
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -36,14 +37,14 @@ _handle = int(sys.argv[1])
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://nerdtorrent.com.br'
+base        = 'https://www.starckfilmes.com.br'
 
 ############################################################################################################
 
 def menuPrincipal():
         addDir('Categorias'                 , base + ''                     ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + '/category/filmes/'    ,   20, artfolder + 'new.png')
-        addDir('Seriados'                   , base + '/category/series/'    ,   25, artfolder + 'series.png')
+        addDir('Lançamentos'                , base + '/?type=filme'         ,   20, artfolder + 'new.png')
+        addDir('Seriados'                   , base + '/?type=série'         ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
         #addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
@@ -71,23 +72,18 @@ def getCategorias(url):
 def getFilmes(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(url), xbmc.LOGNOTICE)
         link = openURL(url)
-        #xbmc.log('[plugin.video.filmestorrentbrasil] L79 - ' + str(link), xbmc.LOGNOTICE)
         soup = BeautifulSoup(link, 'html.parser')
-        conteudo = soup('div',{'class':'elementor-widget-container'})
-        filmes =conteudo[2]('article')
-
-        #xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
+        conteudo = soup('div',{'class':'home post-catalog'})
+        filmes = conteudo[0]('div',{'class':'item'})
 
         totF = len(filmes)
 
         for filme in filmes:
             titF = ""
             try:
-                titF = filme.h3.text.encode('utf-8')
-                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','').replace('\xe2\x80\x93','-')
-                imgF = filme.a.img['data-src'].encode('utf-8')
-                imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                urlF = filme.a['href']
+                urlF = filme('a')[0]['href']
+                titF = filme('a')[1].text
+                imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 100, imgF, False, totF)
@@ -95,9 +91,13 @@ def getFilmes(name,url,iconimage):
                 pass
 
         try :
-                proxima = re.findall(r'<a class="page-numbers next" href="(.*?)">.*?</a>', str(soup))[0]
+                proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
+                if len(proxima) > 1:
+                    proxima = proxima[1]
+                else:
+                    proxima = proxima[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
-                addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
+                addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
                 pass
 
@@ -108,26 +108,25 @@ def getSeries(url):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div',{'class':'elementor-widget-container'})
-        filmes =conteudo[2]('article')
+        conteudo = soup('div', {'class':'home post-catalog'})
+        filmes = conteudo[0]('div', {'class':'item'})
 
         totF = len(filmes)
 
         for filme in filmes:
-            try:
-                titF = filme.h3.text.encode('utf-8')
-                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','').replace('\xe2\x80\x93','-')
-                imgF = filme.a.img['data-src'].encode('utf-8')
-                imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                urlF = filme.a['href']
+                urlF = filme('a')[0]['href']
+                titF = filme('a')[1].text
+                imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 27, imgF, True, totF)
-            except:
-                pass
 
         try :
-                proxima = re.findall(r'<a class="page-numbers next" href="(.*?)">.*?</a>', str(soup))[0]
+                proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
+                if len(proxima) > 1:
+                    proxima = proxima[1]
+                else:
+                    proxima = proxima[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
@@ -160,6 +159,7 @@ def getEpisodios(name, url,iconimage):
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
         links = soup('p')
+        if not 'magnet' in str(links) : links = soup('div',{'class':'buttons-content'})
         totF = len(links)
         imgF = iconimage
         try:
@@ -168,28 +168,6 @@ def getEpisodios(name, url,iconimage):
             pass
 
         for link in links:
-            #xbmc.log('[plugin.video.filmestorrentbrasil] L162 - ' + str(link), xbmc.LOGINFO)
-            if 'tulo Traduzido:' in str(link):
-                titF = link.br.text
-            elif 'tulo Original:' in str(link):
-                titF = link.br.text
-            elif 'emporada' in str(link):
-                if 'strong' in str(link):
-                    titF = link.strong.text
-                if 'b' in str(link):
-                    titF = link.text
-                if 'img' in str(link):
-                    titF = link.img['alt']
-                if 'COMPLETA' in str(link):
-                    titF = link.a.text
-            elif 'Epis' in str(link).upper():
-                if '<strong>' in str(link) : titF = link.strong.text
-                if '<b>' in str(link) : titF = link.text
-                if '<a' in str(link) : titF = link.text
-            elif 'WEB' in str(link).upper():
-                if '<strong>' in str(link) : titF = link.strong.text
-                if '<b>' in str(link) : titF = link.text
-                if '<a' in str(link) : titF = link.text
             if 'campanha' in str(link):
                 #if titF: titF = 'Epis'
                 u = link.a['href']
@@ -201,8 +179,13 @@ def getEpisodios(name, url,iconimage):
             elif 'magnet' in str(link):
                 urlF = link.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
-                titF = str(link.text.encode('utf-8')) #str(titF) + name.split("emporada")[0] + " | " + str(titF)
-                addDirF(name+"|"+titF, urlF, 110, imgF, False, totF)
+                titF = str(link.text)
+                titF = titF.replace('\n','')
+                t = ":"
+                r = titF.find(t)
+                titF = titF[0:r]
+                #addDirF(name+"|"+titF, urlF, 110, imgF, False, totF)
+                addDirF(titF, urlF, 110, imgF, False, totF)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
 
@@ -219,22 +202,23 @@ def pesquisa():
                 hosts = []
                 temp = []
                 link = openURL(url)
-                soup = BeautifulSoup(link, 'html.parser')
-                conteudo = soup('div',{'class':'elementor-widget-container'})
-                filmes =conteudo[3]('article')
+                soup = BeautifulSoup(link, "html.parser")
+                conteudo = soup('div',{'class':'home post-catalog'})
+                filmes = conteudo[0]('div',{'class':'item'})
 
                 totF = len(filmes)
 
                 for filme in filmes:
-                        titF = ''
-                        titF = filme.h3.text.encode('utf-8')
-                        titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','').replace('\xe2\x80\x93','-')
-                        imgF = filme.a.img['src'].encode('utf-8')
-                        imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                        urlF = filme.a['href']
-                        urlF = base + urlF if urlF.startswith("/") else urlF
-                        temp = [urlF, titF, imgF]
-                        hosts.append(temp)
+                        titF = ""
+                        try:
+                            urlF = filme('a')[0]['href']
+                            titF = filme('a')[1].text
+                            imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
+                            urlF = base + urlF if urlF.startswith("/") else urlF
+                            temp = [urlF, titF, imgF]
+                            hosts.append(temp)
+                        except:
+                            pass
 
                 return hosts
 
@@ -267,12 +251,13 @@ def player(name,url,iconimage):
 
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div', attrs={'class':'elementor-widget-container'})
-        #links = conteudo[8]('p')
-        for i in conteudo:
+        conteudo = soup("div",{"class":"container"})
+        conteudo[1]("div",{"class":"buttons-content"})
+        buttons = conteudo[1]("div",{"class":"buttons-content"})
+        links=[]
+        for i in buttons:
                 if 'magnet' in str(i):
-                        links = i
-
+                    links.append(i)
         n = 1
 
         for link in links:
@@ -288,12 +273,15 @@ def player(name,url,iconimage):
             if 'magnet' in str(link):
                 urlF = link.a['href']
                 urlVideo = urlF
-                titS = link.text #"Server_" +str(n)
+                if '&dn=' in str(urlF) :
+                    titF = urlF.split('&dn=')[1].split('&tr=')[0]
+                    titF = urllib.parse.unquote(titF)
+                    titS = titF[0:50]
+                else:
+                    titS = link.text.replace('\n','') #"Server_" +str(n)
                 n = n + 1
                 titsT.append(titS)
                 idsT.append(urlVideo)
-
-
 
         if not titsT : return
 
@@ -393,7 +381,7 @@ def player_series(name,url,iconimage):
 
         urlVideo = url
 
-        #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
+        mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
                 #urlVideo = urllib.parse.unquote(urlVideo)
