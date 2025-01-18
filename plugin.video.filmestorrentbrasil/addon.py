@@ -19,6 +19,7 @@
 # Atualizado (1.2.3) - 20/02/2024
 # Atualizado (1.2.4) - 15/04/2024
 # Atualizado (1.2.5) - 15/01/2025
+# Atualizado (1.2.6) - 85/01/2025
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -82,7 +83,7 @@ def getFilmes(name,url,iconimage):
             titF = ""
             try:
                 urlF = filme('a')[0]['href']
-                titF = filme('a')[1].text
+                titF = filme('a')[1].text.encode('utf-8')
                 imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
@@ -115,7 +116,7 @@ def getSeries(url):
 
         for filme in filmes:
                 urlF = filme('a')[0]['href']
-                titF = filme('a')[1].text
+                titF = filme('a')[1].text.encode('utf-8')
                 imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
@@ -179,7 +180,7 @@ def getEpisodios(name, url,iconimage):
             elif 'magnet' in str(link):
                 urlF = link.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
-                titF = str(link.text)
+                titF = str(link.text.encode('utf-8'))
                 titF = titF.replace('\n','')
                 t = ":"
                 r = titF.find(t)
@@ -212,7 +213,7 @@ def pesquisa():
                         titF = ""
                         try:
                             urlF = filme('a')[0]['href']
-                            titF = filme('a')[1].text
+                            titF = filme('a')[1].text.encode('utf-8')
                             imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                             urlF = base + urlF if urlF.startswith("/") else urlF
                             temp = [urlF, titF, imgF]
@@ -275,7 +276,7 @@ def player(name,url,iconimage):
                 urlVideo = urlF
                 if '&dn=' in str(urlF) :
                     titF = urlF.split('&dn=')[1].split('&tr=')[0]
-                    titF = urllib.parse.unquote(titF)
+                    titF = urllib.unquote(titF)
                     titS = titF[0:50]
                 else:
                     titS = link.text.replace('\n','') #"Server_" +str(n)
@@ -384,7 +385,7 @@ def player_series(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                #urlVideo = urllib.parse.unquote(urlVideo)
+                #urlVideo = urllib.unquote(urlVideo)
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
